@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>KAIRO: ASCENSION — Progress</title>
+<style>
+:root{--v:#9d6bff;--g:#f0c46a;--t:#35f0c0;--bad:#ff4d6a;--ok:#4ade80;
+--bg:#07060e;--panel:#100d1c;--line:#241f3a;--dim:#8b84a8;--fg:#eae6ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+font-family:'Rajdhani','Bahnschrift',system-ui,sans-serif;line-height:1.55}
+a{color:var(--v)}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 20px 80px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:26px}
+h1{margin:0;font-size:38px;letter-spacing:.16em;font-weight:700}
+h1 .c{color:var(--g)}
+.sub{color:var(--dim);letter-spacing:.26em;font-size:12px;margin-top:6px;text-transform:uppercase}
+h2{font-size:13px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);
+margin:34px 0 12px;font-weight:600}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);padding:14px 16px}
+.card .k{font-size:11px;letter-spacing:.2em;color:var(--dim);text-transform:uppercase}
+.card .v{font-size:26px;font-weight:700;margin-top:3px}
+.card .n{font-size:12px;color:var(--dim);margin-top:2px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}.warn{color:var(--g)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase;font-weight:600}
+.bar{height:7px;background:#1c1730;position:relative;min-width:110px}
+.bar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--v),var(--g))}
+.shots{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+figure{margin:0;background:var(--panel);border:1px solid var(--line)}
+figure img{width:100%;display:block}
+figcaption{padding:9px 12px;font-size:12.5px;color:var(--dim)}
+code{font-family:ui-monospace,monospace;font-size:12px;background:#181430;padding:1px 5px}
+.pill{display:inline-block;padding:2px 9px;font-size:11px;letter-spacing:.14em;
+border:1px solid currentColor;text-transform:uppercase}
+.note{background:#160f22;border-left:3px solid var(--g);padding:12px 16px;
+font-size:13.5px;color:#cfc7ea;margin:12px 0}
+ul{margin:6px 0;padding-left:20px}li{margin:3px 0;font-size:14px}
+</style></head><body><div class="wrap">
+
+<header>
+<h1>KAIRO<span class="c">:</span> ASCENSION</h1>
+<div class="sub">Vertical Slice · The Ruins of Veyra · branch <code>claude/kairo-ascension-dev-knegco</code></div>
+</header>
+
+<div class="grid g4">
+  <div class="card"><div class="k">Milestone</div><div class="v">M10</div>
+    <div class="n">Final Gauntlet</div></div>
+  <div class="card"><div class="k">Build</div>
+    <div class="v ok">PASSING</div><div class="n">tsc clean · vite build ok</div></div>
+  <div class="card"><div class="k">Acceptance tests</div>
+    <div class="v ok">59/59 passed</div>
+    <div class="n">headless simulation</div></div>
+  <div class="card"><div class="k">Browser scenarios</div>
+    <div class="v ok">12/12</div>
+    <div class="n">real Chromium, real inputs</div></div>
+  <div class="card"><div class="k">Combat rubric</div><div class="v">8.1<span style="font-size:15px;color:var(--dim)">/10</span></div>
+    <div class="n">no P0 below 7</div></div>
+  <div class="card"><div class="k">10-min stability</div>
+    <div class="v ok">PASS</div>
+    <div class="n">36000 frames · 24 matches · 0 warnings · 82,331 sim-fps</div></div>
+</div>
+
+<h2>Combat rubric</h2>
+<table>
+<tr><th>Category</th><th>P0</th><th>Score</th><th style="width:38%"></th></tr>
+<tr><td>Responsiveness</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Movement freedom</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">9</td>
+<td><div class="bar"><i style="width:90%"></i></div></td></tr>
+<tr><td>Melee feel</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Defensive depth</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Impact</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Camera behaviour</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">7</td>
+<td><div class="bar"><i style="width:70%"></i></div></td></tr>
+<tr><td>VFX readability</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Fighter identity</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">9</td>
+<td><div class="bar"><i style="width:90%"></i></div></td></tr>
+<tr><td>AI behaviour</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Balance</td><td></td>
+<td class="ok" style="font-weight:700">8</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>Spectacle</td><td></td>
+<td class="ok" style="font-weight:700">7</td>
+<td><div class="bar"><i style="width:70%"></i></div></td></tr>
+<tr><td>Originality</td><td><span class="pill" style="color:var(--v)">P0</span></td>
+<td class="ok" style="font-weight:700">9</td>
+<td><div class="bar"><i style="width:90%"></i></div></td></tr>
+</table>
+
+<h2>Gameplay evidence — captured from the running build</h2>
+<div class="note"><b>Rendered by:</b> <code>ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)</code>.
+This container has <b>no GPU</b>, so Chromium falls back to SwiftShader software rasterisation. The frame rates below are a <b>floor</b>, not representative hardware performance — the CPU-side simulation cost is the meaningful number here.
+Captured 2026-08-06T05:36:09.663Z.</div>
+<div class="shots">
+<figure><img src="evidence/01-title.png" alt="Title screen with difficulty selection and control reference." loading="lazy"/>
+<figcaption><b>01-title</b> — Title screen with difficulty selection and control reference.</figcaption></figure>
+<figure><img src="evidence/02-intro.png" alt="Match intro: READY banner over the Ruins of Veyra." loading="lazy"/>
+<figcaption><b>02-intro</b> — Match intro: READY banner over the Ruins of Veyra.</figcaption></figure>
+<figure><img src="evidence/03-neutral.png" alt="Neutral: both fighters framed, full HUD, lock-on reticle on Veyron." loading="lazy"/>
+<figcaption><b>03-neutral</b> — Neutral: both fighters framed, full HUD, lock-on reticle on Veyron.</figcaption></figure>
+<figure><img src="evidence/04-approach.png" alt="Kairo advancing on Veyron; the camera widens with speed." loading="lazy"/>
+<figcaption><b>04-approach</b> — Kairo advancing on Veyron; the camera widens with speed.</figcaption></figure>
+<figure><img src="evidence/05-flight.png" alt="Free flight — Kairo ascending, blob shadow shrinking below." loading="lazy"/>
+<figcaption><b>05-flight</b> — Free flight — Kairo ascending, blob shadow shrinking below.</figcaption></figure>
+<figure><img src="evidence/06-boost.png" alt="Boost flight — speed trail, widened FOV, energy draining." loading="lazy"/>
+<figcaption><b>06-boost</b> — Boost flight — speed trail, widened FOV, energy draining.</figcaption></figure>
+<figure><img src="evidence/07-combo.png" alt="Light chain connecting — combo counter, hit sparks, hitstop freeze." loading="lazy"/>
+<figcaption><b>07-combo</b> — Light chain connecting — combo counter, hit sparks, hitstop freeze.</figcaption></figure>
+<figure><img src="evidence/08-charge.png" alt="Charge stance — braced pose, aura swelling, energy drawn inward." loading="lazy"/>
+<figcaption><b>08-charge</b> — Charge stance — braced pose, aura swelling, energy drawn inward.</figcaption></figure>
+<figure><img src="evidence/09-launcher.png" alt="Launcher connects — Veyron popped into a juggle state." loading="lazy"/>
+<figcaption><b>09-launcher</b> — Launcher connects — Veyron popped into a juggle state.</figcaption></figure>
+<figure><img src="evidence/10-bolt.png" alt="Celestial Bolt in flight with its additive trail." loading="lazy"/>
+<figcaption><b>10-bolt</b> — Celestial Bolt in flight with its additive trail.</figcaption></figure>
+<figure><img src="evidence/11-starfall.png" alt="Starfall Barrage — multiple pooled projectiles homing in." loading="lazy"/>
+<figcaption><b>11-starfall</b> — Starfall Barrage — multiple pooled projectiles homing in.</figcaption></figure>
+<figure><img src="evidence/12-surge.png" alt="CELESTIAL SURGE — transformation sequence, gold aura, HUD state change." loading="lazy"/>
+<figcaption><b>12-surge</b> — CELESTIAL SURGE — transformation sequence, gold aura, HUD state change.</figcaption></figure>
+<figure><img src="evidence/13-transformed.png" alt="Kairo transformed — aura shifted violet to gold, FOV widened." loading="lazy"/>
+<figcaption><b>13-transformed</b> — Kairo transformed — aura shifted violet to gold, FOV widened.</figcaption></figure>
+<figure><img src="evidence/14-ultimate-windup.png" alt="Final Horizon wind-up — cinematic camera taking over, beam pillar." loading="lazy"/>
+<figcaption><b>14-ultimate-windup</b> — Final Horizon wind-up — cinematic camera taking over, beam pillar.</figcaption></figure>
+<figure><img src="evidence/15-ultimate-capture.png" alt="Final Horizon — Veyron captured, energy motes streaming inward." loading="lazy"/>
+<figcaption><b>15-ultimate-capture</b> — Final Horizon — Veyron captured, energy motes streaming inward.</figcaption></figure>
+<figure><img src="evidence/16-ultimate-payoff.png" alt="Final Horizon payoff — full-screen detonation, HUD still legible." loading="lazy"/>
+<figcaption><b>16-ultimate-payoff</b> — Final Horizon payoff — full-screen detonation, HUD still legible.</figcaption></figure>
+<figure><img src="evidence/17-ko.png" alt="K.O. — match resolution banner." loading="lazy"/>
+<figcaption><b>17-ko</b> — K.O. — match resolution banner.</figcaption></figure>
+<figure><img src="evidence/18-results.png" alt="Victory screen with match statistics." loading="lazy"/>
+<figcaption><b>18-results</b> — Victory screen with match statistics.</figcaption></figure>
+<figure><img src="evidence/19-restart.png" alt="Match restarted cleanly from the victory screen." loading="lazy"/>
+<figcaption><b>19-restart</b> — Match restarted cleanly from the victory screen.</figcaption></figure>
+<figure><img src="evidence/20-pause.png" alt="Pause menu with resume, restart and control reference." loading="lazy"/>
+<figcaption><b>20-pause</b> — Pause menu with resume, restart and control reference.</figcaption></figure>
+</div>
+
+<h2>Browser scenario results</h2>
+<table><tr><th>Scenario</th><th>Result</th><th>Detail</th></tr>
+<tr><td>Match reaches Fighting phase</td><td class="ok">PASS</td><td style="color:var(--dim)">phase=Fighting after intro</td></tr>
+<tr><td>Flight reachable from a mid-air jump tap</td><td class="ok">PASS</td><td style="color:var(--dim)">y=9.78 flying=true state=Fly</td></tr>
+<tr><td>Light chain connects in-browser</td><td class="ok">PASS</td><td style="color:var(--dim)">3 hits landed, peak combo counter 3</td></tr>
+<tr><td>Starfall Barrage fires a multi-shot volley</td><td class="ok">PASS</td><td style="color:var(--dim)">projectiles spawned = 5</td></tr>
+<tr><td>Celestial Surge activates</td><td class="ok">PASS</td><td style="color:var(--dim)">transformed=true</td></tr>
+<tr><td>Ultimate releases control cleanly</td><td class="ok">PASS</td><td style="color:var(--dim)">cinematicOwner=-1</td></tr>
+<tr><td>Ultimate deals decisive damage on a captured target</td><td class="ok">PASS</td><td style="color:var(--dim)">Veyron hp=671 / 1180</td></tr>
+<tr><td>Match reaches a resolved Victory state</td><td class="ok">PASS</td><td style="color:var(--dim)">phase=Victory winner=0</td></tr>
+<tr><td>Player can win the match</td><td class="ok">PASS</td><td style="color:var(--dim)">winner=0 (0 = Kairo)</td></tr>
+<tr><td>Restart from the results screen fully resets the match</td><td class="ok">PASS</td><td style="color:var(--dim)">hp=1050/1050 phase=Intro</td></tr>
+<tr><td>Pause menu opens during a live match</td><td class="ok">PASS</td><td style="color:var(--dim)">overlay shown=true</td></tr>
+<tr><td>No uncaught page errors during the session</td><td class="ok">PASS</td><td style="color:var(--dim)">none</td></tr></table>
+
+<h2>Performance</h2>
+<table><tr><th>Scenario</th><th>fps</th><th>sim ms</th><th>render ms</th><th>worst frame</th></tr>
+<tr><td>flight</td><td>5.3</td>
+<td class="ok">0.00</td><td>3.63</td><td>250</td></tr>
+<tr><td>melee</td><td>4.6</td>
+<td class="ok">0.00</td><td>2.43</td><td>233</td></tr>
+<tr><td>projectiles</td><td>5.6</td>
+<td class="ok">0.00</td><td>2.07</td><td>217</td></tr>
+<tr><td>ultimate</td><td>5.0</td>
+<td class="ok">0.00</td><td>2.57</td><td>250</td></tr></table>
+<div class="note"><b>Read this correctly.</b> The fps column is software rasterisation on a
+4-core container with no GPU and is <i>not</i> a hardware figure. The
+<b>sim ms</b> column is the meaningful one: simulation cost is effectively
+zero, so any frame-rate problem on real hardware would be GPU-side, not
+algorithmic. Headless simulation throughput is ~55,000–75,000 frames/sec.
+Verifying the 60 fps target requires one manual run on a GPU machine
+(<code>ACCEPTANCE_TESTS.md</code> P6).</div>
+
+<h2>Balance — measured, 20 matches per tier</h2>
+<table><tr><th>Difficulty</th><th>Kairo</th><th>Veyron</th><th>Avg match</th><th style="width:30%"></th></tr>
+<tr><td>cadet</td><td>16</td><td>4</td><td>25.2s</td>
+<td><div class="bar"><i style="width:80%"></i></div></td></tr>
+<tr><td>warrior</td><td>12</td><td>8</td><td>26.7s</td>
+<td><div class="bar"><i style="width:60%"></i></div></td></tr>
+<tr><td>warlord</td><td>9</td><td>11</td><td>23.8s</td>
+<td><div class="bar"><i style="width:45%"></i></div></td></tr>
+<tr><td>tyrant</td><td>9</td><td>11</td><td>25.9s</td>
+<td><div class="bar"><i style="width:45%"></i></div></td></tr></table>
+
+<h2>Accepted features</h2>
+<div class="grid g2">
+<div class="card"><ul>
+<li>Ground movement, sprint, jump, variable jump height</li>
+<li>Free flight, boost flight, ascend/descend</li>
+<li>Ground dash, air dash, <b>pursuit dash</b></li>
+<li>Air recovery and ground recovery</li>
+<li>Lock-on camera with off-axis melee framing</li>
+<li>Camera collision, occlusion, trauma shake</li>
+</ul></div>
+<div class="card"><ul>
+<li>Frame-data melee: 4-link chain, heavy, charged heavy, launcher</li>
+<li>Aerial chain, ground bounce, wall splat, hitstop</li>
+<li>Guard, guard break, perfect guard, dodge, Phase Break</li>
+<li>Super armor as a character trait</li>
+<li>Energy, charging, cooldowns, refusal feedback</li>
+<li>All 10 abilities + both transformations + both ultimates</li>
+</ul></div>
+<div class="card"><ul>
+<li>Veyron AI: 18 tactics, 4 difficulty tiers, pattern adaptation</li>
+<li>Procedural Ruins of Veyra with reactive energy barrier</li>
+<li>Destructible monoliths, dust, embers</li>
+<li>Pooled VFX, procedural rigs, synthesised audio</li>
+<li>Full HUD, pause, restart, victory and defeat</li>
+<li>Match flow: intro, KO, timeout, draw</li>
+</ul></div>
+</div>
+
+<h2>Rejected and fixed this cycle</h2>
+<div class="card"><ul>
+<li><b class="bad">P0</b> Fighters had no body collision — targets sat inside the hitbox blind spot and combat silently stopped working</li>
+<li><b class="bad">P0</b> Ultimate cinematic motes dealt damage — fake 22-hit combos and a 24–0 balance blowout</li>
+<li><b class="bad">P0</b> Frame-keyed ability effects re-fired during hitstop — the ultimate deadlocked the match permanently</li>
+<li><b class="warn">P1</b> Camera framing — Veyron fully eclipsed Kairo at melee range (rubric score 4 → 7)</li>
+<li><b class="warn">P1</b> Knockdown could be looped OTG</li>
+<li><b class="warn">P1</b> AI could never chain-cancel — longest combo was 2 hits</li>
+<li><b class="warn">P1</b> Balance sweeps reused hardcoded AI seeds, so every match was identical</li>
+<li><b class="warn">P1</b> AI stuck-detector fired during match intro and KO, when the sim deliberately isn't advancing</li>
+</ul></div>
+
+<h2>Known blockers</h2>
+<div class="card"><ul>
+<li><b class="warn">P0 (release)</b> 60 fps on GPU hardware is <b>unverified</b> — not verifiable in this container</li>
+<li><b class="warn">P1</b> Practical combo ceiling is 4; the systems support far longer routes but nothing rewards them yet</li>
+<li><b class="warn">P1</b> No post-processing (bloom/radial blur) — the largest remaining spectacle gap</li>
+<li><b>P2</b> Veyron's black warplate can lose its silhouette against unlit ground</li>
+<li><b>P2</b> Tapped heavy resolves on release, costing one frame vs a light</li>
+</ul></div>
+
+<h2>Active agents / roles this cycle</h2>
+<div class="card"><ul>
+<li><b>Lead architect</b> — simulation/presentation split, data-driven roster</li>
+<li><b>Combat builder + critic</b> — frame data, anti-infinite ruleset, 3 P0 fixes</li>
+<li><b>Movement + camera builder/critic</b> — off-axis framing rejection and fix</li>
+<li><b>AI builder + critic</b> — utility scoring, no input reading, stuck-detector fix</li>
+<li><b>VFX / readability critic</b> — hue separation enforced by test</li>
+<li><b>Originality critic</b> — reference-sheet IP excluded (D-002)</li>
+<li><b>QA / integration</b> — 59 acceptance tests, 10-min stability, browser capture</li>
+</ul></div>
+
+<h2>Recent commits</h2>
+<table><tr><th>Commit</th><th>Date</th><th>Subject</th></tr>
+<tr><td><code>82fd20e</code></td><td>2026-08-06</td><td>Add KAIRO: ASCENSION simulation core, fighters, AI and acceptance tests</td></tr>
+<tr><td><code>1f87b97</code></td><td>2026-06-22</td><td>Initial commit</td></tr>
+</table>
+
+<h2>Next major objective</h2>
+<div class="note"><b>Raise the practical combo ceiling.</b> Every system needed for
+long aerial routes already exists — launcher, air chain, pursuit dash, ground
+bounce, juggle decay — but real play tops out at 4 hits because nothing rewards
+discovering them. The next milestone adds route-enabling cancels and teaches
+them through the AI, which is the difference between a competent fighter and a
+memorable one. Full list in <code>docs/NEXT_ACTIONS.md</code>.</div>
+
+<p style="color:var(--dim);font-size:12px;margin-top:34px">
+Generated 2026-08-06T05:44:41.618Z by <code>npm run dashboard</code>.
+This page is built from captured evidence, live test runs and the git log — not maintained by hand.
+</p>
+</div></body></html>

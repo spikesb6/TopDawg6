@@ -257,7 +257,7 @@ export const VEYRON: CharacterData = {
   energyName: 'VOID DOMINION',
   tagline: 'The warlord who unmade a world.',
 
-  maxHealth: 1180,
+  maxHealth: 1120,
   energyPerBar: 100,
   energyBars: 5,
   energyPassiveRegen: 4.4,

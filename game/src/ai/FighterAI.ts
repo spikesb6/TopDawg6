@@ -109,6 +109,8 @@ export class FighterAI {
   /** Frames the AI has been unable to reach a sensible state — triggers reset. */
   private stuckFrames = 0;
   private lastPosition = new Vec3();
+  private lastOpponentPosition = new Vec3();
+  private lastSelfStateFrames = -1;
 
   private readonly tmp = new Vec3();
 
@@ -699,10 +701,29 @@ export class FighterAI {
   private checkStuck(): void {
     const moved = this.self.position.distanceTo(this.lastPosition);
     this.lastPosition.copy(this.self.position);
+    // "Stuck" must mean the AI cannot reach where it wants to go — not merely
+    // that it did not move. Three situations produce a stationary AI that is
+    // behaving perfectly correctly, and counting any of them fires spurious
+    // recoveries throughout a long session:
+    //
+    //   - it is already in range, and body collision is holding it against the
+    //     opponent (there is nothing left to approach);
+    //   - the opponent is defeated, so the match is over;
+    //   - neither fighter is moving because the simulation is not advancing
+    //     them at all — the match intro and the KO sequence both do this.
+    const inRange = this.self.position.distanceTo(this.opponent.position) < 3.2;
+    const opponentMoved = this.opponent.position.distanceTo(this.lastOpponentPosition) > 1e-4;
+    this.lastOpponentPosition.copy(this.opponent.position);
+    const simAdvancing = opponentMoved || this.self.stateFrames !== this.lastSelfStateFrames;
+    this.lastSelfStateFrames = this.self.stateFrames;
+
     const wantsToMove =
-      this.currentTactic.id === 'approach' ||
-      this.currentTactic.id === 'pursue' ||
-      this.currentTactic.id === 'aerial';
+      !inRange &&
+      !this.opponent.defeated &&
+      simAdvancing &&
+      (this.currentTactic.id === 'approach' ||
+        this.currentTactic.id === 'pursue' ||
+        this.currentTactic.id === 'aerial');
 
     if (wantsToMove && moved < 0.02) this.stuckFrames++;
     else this.stuckFrames = Math.max(0, this.stuckFrames - 2);

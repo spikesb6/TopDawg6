@@ -7,8 +7,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { Simulation, MatchPhase } from '../src/gameplay/Simulation';
-import { FighterState, ReactionType } from '../src/gameplay/CombatTypes';
+import { Simulation } from '../src/gameplay/Simulation';
+import { FighterState } from '../src/gameplay/CombatTypes';
 import { KAIRO } from '../src/characters/kairo';
 import { VEYRON } from '../src/characters/veyron';
 import { emptyInputFrame, type InputFrame, type ActionName } from '../src/core/Input';

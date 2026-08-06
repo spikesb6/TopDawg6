@@ -1,0 +1,1152 @@
+{
+  "generatedAt": "2026-08-06T05:36:09.663Z",
+  "url": "http://127.0.0.1:4173",
+  "viewport": {
+    "width": 1280,
+    "height": 720
+  },
+  "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "softwareRendered": true,
+  "shots": [
+    {
+      "name": "01-title",
+      "file": "01-title.png",
+      "caption": "Title screen with difficulty selection and control reference.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 138,
+        "timer": 178,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Downed",
+            "stateFrames": 3,
+            "hp": 954,
+            "energy": 113,
+            "guard": 100,
+            "ascension": 91,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -10.27,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Attack",
+            "stateFrames": 32,
+            "hp": 1120,
+            "energy": 154,
+            "guard": 138,
+            "ascension": 48,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5.09,
+            "speed": 0.09,
+            "combo": 1,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "02-intro",
+      "file": "02-intro.png",
+      "caption": "Match intro: READY banner over the Ruins of Veyra.",
+      "state": {
+        "phase": "Intro",
+        "frame": 38,
+        "timer": 180,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1050,
+            "energy": 100,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1120,
+            "energy": 100,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "03-neutral",
+      "file": "03-neutral.png",
+      "caption": "Neutral: both fighters framed, full HUD, lock-on reticle on Veyron.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 26,
+        "timer": 180,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 26,
+            "hp": 1050,
+            "energy": 101,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Sprint",
+            "stateFrames": 17,
+            "hp": 1120,
+            "energy": 102,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0.22,
+            "y": 0,
+            "z": 4.05,
+            "speed": 10.54,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "04-approach",
+      "file": "04-approach.png",
+      "caption": "Kairo advancing on Veyron; the camera widens with speed.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 50,
+        "timer": 180,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Move",
+            "stateFrames": 23,
+            "hp": 1050,
+            "energy": 103,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0.06,
+            "y": 0,
+            "z": -4.8,
+            "speed": 7.6,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Move",
+            "stateFrames": 13,
+            "hp": 1120,
+            "energy": 104,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0.14,
+            "y": 0,
+            "z": 0.9,
+            "speed": 5.97,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "05-flight",
+      "file": "05-flight.png",
+      "caption": "Free flight — Kairo ascending, blob shadow shrinking below.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 121,
+        "timer": 178,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Fly",
+            "stateFrames": 50,
+            "hp": 1050,
+            "energy": 106,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": false,
+            "flying": true,
+            "x": 0.06,
+            "y": 9.78,
+            "z": -4.6,
+            "speed": 12.5,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Fall",
+            "stateFrames": 0,
+            "hp": 1120,
+            "energy": 109,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": false,
+            "flying": false,
+            "x": 26.72,
+            "y": 0.61,
+            "z": 21.38,
+            "speed": 7.81,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "06-boost",
+      "file": "06-boost.png",
+      "caption": "Boost flight — speed trail, widened FOV, energy draining.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 161,
+        "timer": 178,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Boost",
+            "stateFrames": 39,
+            "hp": 1050,
+            "energy": 98,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": false,
+            "flying": true,
+            "x": 13.25,
+            "y": 10.32,
+            "z": -18.04,
+            "speed": 35.47,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Boost",
+            "stateFrames": 16,
+            "hp": 1120,
+            "energy": 106,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": false,
+            "flying": true,
+            "x": 22.38,
+            "y": 2.98,
+            "z": 14.54,
+            "speed": 27.77,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "07-combo",
+      "file": "07-combo.png",
+      "caption": "Light chain connecting — combo counter, hit sparks, hitstop freeze.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 327,
+        "timer": 175,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Attack",
+            "stateFrames": 20,
+            "hp": 1010,
+            "energy": 177,
+            "guard": 100,
+            "ascension": 98,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -0.12,
+            "speed": 6.15,
+            "combo": 3,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Hitstun",
+            "stateFrames": 15,
+            "hp": 1011,
+            "energy": 130,
+            "guard": 138,
+            "ascension": 118,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -0.01,
+            "y": 0,
+            "z": 1.03,
+            "speed": 2.69,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "08-charge",
+      "file": "08-charge.png",
+      "caption": "Charge stance — braced pose, aura swelling, energy drawn inward.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 367,
+        "timer": 174,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1010,
+            "energy": 213,
+            "guard": 100,
+            "ascension": 128,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 0.32,
+            "speed": 0.03,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "WakeUp",
+            "stateFrames": 6,
+            "hp": 956,
+            "energy": 138,
+            "guard": 138,
+            "ascension": 168,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -0.01,
+            "y": 0,
+            "z": 3.02,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "09-launcher",
+      "file": "09-launcher.png",
+      "caption": "Launcher connects — Veyron popped into a juggle state.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 427,
+        "timer": 173,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Launched",
+            "stateFrames": 0,
+            "hp": 914,
+            "energy": 221,
+            "guard": 100,
+            "ascension": 219,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 0.58,
+            "speed": 16.38,
+            "combo": 0,
+            "hitstop": 7
+          },
+          {
+            "id": "veyron",
+            "state": "Attack",
+            "stateFrames": 16,
+            "hp": 928,
+            "energy": 187,
+            "guard": 138,
+            "ascension": 240,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -0.01,
+            "y": 0,
+            "z": 2.54,
+            "speed": 0.4,
+            "combo": 1,
+            "hitstop": 7
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "10-bolt",
+      "file": "10-bolt.png",
+      "caption": "Celestial Bolt in flight with its additive trail.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 445,
+        "timer": 173,
+        "projectiles": 1,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Ability",
+            "stateFrames": 11,
+            "hp": 914,
+            "energy": 177,
+            "guard": 100,
+            "ascension": 219,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -11,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Attack",
+            "stateFrames": 17,
+            "hp": 928,
+            "energy": 188,
+            "guard": 138,
+            "ascension": 240,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 10.71,
+            "speed": 0.2,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "11-starfall",
+      "file": "11-starfall.png",
+      "caption": "Starfall Barrage — multiple pooled projectiles homing in.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 509,
+        "timer": 172,
+        "projectiles": 5,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Ability",
+            "stateFrames": 33,
+            "hp": 914,
+            "energy": 372,
+            "guard": 100,
+            "ascension": 248,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -11,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Sprint",
+            "stateFrames": 4,
+            "hp": 876,
+            "energy": 198,
+            "guard": 138,
+            "ascension": 287,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -0.08,
+            "y": 0,
+            "z": 9.18,
+            "speed": 9.98,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "12-surge",
+      "file": "12-surge.png",
+      "caption": "CELESTIAL SURGE — transformation sequence, gold aura, HUD state change.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 539,
+        "timer": 172,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Transform",
+            "stateFrames": 23,
+            "hp": 914,
+            "energy": 375,
+            "guard": 100,
+            "ascension": 976,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Move",
+            "stateFrames": 16,
+            "hp": 876,
+            "energy": 2,
+            "guard": 138,
+            "ascension": 287,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0.04,
+            "y": 0,
+            "z": 2.14,
+            "speed": 6,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "13-transformed",
+      "file": "13-transformed.png",
+      "caption": "Kairo transformed — aura shifted violet to gold, FOV widened.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 579,
+        "timer": 171,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 9,
+            "hp": 914,
+            "energy": 380,
+            "guard": 100,
+            "ascension": 935,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Attack",
+            "stateFrames": 4,
+            "hp": 876,
+            "energy": 6,
+            "guard": 138,
+            "ascension": 287,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0.09,
+            "y": 0,
+            "z": -1.99,
+            "speed": 5.69,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "14-ultimate-windup",
+      "file": "14-ultimate-windup.png",
+      "caption": "Final Horizon wind-up — cinematic camera taking over, beam pillar.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 605,
+        "timer": 170,
+        "projectiles": 0,
+        "cinematic": 0,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Cinematic",
+            "stateFrames": 25,
+            "hp": 914,
+            "energy": 103,
+            "guard": 100,
+            "ascension": 908,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Attack",
+            "stateFrames": 30,
+            "hp": 1120,
+            "energy": 8,
+            "guard": 138,
+            "ascension": 287,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 4.03,
+            "y": 0,
+            "z": -5.57,
+            "speed": 0.12,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "15-ultimate-capture",
+      "file": "15-ultimate-capture.png",
+      "caption": "Final Horizon — Veyron captured, energy motes streaming inward.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 645,
+        "timer": 170,
+        "projectiles": 3,
+        "cinematic": 0,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Cinematic",
+            "stateFrames": 65,
+            "hp": 914,
+            "energy": 108,
+            "guard": 100,
+            "ascension": 867,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Cinematic",
+            "stateFrames": 0,
+            "hp": 1120,
+            "energy": 11,
+            "guard": 138,
+            "ascension": 287,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 3.78,
+            "y": 0,
+            "z": -5.49,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "16-ultimate-payoff",
+      "file": "16-ultimate-payoff.png",
+      "caption": "Final Horizon payoff — full-screen detonation, HUD still legible.",
+      "state": {
+        "phase": "Fighting",
+        "frame": 695,
+        "timer": 169,
+        "projectiles": 5,
+        "cinematic": 0,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Cinematic",
+            "stateFrames": 111,
+            "hp": 914,
+            "energy": 114,
+            "guard": 100,
+            "ascension": 819,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -5,
+            "speed": 0,
+            "combo": 1,
+            "hitstop": 20
+          },
+          {
+            "id": "veyron",
+            "state": "Launched",
+            "stateFrames": 0,
+            "hp": 671,
+            "energy": 20,
+            "guard": 138,
+            "ascension": 691,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 3.78,
+            "y": 0,
+            "z": -5.49,
+            "speed": 26.83,
+            "combo": 0,
+            "hitstop": 20
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "17-ko",
+      "file": "17-ko.png",
+      "caption": "K.O. — match resolution banner.",
+      "state": {
+        "phase": "KO",
+        "frame": 20,
+        "timer": 167,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Attack",
+            "stateFrames": 32,
+            "hp": 914,
+            "energy": 180,
+            "guard": 100,
+            "ascension": 713,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0.72,
+            "y": 0,
+            "z": 1.15,
+            "speed": 0.17,
+            "combo": 2,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Defeated",
+            "stateFrames": 15,
+            "hp": 0,
+            "energy": 35,
+            "guard": 131,
+            "ascension": 744,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -0.8,
+            "y": 0,
+            "z": 1.38,
+            "speed": 1.61,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": {
+          "winnerIndex": 0,
+          "reason": "ko",
+          "durationFrames": 823,
+          "bestCombo": [
+            4,
+            1
+          ],
+          "damageDealt": [
+            800.665,
+            136
+          ]
+        }
+      }
+    },
+    {
+      "name": "18-results",
+      "file": "18-results.png",
+      "caption": "Victory screen with match statistics.",
+      "state": {
+        "phase": "Victory",
+        "frame": 150,
+        "timer": 167,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 129,
+            "hp": 914,
+            "energy": 196,
+            "guard": 100,
+            "ascension": 578,
+            "transformed": true,
+            "grounded": true,
+            "flying": false,
+            "x": 0.72,
+            "y": 0,
+            "z": 1.16,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Defeated",
+            "stateFrames": 145,
+            "hp": 0,
+            "energy": 35,
+            "guard": 131,
+            "ascension": 744,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": -1.31,
+            "y": 0,
+            "z": 1.49,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": {
+          "winnerIndex": 0,
+          "reason": "ko",
+          "durationFrames": 823,
+          "bestCombo": [
+            4,
+            1
+          ],
+          "damageDealt": [
+            800.665,
+            136
+          ]
+        }
+      }
+    },
+    {
+      "name": "19-restart",
+      "file": "19-restart.png",
+      "caption": "Match restarted cleanly from the victory screen.",
+      "state": {
+        "phase": "Intro",
+        "frame": 30,
+        "timer": 180,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1050,
+            "energy": 100,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1120,
+            "energy": 100,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    },
+    {
+      "name": "20-pause",
+      "file": "20-pause.png",
+      "caption": "Pause menu with resume, restart and control reference.",
+      "state": {
+        "phase": "Intro",
+        "frame": 30,
+        "timer": 180,
+        "projectiles": 0,
+        "cinematic": -1,
+        "fighters": [
+          {
+            "id": "kairo",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1050,
+            "energy": 100,
+            "guard": 100,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": -7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          },
+          {
+            "id": "veyron",
+            "state": "Idle",
+            "stateFrames": 0,
+            "hp": 1120,
+            "energy": 100,
+            "guard": 138,
+            "ascension": 0,
+            "transformed": false,
+            "grounded": true,
+            "flying": false,
+            "x": 0,
+            "y": 0,
+            "z": 7.5,
+            "speed": 0,
+            "combo": 0,
+            "hitstop": 0
+          }
+        ],
+        "result": null
+      }
+    }
+  ],
+  "perf": [
+    {
+      "scenario": "flight",
+      "fps": 5.293806246691398,
+      "simMs": 0,
+      "renderMs": 3.633333333147069,
+      "worst": 250
+    },
+    {
+      "scenario": "melee",
+      "fps": 4.615384615384615,
+      "simMs": 0,
+      "renderMs": 2.433333333271245,
+      "worst": 233.3000000000029
+    },
+    {
+      "scenario": "projectiles",
+      "fps": 5.625351584473999,
+      "simMs": 0,
+      "renderMs": 2.066666666418314,
+      "worst": 216.59999999999127
+    },
+    {
+      "scenario": "ultimate",
+      "fps": 5.000833472245422,
+      "simMs": 0,
+      "renderMs": 2.5666666670391955,
+      "worst": 250
+    }
+  ],
+  "consoleErrors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ],
+  "pageErrors": [],
+  "scenarios": [
+    {
+      "name": "Match reaches Fighting phase",
+      "passed": true,
+      "detail": "phase=Fighting after intro"
+    },
+    {
+      "name": "Flight reachable from a mid-air jump tap",
+      "passed": true,
+      "detail": "y=9.78 flying=true state=Fly"
+    },
+    {
+      "name": "Light chain connects in-browser",
+      "passed": true,
+      "detail": "3 hits landed, peak combo counter 3"
+    },
+    {
+      "name": "Starfall Barrage fires a multi-shot volley",
+      "passed": true,
+      "detail": "projectiles spawned = 5"
+    },
+    {
+      "name": "Celestial Surge activates",
+      "passed": true,
+      "detail": "transformed=true"
+    },
+    {
+      "name": "Ultimate releases control cleanly",
+      "passed": true,
+      "detail": "cinematicOwner=-1"
+    },
+    {
+      "name": "Ultimate deals decisive damage on a captured target",
+      "passed": true,
+      "detail": "Veyron hp=671 / 1180"
+    },
+    {
+      "name": "Match reaches a resolved Victory state",
+      "passed": true,
+      "detail": "phase=Victory winner=0"
+    },
+    {
+      "name": "Player can win the match",
+      "passed": true,
+      "detail": "winner=0 (0 = Kairo)"
+    },
+    {
+      "name": "Restart from the results screen fully resets the match",
+      "passed": true,
+      "detail": "hp=1050/1050 phase=Intro"
+    },
+    {
+      "name": "Pause menu opens during a live match",
+      "passed": true,
+      "detail": "overlay shown=true"
+    },
+    {
+      "name": "No uncaught page errors during the session",
+      "passed": true,
+      "detail": "none"
+    }
+  ]
+}
