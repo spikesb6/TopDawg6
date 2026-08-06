@@ -1,0 +1,28 @@
+{
+  "name": "kairo-ascension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "KAIRO: ASCENSION - original 3D anime arena fighter vertical slice",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --port 4173 --host 0.0.0.0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "sim": "tsx src/headless/cli.ts",
+    "evidence": "tsx ../tools/capture-evidence.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "playwright": "^1.56.1",
+    "tsx": "^4.19.2",
+    "typescript": "~5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}
