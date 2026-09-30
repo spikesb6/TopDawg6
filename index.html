@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}body{margin:0}</style>
+</head>
+<body>
+<title>Deed &amp; Dice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;600;700&family=DM+Mono:wght@500&display=swap">
+<style>
+/* Layout: full-bleed 3D board; HUD floats as blueprint-navy glass panels at the edges; gold = money/actions. */
+:root{
+  --ink:#0d1a2b;
+  --panel:rgba(13,26,43,.84);
+  --panel-solid:#132339;
+  --line:rgba(190,215,240,.16);
+  --text:#eef4fa;
+  --muted:#9db1c7;
+  --gold:#f5b83d;
+  --gold-deep:#c98a12;
+  --mint:#3fd49c;
+  --coral:#ff6f61;
+  --sky:#7cc4ff;
+  --display:"Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono:"DM Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--text);font-family:var(--body);font-size:14px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+#stage{position:fixed;inset:0;background:linear-gradient(#8fd3ff,#e6f6ff);touch-action:none}
+#stage canvas{display:block;width:100%;height:100%;cursor:grab}
+#stage canvas:active{cursor:grabbing}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* HUD */
+.hud{position:fixed;left:0;right:0;pointer-events:none;display:flex;gap:10px;padding-inline:16px;z-index:5}
+.hud>*{pointer-events:auto}
+.hud-top{top:0;padding-top:calc(12px + env(safe-area-inset-top,0px));justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+.hud-bottom{bottom:0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));justify-content:center;align-items:flex-end}
+.glass{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(5,12,24,.35)}
+#goalCard{padding:12px 14px;min-width:0;width:min(330px,100%)}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700}
+#goalCard h2{font-family:var(--display);font-weight:800;font-size:20px;margin:2px 0 8px;text-wrap:balance;line-height:1.1}
+.goal{display:grid;gap:4px;margin-top:8px}
+.goal-row{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.goal-row b{font-weight:600}
+.bar{height:7px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold));border-radius:9px;transition:width .5s}
+.goal.done .bar i{background:var(--mint)}
+.goal.done .goal-row b::after{content:" ✓";color:var(--mint)}
+#stats{display:grid;grid-template-columns:repeat(3,auto);gap:6px}
+.stat{padding:7px 11px;min-width:92px}
+.stat .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.stat .v{font-family:var(--mono);font-size:16px;margin-top:1px;white-space:nowrap}
+.stat.cash .v{color:var(--gold)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;background:rgba(255,255,255,.08)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.up{color:var(--mint)} .down{color:var(--coral)} .flat{color:var(--sky)}
+
+#rollBtn{min-width:190px;padding:14px 26px;border-radius:18px;background:linear-gradient(180deg,#ffd166,var(--gold) 55%,var(--gold-deep));color:#2a1a00;font-family:var(--display);font-weight:800;font-size:21px;box-shadow:0 6px 0 #8a5a06,0 14px 30px rgba(0,0,0,.35);transition:transform .08s, filter .2s;display:flex;align-items:center;justify-content:center;gap:10px}
+#rollBtn:active{transform:translateY(4px);box-shadow:0 2px 0 #8a5a06,0 8px 20px rgba(0,0,0,.35)}
+#rollBtn[disabled]{filter:grayscale(.7) brightness(.8);cursor:wait}
+#rollBtn small{display:block;font-family:var(--body);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
+.pips{display:grid;grid-template-columns:repeat(3,5px);gap:3px;padding:6px;background:#fff8e6;border-radius:7px}
+.pips i{width:5px;height:5px;border-radius:50%}
+.pips i.on{background:#2a1a00}
+.side-btns{display:flex;gap:8px;align-items:flex-end}
+.tool{padding:10px 12px;border-radius:13px;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:74px}
+.tool svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool:hover{border-color:rgba(245,184,61,.5)}
+#rivals{position:fixed;left:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:4;pointer-events:none}
+.rival{padding:6px 10px;display:flex;align-items:center;gap:8px;font-size:12px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+#log{position:fixed;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));width:min(290px,calc(100% - 32px));display:flex;flex-direction:column;gap:4px;z-index:4;pointer-events:none;align-items:flex-end}
+#log div{background:var(--panel);border:1px solid var(--line);padding:5px 10px;border-radius:10px;font-size:12px;color:var(--muted);animation:logIn .3s ease-out}
+#log div b{color:var(--text);font-weight:600}
+@keyframes logIn{from{transform:translateY(8px);opacity:.2}}
+
+/* floating money text */
+#floaters{position:fixed;inset:0;pointer-events:none;z-index:6;overflow:hidden}
+.floater{position:absolute;font-family:var(--display);font-weight:800;font-size:20px;text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 12px rgba(0,0,0,.25);transform:translate(-50%,-50%);animation:floatUp 1.6s ease-out forwards;white-space:nowrap}
+@keyframes floatUp{0%{opacity:0;margin-top:10px}15%{opacity:1}100%{opacity:0;margin-top:-70px}}
+
+/* toast */
+#toasts{position:fixed;top:calc(12px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:30;display:flex;flex-direction:column;gap:6px;align-items:center;pointer-events:none;width:min(380px,calc(100% - 32px))}
+.toast{padding:9px 14px;border-radius:12px;background:var(--panel-solid);border:1px solid rgba(245,184,61,.45);font-weight:600;font-size:13px;animation:toast 3.2s ease forwards;text-align:center}
+.toast em{font-style:normal;color:var(--gold)}
+@keyframes toast{0%{opacity:0;transform:translateY(-10px)}8%{opacity:1;transform:none}85%{opacity:1}100%{opacity:0}}
+
+/* modal */
+#modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:rgba(6,12,22,.45)}
+#modal .card{width:min(470px,100%);max-height:calc(100% - 20px);overflow:auto;background:var(--panel-solid);border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:pop .28s cubic-bezier(.2,1.4,.4,1)}
+#modal .card.wide{width:min(720px,100%)}
+@keyframes pop{from{transform:scale(.9);opacity:0}}
+#modal h3{font-family:var(--display);font-weight:800;font-size:26px;line-height:1.08;margin:4px 0 10px;text-wrap:balance}
+#modal p{line-height:1.5;color:#d6e2ee;margin:0 0 10px;max-width:62ch}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.btn{flex:1 1 140px;padding:12px 14px;border-radius:13px;font-weight:700;background:rgba(255,255,255,.08);border:1px solid var(--line);text-align:center;line-height:1.25}
+.btn small{display:block;font-weight:600;font-size:11.5px;opacity:.75;margin-top:2px}
+.btn.primary{background:var(--gold);color:#2a1a00;border-color:transparent}
+.btn.good{background:var(--mint);color:#032417;border-color:transparent}
+.btn.danger{background:rgba(255,111,97,.16);border-color:rgba(255,111,97,.5);color:#ffc2bb}
+.btn[disabled]{opacity:.38;cursor:not-allowed}
+.btn:not([disabled]):hover{filter:brightness(1.08)}
+table.sheet{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
+.sheet td{padding:6px 0;border-bottom:1px dashed var(--line)}
+.sheet td:last-child{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+.sheet tr.total td{border-bottom:0;border-top:1px solid rgba(255,255,255,.35);font-weight:700;padding-top:8px}
+.sheet .neg{color:#ffa79d} .sheet .pos{color:var(--mint)}
+.lesson{margin-top:12px;padding:11px 13px;border-radius:12px;background:rgba(124,196,255,.09);border:1px solid rgba(124,196,255,.28);font-size:13px;line-height:1.5}
+.lesson b{color:var(--sky);display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.tag{display:inline-block;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.checks{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.check{font-size:12px;padding:3px 9px;border-radius:99px;border:1px solid var(--line)}
+.check.ok{color:var(--mint);border-color:rgba(63,212,156,.4)}
+.check.no{color:#ffa79d;border-color:rgba(255,111,97,.4)}
+.quiz-opts{display:grid;gap:8px;margin-top:12px}
+.quiz-opts .btn{text-align:left}
+
+/* drawer */
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(380px,100%);z-index:15;background:var(--panel-solid);border-left:1px solid var(--line);transform:translateX(105%);transition:transform .3s ease;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+#drawer.open{transform:none}
+#drawer header{display:flex;justify-content:space-between;align-items:center;padding:16px}
+#drawer h3{font-family:var(--display);font-weight:800;font-size:22px;margin:0}
+#drawerBody{overflow:auto;padding:0 16px 24px;display:grid;gap:8px;align-content:start}
+.prop-row{display:grid;grid-template-columns:10px 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);text-align:left;width:100%}
+.prop-row .sub{font-size:12px;color:var(--muted)}
+.term{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.term b{font-family:var(--display);font-size:16px}
+.term p{margin:4px 0 0;font-size:13px;line-height:1.45;color:#d0dcea}
+.term.locked{opacity:.45}
+.x{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);font-size:18px}
+
+/* screens */
+.screen{position:fixed;inset:0;z-index:12;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;overflow:auto}
+#title{background:radial-gradient(ellipse at 50% 120%,rgba(13,26,43,.0),rgba(13,26,43,.55))}
+.logo{font-family:var(--display);font-weight:800;font-size:clamp(46px,11vw,104px);line-height:.9;letter-spacing:-.03em;color:#fff;text-shadow:0 6px 0 var(--gold-deep),0 12px 40px rgba(0,0,0,.35);text-align:center}
+.logo span{color:var(--gold);text-shadow:0 6px 0 #7a4f00,0 12px 40px rgba(0,0,0,.35)}
+.tagline{font-size:17px;font-weight:600;margin:18px 0 26px;text-align:center;max-width:36ch;text-shadow:0 1px 8px rgba(0,0,0,.5)}
+.big-btn{padding:16px 40px;border-radius:18px;background:linear-gradient(180deg,#ffd166,var(--gold) 55%,var(--gold-deep));color:#2a1a00;font-family:var(--display);font-weight:800;font-size:24px;box-shadow:0 6px 0 #8a5a06,0 16px 36px rgba(0,0,0,.35)}
+.big-btn:active{transform:translateY(4px);box-shadow:0 2px 0 #8a5a06}
+.rank{margin-top:18px;padding:8px 14px;font-size:13px}
+#levels{background:rgba(9,18,31,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);justify-content:flex-start}
+#levels h2{font-family:var(--display);font-weight:800;font-size:34px;margin:10px 0 4px}
+.lvl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;width:min(960px,100%);margin-top:18px}
+.lvl{padding:14px;border-radius:16px;text-align:left;background:var(--panel-solid);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px;min-height:132px;position:relative}
+.lvl:not([disabled]):hover{border-color:var(--gold)}
+.lvl[disabled]{opacity:.4;cursor:not-allowed}
+.lvl .n{font-family:var(--mono);color:var(--gold);font-size:12px}
+.lvl b{font-family:var(--display);font-size:18px;line-height:1.1}
+.lvl .sub{font-size:12px;color:var(--muted)}
+.lvl .stars{margin-top:auto;letter-spacing:2px;color:var(--gold);font-size:15px}
+.lvl .stars .off{color:rgba(255,255,255,.18)}
+.lvl .new{position:absolute;top:12px;right:12px}
+.levels-top{display:flex;justify-content:space-between;align-items:center;gap:12px;width:min(960px,100%);flex-wrap:wrap}
+.stars-big{font-size:40px;letter-spacing:6px;color:var(--gold);text-align:center;margin:6px 0}
+.stars-big .off{color:rgba(255,255,255,.15)}
+
+@media (max-width:720px){
+  #stats{grid-template-columns:repeat(3,1fr);width:100%}
+  #stats{gap:4px}
+  .stat{min-width:0;padding:4px 8px;border-radius:10px}
+  .stat .k{font-size:9px}
+  .stat .v{font-size:13px}
+  .hud-top{gap:6px}
+  #goalCard{width:100%;padding:10px 12px}
+  #goalCard h2{font-size:17px;margin-bottom:4px}
+  #rivals{display:none}
+  #log{bottom:calc(86px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px)}
+  #log div:nth-child(n+3){display:none}
+  #rollBtn{min-width:0;padding:12px 18px;font-size:18px}
+  .tool{min-width:0;padding:11px;border-radius:12px}
+  .tool .tl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .hud-bottom{gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div id="stage"></div>
+
+<div id="hudTop" class="hud hud-top" hidden>
+  <div id="goalCard" class="glass"></div>
+  <div id="stats"></div>
+</div>
+<div id="hudBottom" class="hud hud-bottom" hidden>
+  <div class="side-btns">
+    <button class="tool glass" id="btnPortfolio" type="button"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span class="tl">Portfolio</span></button>
+    <button class="tool glass" id="btnBook" type="button"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/></svg><span class="tl">Playbook</span></button>
+  </div>
+  <button id="rollBtn" type="button"><span class="pips" aria-hidden="true"><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i><i></i><i class="on"></i></span><span>Roll<small id="rollSub">Space to roll</small></span></button>
+  <div class="side-btns">
+    <button class="tool glass" id="btnCam" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12a9 9 0 0118 0M21 12a9 9 0 01-18 0"/></svg><span id="camLbl" class="tl">Follow</span></button>
+    <button class="tool glass" id="btnMenu" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="tl">Levels</span></button>
+  </div>
+</div>
+<div id="rivals" hidden></div>
+<div id="log" aria-live="polite" hidden></div>
+<div id="floaters"></div>
+<div id="toasts"></div>
+
+<aside id="drawer" aria-label="Side panel">
+  <header><h3 id="drawerTitle">Portfolio</h3><button class="x" id="drawerClose" type="button" aria-label="Close">✕</button></header>
+  <div id="drawerBody"></div>
+</aside>
+
+<section id="title" class="screen">
+  <div class="logo">Deed <span>&amp;</span><br>Dice</div>
+  <p class="tagline">Roll the dice, buy the block, and learn how real estate wealth is actually built.</p>
+  <button class="big-btn" id="playBtn" type="button">Play</button>
+  <div class="rank glass" id="rankBadge"></div>
+</section>
+
+<section id="levels" class="screen" hidden>
+  <div class="levels-top">
+    <div><div class="eyebrow">Your career</div><h2>Choose a city</h2><div id="rankLine" class="sub" style="color:var(--muted)"></div></div>
+    <button class="btn" id="levelsBack" type="button" style="flex:0 0 auto">Back to board</button>
+  </div>
+  <div class="lvl-grid" id="lvlGrid"></div>
+</section>
+
+<div id="modal" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const rnd = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const money = n => (n < 0 ? '-$' : '$') + Math.round(Math.abs(n)).toLocaleString('en-US');
+const short = n => { const a = Math.abs(n), s = n < 0 ? '-$' : '$';
+  if (a >= 1e6) return s + (a / 1e6).toFixed(a >= 1e7 ? 1 : 2) + 'M';
+  if (a >= 1e4) return s + Math.round(a / 1e3) + 'k';
+  return s + Math.round(a).toLocaleString('en-US'); };
+const pct = (n, d = 1) => (n * 100).toFixed(d) + '%';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+/* ================= Real estate model ================= */
+const V = [0.4, 1, 1.9, 3.2, 5.2, 8.5];          // value multiple by building tier
+const R = [0, 1, 2.1, 3.6, 6.2, 10.5];           // rent multiple by tier
+const TIER = ['Vacant Lot', 'Single-Family Home', 'Duplex', 'Fourplex', 'Apartment Building', 'Mixed-Use Tower'];
+const OPEX = 0.35;                                // taxes, insurance, repairs, management as share of gross rent
+const HOODS = [
+  { base: 55000, rent: 0.0115, appr: 0.000, vac: 0.08, cls: 'Class C', color: '#e0823a' },
+  { base: 75000, rent: 0.0100, appr: 0.006, vac: 0.06, cls: 'Class B', color: '#3aa6dd' },
+  { base: 98000, rent: 0.0090, appr: 0.013, vac: 0.05, cls: 'Class B+', color: '#d6508e' },
+  { base: 125000, rent: 0.0080, appr: 0.022, vac: 0.04, cls: 'Class A', color: '#2fae66' },
+];
+const PHASES = [
+  { name: 'Expansion', appr: 0.06, rate: 0.065, cls: 'up', lesson: 'Jobs are growing and buyers are competing. Prices rise fast, but so does the temptation to overpay.' },
+  { name: 'Peak', appr: 0.015, rate: 0.075, cls: 'flat', lesson: 'Prices are at their highest and rates are up. Deals are thin. Smart investors build cash reserves here.' },
+  { name: 'Correction', appr: -0.07, rate: 0.07, cls: 'down', lesson: 'Values fall. Owners with cash flow and fixed-rate loans can wait it out. Over-leveraged owners are forced to sell.' },
+  { name: 'Recovery', appr: 0.03, rate: 0.055, cls: 'up', lesson: 'Prices are low and rates are easing. Historically, this is when patient buyers find the best deals.' },
+];
+const pmt = (P, r, n = 360) => r === 0 ? P / n : P * (r / 12) / (1 - Math.pow(1 + r / 12, -n));
+
+/* ================= Playbook (glossary) ================= */
+const TERMS = {
+  cashflow: ['Cash Flow', 'Money left after rent pays every bill, including the mortgage. Positive cash flow pays you every month.'],
+  noi: ['NOI', 'Net Operating Income: rent minus vacancy and operating expenses. Mortgage payments are not included.'],
+  caprate: ['Cap Rate', 'NOI ÷ price. A quick way to compare deals as if you paid all cash. Higher cap rate means more income per dollar.'],
+  onepercent: ['The 1% Rule', 'A screening shortcut: monthly rent should be at least 1% of the purchase price.'],
+  fiftypercent: ['The 50% Rule', 'Expect operating expenses (not the mortgage) to eat about half of rent over time. This game uses 35% plus vacancy.'],
+  mortgage: ['Mortgage', 'A loan secured by the property. You make monthly payments of principal and interest, usually for 30 years.'],
+  downpayment: ['Down Payment', 'The cash you put in upfront. Investment loans typically need 20–25% down.'],
+  leverage: ['Leverage', 'Using borrowed money to control more property. It multiplies gains and losses.'],
+  closing: ['Closing Costs', 'Fees to finalize a purchase: lender fees, title, appraisal. Usually 2–5% of the price.'],
+  equity: ['Equity', 'What you truly own: property value minus the loan balance.'],
+  vacancy: ['Vacancy', 'Months a unit sits empty. Budget 4–10% of rent for it, depending on the neighborhood.'],
+  capex: ['CapEx', 'Capital expenditures: big, infrequent costs like roofs, HVAC and water heaters.'],
+  reserves: ['Reserves', 'Cash set aside for surprises. A common target is 3–6 months of expenses per property.'],
+  appreciation: ['Appreciation', 'The rise in a property\'s value over time from the market, inflation and demand.'],
+  forced: ['Forced Appreciation', 'Raising value yourself by renovating or adding units, instead of waiting on the market.'],
+  ltv: ['Loan-to-Value', 'Loan balance ÷ property value. Lenders usually cap refinances around 75% LTV.'],
+  refi: ['Cash-Out Refinance', 'Replacing your loan with a bigger one based on today\'s value, and pocketing the difference.'],
+  brrrr: ['BRRRR', 'Buy, Rehab, Rent, Refinance, Repeat. Recycle the same cash into more properties.'],
+  amort: ['Amortization', 'How a loan is paid down. Early payments are mostly interest, later ones mostly principal.'],
+  fixedrate: ['Fixed-Rate Loan', 'Your interest rate and payment never change, even if market rates rise.'],
+  cycle: ['Market Cycle', 'Real estate moves through Expansion, Peak, Correction and Recovery.'],
+  depreciation: ['Depreciation', 'A tax deduction for wear and tear. US residential buildings are depreciated over 27.5 years.'],
+  x1031: ['1031 Exchange', 'Selling a property and reinvesting in a like-kind property to defer capital gains tax.'],
+  coc: ['Cash-on-Cash Return', 'Annual cash flow ÷ the cash you invested. It measures how hard your own dollars work.'],
+  location: ['Location', 'The one thing you can\'t renovate. Jobs, transit and schools drive long-term value.'],
+  househack: ['House Hacking', 'Living in one unit of a small multifamily and renting the others to cover your mortgage.'],
+  screening: ['Tenant Screening', 'Checking credit, income, rental history and references before signing a lease.'],
+  insurance: ['Landlord Insurance', 'Covers property damage and liability. You pay a deductible on each claim.'],
+  comps: ['Comps', 'Comparable recent sales used to estimate a property\'s market value.'],
+  arv: ['ARV', 'After Repair Value: what a property will be worth once renovations are done.'],
+  proptax: ['Property Tax', 'Annual tax based on assessed value, paid to the local government.'],
+  dscr: ['DSCR', 'Debt Service Coverage Ratio: NOI ÷ debt payments. Lenders like 1.2 or higher.'],
+  sellcosts: ['Selling Costs', 'Agent commissions plus closing costs: often 6–8% of the sale price.'],
+  rates: ['Interest Rates', 'Higher rates mean bigger payments, so the same budget buys less property.'],
+  hoa: ['HOA Fees', 'Dues paid to a homeowners association for shared upkeep, sometimes with surprise special assessments.'],
+  inspection: ['Inspection', 'A professional check before buying that uncovers costly problems while you can still walk away.'],
+  neighborhood: ['Market Concentration', 'Owning many properties in one area builds local knowledge and pricing power, but also concentrates risk.'],
+};
+
+const QUIZ = [
+  ['A rental brings in $1,500/mo and all expenses plus the mortgage cost $1,200/mo. What is the monthly cash flow?', ['$300', '$1,500', '$2,700'], 0, 'Cash flow is what is left after every bill: $1,500 − $1,200 = $300 a month, or $3,600 a year.', 'cashflow', 1],
+  ['Which of these is NOT an operating expense when calculating NOI?', ['Property taxes', 'The mortgage payment', 'Repairs'], 1, 'NOI ignores financing, so two buyers of the same building see the same NOI no matter how they paid.', 'noi', 1],
+  ['A property earns $8,000 NOI per year and costs $100,000. What is its cap rate?', ['8%', '12.5%', '80%'], 0, 'Cap rate = NOI ÷ price = 8,000 ÷ 100,000 = 8%.', 'caprate', 1],
+  ['Under the 1% rule, a $150,000 rental should rent for at least...', ['$150/mo', '$1,500/mo', '$15,000/mo'], 1, '1% of $150,000 is $1,500 a month. It is a quick filter, not a full analysis.', 'onepercent', 1],
+  ['The 50% rule estimates operating expenses will eat about what share of rent?', ['10%', '50%', '90%'], 1, 'Over time, taxes, insurance, repairs, vacancy and management add up to roughly half the rent.', 'fiftypercent', 1],
+  ['You buy a $200k home with $40k down and it rises 10% in value. What is the return on your cash, ignoring costs?', ['10%', '20%', '50%'], 2, 'The home gained $20k and you only put in $40k: a 50% return. That is leverage.', 'leverage', 2],
+  ['On a $300,000 property with 20% down, how much is the down payment?', ['$20,000', '$60,000', '$240,000'], 1, '20% of $300,000 is $60,000. The other $240,000 is the loan.', 'downpayment', 2],
+  ['Your property is worth $250k and you owe $180k. What is your equity?', ['$70,000', '$250,000', '$430,000'], 0, 'Equity = value − loan balance = $70,000.', 'equity', 1],
+  ['Closing costs usually run about what percent of the purchase price?', ['0.1%', '2–5%', '25%'], 1, 'Lender fees, title insurance, appraisal and recording fees typically add 2–5%.', 'closing', 1],
+  ['Why budget for vacancy even when you have a great tenant?', ['Every tenant eventually moves out', 'Banks require empty units', 'Empty homes appreciate faster'], 0, 'Turnover happens. Cleaning, repainting and finding a new tenant can mean a month or two of no rent.', 'vacancy', 1],
+  ['Which is a capital expenditure rather than routine maintenance?', ['Replacing the roof', 'Changing an air filter', 'Mowing the lawn'], 0, 'CapEx items are big and infrequent. Set aside a little every month so they never surprise you.', 'capex', 2],
+  ['How much cash should you keep in reserve for a rental?', ['One week of expenses', '3–6 months of expenses', 'None, borrow instead'], 1, 'Reserves keep a bad month from turning into a forced sale.', 'reserves', 2],
+  ['Adding a bedroom to raise a home\'s value is called...', ['Market appreciation', 'Forced appreciation', 'Depreciation'], 1, 'You created the value yourself instead of waiting on the market.', 'forced', 3],
+  ['You owe $150k on a $200k property. What is the loan-to-value ratio?', ['75%', '25%', '133%'], 0, 'LTV = 150 ÷ 200 = 75%. Your equity is the other 25%.', 'ltv', 4],
+  ['A cash-out refinance lets you...', ['Borrow against equity you have built', 'Erase your mortgage', 'Skip property taxes'], 0, 'The new, larger loan pays off the old one and the difference comes to you as cash. It is borrowed, so it is not taxed as income.', 'refi', 5],
+  ['What does BRRRR stand for?', ['Buy, Rehab, Rent, Refinance, Repeat', 'Build, Rent, Resell, Retire, Relax', 'Borrow, Renovate, Rent, Resell, Repeat'], 0, 'Buy below value, add value, rent it out, refinance to pull your cash back, then do it again.', 'brrrr', 5],
+  ['Early in a 30-year mortgage, most of each payment goes to...', ['Interest', 'Principal', 'Insurance'], 0, 'At 6.5%, over 80% of your first payment is interest. Principal paydown speeds up over time.', 'amort', 3],
+  ['With a fixed-rate mortgage, when market rates rise your payment...', ['Stays the same', 'Rises too', 'Drops'], 0, 'Locking a fixed rate protects your cash flow from rate spikes.', 'fixedrate', 3],
+  ['What is the usual order of a real estate cycle?', ['Expansion → Peak → Correction → Recovery', 'Peak → Recovery → Expansion → Correction', 'It only goes up'], 0, 'Markets move in cycles. Knowing the phase helps you decide when to buy, hold or sell.', 'cycle', 4],
+  ['US residential rental buildings are depreciated over...', ['5 years', '27.5 years', '100 years'], 1, 'You deduct 1/27.5 of the building\'s cost each year, which can shelter your cash flow from income tax.', 'depreciation', 6],
+  ['A 1031 exchange lets investors...', ['Defer capital gains tax by reinvesting in similar property', 'Avoid property taxes forever', 'Buy homes without a loan'], 0, 'Sell, then reinvest the proceeds into a like-kind property within strict deadlines, and the tax bill waits.', 'x1031', 6],
+  ['You invest $50,000 cash and the property nets $5,000 a year. What is the cash-on-cash return?', ['5%', '10%', '50%'], 1, '$5,000 ÷ $50,000 = 10%. Compare that with what the same cash earns elsewhere.', 'coc', 2],
+  ['Which usually boosts a property\'s long-term value the most?', ['Paint color', 'Location', 'Mailbox style'], 1, 'You can repaint a house. You cannot move it closer to jobs and good schools.', 'location', 1],
+  ['House hacking means...', ['Living in one unit of a multi-unit and renting the others', 'Breaking into a vacant house', 'Hacking a listing website'], 0, 'Your tenants help pay your mortgage, and owner-occupied loans can need as little as 3.5% down.', 'househack', 2],
+  ['The best defense against a tenant who doesn\'t pay is...', ['Thorough screening before signing', 'Charging lower rent', 'Skipping the lease'], 0, 'Verify income (often 3× rent), rental history and references before signing.', 'screening', 1],
+  ['Landlord insurance mainly protects against...', ['Property damage and liability', 'Low rents', 'Rising interest rates'], 0, 'It covers the building and lawsuits. You still pay the deductible on each claim.', 'insurance', 2],
+  ['Comparable sales ("comps") are used to...', ['Estimate a property\'s market value', 'Choose tenants', 'Calculate rent tax'], 0, 'Recent sales of similar nearby homes are the best evidence of what a property is worth.', 'comps', 2],
+  ['ARV stands for...', ['After Repair Value', 'Annual Rent Variance', 'Average Resale Volume'], 0, 'Flippers and BRRRR investors buy based on what a property will be worth after renovation.', 'arv', 4],
+  ['Property taxes are generally based on...', ['The assessed value of the property', 'Your personal income', 'The number of tenants'], 0, 'When values rise, a reassessment can raise your tax bill.', 'proptax', 2],
+  ['A DSCR of 1.25 means...', ['NOI is 1.25× the loan payments', 'The interest rate is 1.25%', 'You own 125% of the building'], 0, 'Lenders use DSCR to make sure the property can comfortably carry its own debt.', 'dscr', 5],
+  ['When selling, commissions and closing costs often total about...', ['1%', '6–8%', '30%'], 1, 'Selling is expensive, which is why many investors hold, refinance or 1031 exchange instead.', 'sellcosts', 3],
+  ['When interest rates rise, the same monthly budget buys...', ['Less property', 'More property', 'The same property'], 0, 'At 7% instead of 5%, the same payment supports a loan about 20% smaller.', 'rates', 2],
+  ['HOA fees are paid to...', ['A homeowners association for shared upkeep', 'The IRS', 'Your tenant'], 0, 'Fees can rise, and special assessments can hit when big shared repairs come due.', 'hoa', 3],
+  ['Why get an inspection before buying?', ['To find costly defects before you commit', 'It is required to collect rent', 'To raise the price'], 0, 'An inspection can save you from a bad foundation, or give you leverage to negotiate the price down.', 'inspection', 1],
+  ['Owning every property in a neighborhood mainly gives you...', ['Local knowledge and pricing power', 'An exemption from taxes', 'Frozen rents'], 0, 'Concentration makes management efficient and lets you shape an area. It also concentrates your risk.', 'neighborhood', 6],
+  ['A lender typically offers a cash-out refinance up to about...', ['75% of current value', '100% of current value', '150% of current value'], 0, 'Most lenders cap investment refinances around 70–80% LTV so you keep some equity cushion.', 'ltv', 7],
+];
+
+/* ================= Themes & levels ================= */
+const THEMES = {
+  maple:  { name: 'Maple Grove', sky: ['#7fcbff', '#e8f7ff'], grass: 0x7cc56b, park: 0x8fd27a, tile: 0xf6f1e4, water: 0x58b6e6, tree: [0x3f9a4a, 0x5bb05a, 0x2e7d45, 0xe39b3b], far: 'trees', light: 0xffffff, hoods: ['Elm Street', 'Birch Row', 'Cedar Park', 'Willow Bend'] },
+  river:  { name: 'Riverside', sky: ['#6ec2f0', '#dff3fb'], grass: 0x6cbf7a, park: 0x86d08a, tile: 0xf3f0e6, water: 0x3fa9d9, tree: [0x2f8a50, 0x48a560, 0x6dbb4f], far: 'river', light: 0xfffaf0, hoods: ['Mill Lane', 'Ferry Road', 'Bluff Terrace', 'Riverfront'] },
+  harbor: { name: 'Harbor City', sky: ['#58b3ec', '#fdf1d8'], grass: 0xd9c792, park: 0x7fc47a, tile: 0xfaf4e6, water: 0x2d9fd6, tree: [0x2f9a6a, 0x3aa874], far: 'sea', light: 0xfff4e0, hoods: ['Dockside', 'Lighthouse Row', 'Marina Heights', 'Pier Point'] },
+  summit: { name: 'Summit Heights', sky: ['#8db8e8', '#f1f5fb'], grass: 0xe8eef3, park: 0xd6e4dc, tile: 0xffffff, water: 0x7fc3e8, tree: [0x2c6b4f, 0x3a7d5c], far: 'mountains', light: 0xf4f8ff, hoods: ['Pine Ridge', 'Glacier Way', 'Lodge Hill', 'Summit Crest'] },
+  metro:  { name: 'Metro Bay', sky: ['#9fb8d6', '#eef1f5'], grass: 0x8c9aa6, park: 0x7fbf76, tile: 0xeeeeea, water: 0x4a8fc2, tree: [0x3f8f55, 0x4f9e5f], far: 'city', light: 0xffffff, hoods: ['Warehouse Row', 'Midtown', 'Arts District', 'Financial Center'] },
+  skyline:{ name: 'Skyline', sky: ['#2b2f6b', '#f59e6b'], grass: 0x5e7a66, park: 0x6f9c6a, tile: 0xf2ece4, water: 0x3a6ea5, tree: [0x2d6b4a, 0x3c7c55], far: 'city', light: 0xffd2a8, dusk: true, hoods: ['Old Town', 'Canal Street', 'Uptown', 'Crown Heights'] },
+};
+const THEME_ORDER = ['maple', 'river', 'harbor', 'summit', 'metro', 'skyline'];
+
+const LEVELS = [
+  { theme: 'maple', title: 'Your First Door', m: 1, cash: 100000, salary: 15000, turns: 16, rivals: 0, goals: [['props', 2]], unlock: [],
+    intro: 'Every investor starts with one door. Land on a property and buy it with cash. Each time you pass <b>Payday</b>, a year passes: you collect your salary plus every rental\'s cash flow.', terms: ['cashflow', 'noi'] },
+  { theme: 'maple', title: 'The Power of Leverage', m: 1, cash: 70000, salary: 16000, turns: 18, rivals: 0, goals: [['props', 4]], unlock: ['mortgage'],
+    intro: '<b>Mortgages unlocked.</b> Put 20% down and let the bank fund the rest. You can control far more property, but every loan payment comes out of your cash flow.', terms: ['mortgage', 'downpayment', 'leverage'] },
+  { theme: 'maple', title: 'Cash Flow Is King', m: 1, cash: 90000, salary: 16000, turns: 22, rivals: 0, goals: [['cf', 9000]], unlock: [],
+    intro: 'Owning a lot of property doesn\'t help if it doesn\'t pay you. Use the deal analyzer: <b>Class C</b> neighborhoods rent high for their price, while <b>Class A</b> areas grow in value but pay less today.', terms: ['caprate', 'onepercent'] },
+  { theme: 'maple', title: 'Forced Appreciation', m: 1, cash: 100000, salary: 18000, turns: 22, rivals: 0, goals: [['tier', 3]], unlock: ['upgrade'],
+    intro: '<b>Renovations unlocked.</b> Tap any property you own to add units. Construction costs less than the value it creates, so you gain equity instantly. Build a Fourplex.', terms: ['forced', 'arv'] },
+  { theme: 'river', title: 'Riding the Cycle', m: 1.3, cash: 100000, salary: 20000, turns: 24, rivals: 0, goals: [['nw', 320000]], unlock: ['market'],
+    intro: '<b>Market cycles unlocked.</b> Riverside moves through Expansion, Peak, Correction and Recovery. Rates and prices shift with each phase. Land on <b>Market Watch</b> to push the cycle forward.', terms: ['cycle', 'appreciation', 'fixedrate'] },
+  { theme: 'river', title: 'Competition Arrives', m: 1.3, cash: 120000, salary: 20000, turns: 26, rivals: 1, goals: [['sets', 1]], unlock: [],
+    intro: 'A rival investor has come to town. Owning all three lots in a neighborhood <b>doubles the rent</b> visitors pay you. Lock one down before they do.', terms: ['neighborhood', 'location'] },
+  { theme: 'river', title: 'The BRRRR Method', m: 1.3, cash: 120000, salary: 22000, turns: 26, rivals: 1, goals: [['props', 6], ['cf', 15000]], unlock: ['refi'],
+    intro: '<b>Refinancing unlocked.</b> Renovate a property, then refinance at 75% of its new value to pull your cash back out. Buy, Rehab, Rent, Refinance, Repeat.', terms: ['refi', 'brrrr', 'ltv'] },
+  { theme: 'harbor', title: 'Tax Time', m: 1.8, cash: 250000, salary: 30000, turns: 26, rivals: 2, goals: [['nw', 800000]], unlock: ['tax'],
+    intro: '<b>Taxes unlocked.</b> The Tax Office charges tax on rental profit, but <b>depreciation</b> deducts 1/27.5 of your buildings\' cost each year. Big portfolios often owe little.', terms: ['depreciation', 'x1031'] },
+  { theme: 'harbor', title: 'Build From Dirt', m: 1.8, cash: 320000, salary: 32000, turns: 26, rivals: 2, goals: [['tier', 4]], unlock: ['lots'],
+    intro: '<b>Vacant lots unlocked.</b> Raw land is cheap and earns nothing until you build on it. Develop one all the way up to an Apartment Building.', terms: ['forced', 'arv'] },
+  { theme: 'summit', title: 'Weather the Downturn', m: 2.4, cash: 500000, salary: 40000, turns: 28, rivals: 2, goals: [['nw', 1500000]], unlock: [], startPhase: 2,
+    intro: 'Summit Heights is in a <b>correction</b>. Prices are falling and rates are high. Survive on cash flow, buy while others panic, and ride the recovery.', terms: ['reserves', 'dscr'] },
+  { theme: 'metro', title: 'Empire Builder', m: 3, cash: 700000, salary: 50000, turns: 30, rivals: 3, goals: [['sets', 2], ['cf', 60000]], unlock: [],
+    intro: 'Three rivals fight over Metro Bay. Control two full neighborhoods and earn serious passive income.', terms: ['neighborhood', 'coc'] },
+  { theme: 'skyline', title: 'Skyline Tycoon', m: 4, cash: 1200000, salary: 70000, turns: 32, rivals: 3, goals: [['tier', 5], ['nw', 5000000]], unlock: ['towers'],
+    intro: '<b>Towers unlocked.</b> Build a Mixed-Use Tower and reach $5M net worth to become a Skyline Tycoon.', terms: ['x1031', 'sellcosts'] },
+];
+const ALL_UNLOCKS = ['mortgage', 'upgrade', 'market', 'refi', 'tax', 'lots', 'towers'];
+
+function getLevel(i) {
+  if (i < LEVELS.length) {
+    const L = Object.assign({}, LEVELS[i]);
+    L.unlocks = new Set(LEVELS.slice(0, i + 1).flatMap(l => l.unlock));
+    L.num = i + 1;
+    return L;
+  }
+  // Endless: each new city is bigger, richer and harder.
+  const e = i - LEVELS.length + 1, m = 4 * Math.pow(1.35, e);
+  const themeKey = THEME_ORDER[(e + 1) % THEME_ORDER.length];
+  const goalSets = [
+    [['nw', Math.round(5e6 * Math.pow(1.5, e) / 1e5) * 1e5]],
+    [['cf', Math.round(90000 * Math.pow(1.45, e) / 1000) * 1000], ['sets', 2]],
+    [['tier', 5], ['props', 8]],
+    [['nw', Math.round(6e6 * Math.pow(1.5, e) / 1e5) * 1e5], ['sets', 1]],
+  ];
+  return { theme: themeKey, title: 'Expansion ' + e + ': ' + THEMES[themeKey].name, m, cash: Math.round(1.2e6 * Math.pow(1.4, e) / 1e4) * 1e4, salary: Math.round(70000 * Math.pow(1.3, e) / 1000) * 1000,
+    turns: 32, rivals: 3, goals: goalSets[(e - 1) % goalSets.length], unlocks: new Set(ALL_UNLOCKS), startPhase: Math.floor(Math.random() * 4), num: i + 1, endless: true,
+    intro: 'A new city opens. Prices are higher, rivals are richer, and the goals keep growing. How far can your empire go?', terms: [] };
+}
+const maxTier = L => L.unlocks.has('towers') ? 5 : L.unlocks.has('lots') ? 4 : L.unlocks.has('upgrade') ? 3 : 1;
+
+const RANKS = [['Renter', 0], ['House Hacker', 300], ['Landlord', 900], ['Investor', 2000], ['Syndicator', 4000], ['Mogul', 7500], ['Tycoon', 12000], ['Legend', 20000]];
+function rankOf(xp) { let r = RANKS[0], next = null; for (let k = 0; k < RANKS.length; k++) { if (xp >= RANKS[k][1]) { r = RANKS[k]; next = RANKS[k + 1] || null; } } return { name: r[0], next }; }
+
+/* ================= Save data ================= */
+const SAVE_KEY = 'deed-dice-v1';
+let SAVE = { max: 0, stars: {}, xp: 0, terms: [] };
+try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s === 'object') SAVE = Object.assign(SAVE, s); } catch (e) {}
+function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (e) {} }
+function learn(id, quiet) {
+  if (!TERMS[id] || SAVE.terms.includes(id)) return;
+  SAVE.terms.push(id); persist();
+  if (!quiet) toast('New Playbook term: <em>' + TERMS[id][0] + '</em>');
+}
+function addXP(n) { const before = rankOf(SAVE.xp).name; SAVE.xp += n; persist(); const after = rankOf(SAVE.xp).name; if (after !== before) toast('Rank up! You are now a <em>' + after + '</em>'); }
+
+/* ================= Three.js scene ================= */
+const stage = $('#stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+stage.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, 1, 0.5, 400);
+const hemi = new THREE.HemisphereLight(0xdfefff, 0x6b8a55, 0.62);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+sun.position.set(22, 34, 14);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -26, right: 26, top: 26, bottom: -26, near: 1, far: 90 });
+sun.shadow.bias = -0.0008;
+scene.add(sun);
+
+const T = 4.2; // tile pitch
+const world = new THREE.Group(); scene.add(world);
+let decor = new THREE.Group(); world.add(decor);
+const boardGroup = new THREE.Group(); world.add(boardGroup);
+const spinners = [], cars = [], blinkers = [];
+const matCache = {};
+const M = (c, o) => { const k = c + JSON.stringify(o || {}); return matCache[k] || (matCache[k] = new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.85, metalness: 0 }, o || {}))); };
+function mesh(geo, mat, x = 0, y = 0, z = 0, parent) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; m.receiveShadow = true; if (parent) parent.add(m); return m; }
+const G_BOX = new THREE.BoxGeometry(1, 1, 1);
+function box(w, h, d, mat, x, y, z, parent) { const m = mesh(G_BOX, mat, x, y + h / 2, z, parent); m.scale.set(w, h, d); return m; }
+
+/* camera orbit */
+const cam = { theta: Math.PI * 0.25, phi: 0.92, radius: 44, target: new THREE.Vector3(), goal: new THREE.Vector3(), follow: true, idle: true };
+function placeCamera() {
+  cam.target.lerp(cam.goal, 0.06);
+  const r = cam.radius, s = Math.sin(cam.phi);
+  camera.position.set(cam.target.x + r * s * Math.sin(cam.theta), cam.target.y + r * Math.cos(cam.phi), cam.target.z + r * s * Math.cos(cam.theta));
+  camera.lookAt(cam.target);
+}
+const pointers = new Map(); let dragMoved = 0, pinchDist = 0;
+renderer.domElement.addEventListener('pointerdown', e => { pointers.set(e.pointerId, { x: e.clientX, y: e.clientY }); dragMoved = 0; cam.idle = false; renderer.domElement.setPointerCapture(e.pointerId); });
+renderer.domElement.addEventListener('pointermove', e => {
+  const p = pointers.get(e.pointerId); if (!p) return;
+  const dx = e.clientX - p.x, dy = e.clientY - p.y; p.x = e.clientX; p.y = e.clientY;
+  if (pointers.size === 1) { cam.theta -= dx * 0.0075; cam.phi = clamp(cam.phi - dy * 0.006, 0.32, 1.32); dragMoved += Math.abs(dx) + Math.abs(dy); }
+  else if (pointers.size === 2) { const [a, b] = [...pointers.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinchDist) cam.radius = clamp(cam.radius * pinchDist / d, 14, 80); pinchDist = d; dragMoved = 99; }
+});
+const endPtr = e => { const wasTap = pointers.size === 1 && dragMoved < 6; pointers.delete(e.pointerId); if (pointers.size < 2) pinchDist = 0; if (wasTap && e.type === 'pointerup') onTap(e); };
+renderer.domElement.addEventListener('pointerup', endPtr);
+renderer.domElement.addEventListener('pointercancel', endPtr);
+renderer.domElement.addEventListener('wheel', e => { e.preventDefault(); cam.radius = clamp(cam.radius * (1 + e.deltaY * 0.0012), 14, 80); cam.idle = false; }, { passive: false });
+
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < h ? 58 : 45; camera.updateProjectionMatrix(); }
+window.addEventListener('resize', resize);
+
+/* ---- textures ---- */
+function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return { tex: t, canvas: c }; }
+const winTexCache = {};
+function winTex(cols, rows, wall, win, lit) {
+  const key = [cols, rows, wall, win, lit].join();
+  if (winTexCache[key]) return winTexCache[key];
+  const { tex } = canvasTex(cols * 32, rows * 40, (x, w, h) => {
+    x.fillStyle = wall; x.fillRect(0, 0, w, h);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      x.fillStyle = lit && Math.random() < 0.55 ? '#ffd98a' : win;
+      x.fillRect(c * 32 + 7, r * 40 + 8, 18, 24);
+      x.fillStyle = 'rgba(255,255,255,.35)'; x.fillRect(c * 32 + 7, r * 40 + 8, 18, 3);
+    }
+  });
+  return (winTexCache[key] = tex);
+}
+function roundRect(x, X, Y, W, H, r) { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + W, Y, X + W, Y + H, r); x.arcTo(X + W, Y + H, X, Y + H, r); x.arcTo(X, Y + H, X, Y, r); x.arcTo(X, Y, X + W, Y, r); x.closePath(); }
+const DISPLAY_FONT = '"Bricolage Grotesque", "Trebuchet MS", sans-serif';
+const BODY_FONT = 'Figtree, system-ui, sans-serif';
+
+/* ---- buildings ---- */
+const WALLS = [0xf2e3c6, 0xe9b89a, 0xc9dbe8, 0xf5f0e8, 0xd9c2e4, 0xbfe0c8, 0xf3d28b];
+const ROOFS = [0x9c4a3a, 0x4d5d74, 0x6b4a3a, 0x3b6e8f, 0x7a3f5c];
+function gableRoof(w, d, h, mat, y, parent) {
+  const s = new THREE.Shape(); s.moveTo(-d / 2 - 0.1, 0); s.lineTo(d / 2 + 0.1, 0); s.lineTo(0, h); s.closePath();
+  const g = new THREE.ExtrudeGeometry(s, { depth: w + 0.2, bevelEnabled: false }); g.translate(0, 0, -(w + 0.2) / 2);
+  const m = mesh(g, mat, 0, y, 0, parent); m.rotation.y = Math.PI / 2; return m;
+}
+function tree(parent, x, z, s = 1, color) {
+  const g = new THREE.Group(); g.position.set(x, 0, z); g.scale.setScalar(s);
+  mesh(new THREE.CylinderGeometry(0.08, 0.11, 0.5, 6), M(0x7a5234), 0, 0.25, 0, g);
+  const c = color || pick(THEMES[currentTheme].tree);
+  mesh(new THREE.ConeGeometry(0.45, 0.9, 7), M(c, { flatShading: true }), 0, 0.85, 0, g);
+  mesh(new THREE.ConeGeometry(0.34, 0.7, 7), M(c, { flatShading: true }), 0, 1.25, 0, g);
+  parent.add(g); return g;
+}
+function makeBuilding(tier, seed) {
+  const g = new THREE.Group();
+  const wall = M(WALLS[seed % WALLS.length]), roof = M(ROOFS[seed % ROOFS.length]);
+  const glass = M(0x9fd4f2, { roughness: 0.25, metalness: 0.2 }), dark = M(0x3c2f2a), white = M(0xffffff);
+  const dusk = THEMES[currentTheme].dusk;
+  if (tier === 0) {
+    box(2.8, 0.05, 1.9, M(0xa27a50), 0, 0, 0, g);
+    for (let i = 0; i < 6; i++) { box(0.07, 0.35, 0.07, M(0xe8dcc0), -1.35 + i * 0.54, 0, -0.95, g); box(0.07, 0.35, 0.07, M(0xe8dcc0), -1.35 + i * 0.54, 0, 0.95, g); }
+    box(0.06, 0.8, 0.06, dark, 0.9, 0, 0.5, g); box(0.7, 0.42, 0.05, M(0xff6f61), 0.9, 0.55, 0.52, g);
+    const mound = mesh(new THREE.SphereGeometry(0.45, 8, 6, 0, Math.PI * 2, 0, Math.PI / 2), M(0x8d6a45, { flatShading: true }), -0.6, 0.02, -0.2, g); mound.scale.y = 0.5;
+  } else if (tier === 1) {
+    box(1.7, 1.05, 1.35, wall, 0, 0, 0, g);
+    const r = mesh(new THREE.ConeGeometry(1, 0.85, 4), roof, 0, 1.05 + 0.42, 0, g); r.rotation.y = Math.PI / 4; r.scale.set(1.35, 1, 1.12);
+    box(0.34, 0.6, 0.05, dark, 0, 0, 0.68, g);
+    box(0.36, 0.3, 0.04, glass, -0.52, 0.45, 0.68, g); box(0.36, 0.3, 0.04, glass, 0.52, 0.45, 0.68, g);
+    box(0.18, 0.4, 0.18, M(0xb05a45), 0.45, 1.3, -0.2, g);
+    tree(g, 1.25, 0.4, 0.8);
+  } else if (tier === 2) {
+    box(2.5, 1.2, 1.4, wall, 0, 0, 0, g);
+    gableRoof(2.5, 1.4, 0.8, roof, 1.2, g);
+    [-0.65, 0.65].forEach(x => { box(0.32, 0.62, 0.05, dark, x, 0, 0.71, g); box(0.34, 0.3, 0.04, glass, x - 0.45 * Math.sign(x) * -1, 0.5, 0.71, g); });
+    box(0.05, 1.2, 1.42, white, 0, 0, 0, g);
+  } else if (tier === 3) {
+    const mats = [0, 0, 0, 0, 0, 0].map((_, i) => i === 2 || i === 3 ? wall : new THREE.MeshStandardMaterial({ map: winTex(3, 2, '#' + WALLS[seed % WALLS.length].toString(16).padStart(6, '0'), '#6aa9cc', dusk), roughness: 0.8 }));
+    const b = mesh(G_BOX, mats, 0, 1.1, 0, g); b.scale.set(2.3, 2.2, 1.7);
+    box(2.45, 0.12, 1.85, M(0x6b6259), 0, 2.2, 0, g);
+    box(0.5, 0.3, 0.4, M(0xbfc5c9), 0.6, 2.32, -0.3, g);
+    box(0.5, 0.08, 0.5, M(0x6b6259), 0, 0.6, 0.95, g);
+  } else if (tier === 4) {
+    const wallHex = ['#d8c3a5', '#c7d3dd', '#e7d7c0', '#b9c9b7'][seed % 4];
+    const mats = [0, 0, 0, 0, 0, 0].map((_, i) => i === 2 || i === 3 ? M(0x8d8278) : new THREE.MeshStandardMaterial({ map: winTex(4, 5, wallHex, '#5b93b8', dusk), roughness: 0.8 }));
+    const b = mesh(G_BOX, mats, 0, 2.1, 0, g); b.scale.set(2.4, 4.2, 1.9);
+    box(2.55, 0.14, 2.05, M(0x5a534d), 0, 4.2, 0, g);
+    const wt = new THREE.Group(); wt.position.set(-0.6, 4.34, -0.3); g.add(wt);
+    mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.5, 10), M(0x8a6a4a), 0, 0.55, 0, wt);
+    mesh(new THREE.ConeGeometry(0.34, 0.25, 10), M(0x5a4535), 0, 0.92, 0, wt);
+    [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].forEach(([x, z]) => box(0.04, 0.3, 0.04, dark, x, 0, z, wt));
+    box(0.7, 0.9, 0.08, M(0x3c4c5c), 0, 0, 0.96, g);
+  } else {
+    const mats = [0, 0, 0, 0, 0, 0].map((_, i) => i === 2 || i === 3 ? M(0x4b6275) : new THREE.MeshStandardMaterial({ map: winTex(4, 10, '#35556f', '#8fc7ea', dusk), roughness: 0.3, metalness: 0.35 }));
+    const b = mesh(G_BOX, mats, 0, 3.6, 0, g); b.scale.set(2.2, 7.2, 2.0);
+    const top = mesh(G_BOX, mats, 0, 7.2 + 0.9, 0, g); top.scale.set(1.5, 1.8, 1.4);
+    box(2.5, 0.9, 2.3, M(0xe9e2d6), 0, 0, 0, g);
+    box(1.6, 0.5, 0.06, glass, 0, 0.1, 1.16, g);
+    mesh(new THREE.CylinderGeometry(0.03, 0.05, 1.6, 6), M(0xcccccc), 0, 9.8, 0, g);
+    const light = mesh(new THREE.SphereGeometry(0.1, 8, 6), new THREE.MeshBasicMaterial({ color: 0xff3b30 }), 0, 10.6, 0, g);
+    blinkers.push(light);
+  }
+  return g;
+}
+
+/* ---- scenery ---- */
+let currentTheme = 'maple';
+function buildDecor(themeKey) {
+  world.remove(decor); decor = new THREE.Group(); world.add(decor);
+  cars.length = 0; spinners.length = 0; blinkers.length = 0;
+  const th = THEMES[themeKey];
+  stage.style.background = `linear-gradient(${th.sky[0]}, ${th.sky[1]} 70%)`;
+  sun.color.set(th.light); sun.intensity = th.dusk ? 0.8 : 0.95;
+  hemi.intensity = th.dusk ? 0.5 : 0.62;
+  sun.position.set(th.dusk ? 30 : 22, th.dusk ? 20 : 34, 14);
+  const groundR = th.far === 'sea' ? 22 : 120;
+  const ground = new THREE.Mesh(th.far === 'sea' ? new THREE.CylinderGeometry(groundR, groundR + 1.5, 1.2, 48) : new THREE.PlaneGeometry(240, 240), M(th.grass));
+  if (th.far === 'sea') { ground.position.y = -0.6; } else { ground.rotation.x = -Math.PI / 2; }
+  ground.receiveShadow = true; decor.add(ground);
+  if (th.far === 'sea') {
+    const sea = new THREE.Mesh(new THREE.PlaneGeometry(260, 260), M(th.water, { roughness: 0.25, metalness: 0.1 })); sea.rotation.x = -Math.PI / 2; sea.position.y = -0.4; decor.add(sea);
+    for (let i = 0; i < 6; i++) { const b = new THREE.Group(); const a = i / 6 * Math.PI * 2 + 0.3; b.position.set(Math.cos(a) * 30, -0.3, Math.sin(a) * 30); box(1.6, 0.4, 0.6, M(0xffffff), 0, 0, 0, b); box(0.06, 1.4, 0.06, M(0x666666), 0.2, 0.4, 0, b); const sail = mesh(new THREE.ConeGeometry(0.5, 1.2, 3), M(0xfdf5e6), 0.2, 1.2, 0, b); sail.scale.z = 0.1; decor.add(b); spinners.push({ o: b, boat: a }); }
+    const lh = new THREE.Group(); lh.position.set(-17, 0, 14); decor.add(lh);
+    mesh(new THREE.CylinderGeometry(0.6, 0.9, 5, 12), M(0xffffff), 0, 2.5, 0, lh); mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.7, 12), M(0xe2463a), 0, 2.2, 0, lh); mesh(new THREE.ConeGeometry(0.7, 0.8, 12), M(0xe2463a), 0, 5.5, 0, lh);
+  }
+  // inner park + road
+  box(18.4, 0.08, 18.4, M(0x6f7780), 0, 0, 0, decor);
+  box(16.8, 0.1, 16.8, M(th.park), 0, 0, 0, decor);
+  for (let i = -8; i <= 8; i += 2) { box(0.9, 0.02, 0.1, M(0xf1e7c8), i, 0.08, 8.8, decor); box(0.9, 0.02, 0.1, M(0xf1e7c8), i, 0.08, -8.8, decor); box(0.1, 0.02, 0.9, M(0xf1e7c8), 8.8, 0.08, i, decor); box(0.1, 0.02, 0.9, M(0xf1e7c8), -8.8, 0.08, i, decor); }
+  // plaza where dice land
+  mesh(new THREE.CylinderGeometry(3.2, 3.2, 0.14, 40), M(0xe7ddc8), 0, 0.07, 0, decor);
+  mesh(new THREE.CylinderGeometry(2.6, 2.6, 0.16, 40), M(0xd9ccb2), 0, 0.08, 0, decor);
+  // city hall
+  const hall = new THREE.Group(); hall.position.set(-4.6, 0.1, -4.6); hall.rotation.y = Math.PI / 4; decor.add(hall);
+  box(3.2, 0.3, 2.4, M(0xe8e1d3), 0, 0, 0, hall); box(2.8, 1.6, 2, M(0xf6f1e7), 0, 0.3, 0, hall);
+  for (let i = 0; i < 5; i++) mesh(new THREE.CylinderGeometry(0.1, 0.1, 1.5, 8), M(0xffffff), -1.1 + i * 0.55, 1.05, 1.1, hall);
+  gableRoof(3, 2.3, 0.6, M(0xe8e1d3), 1.9, hall).rotation.y = 0;
+  mesh(new THREE.CylinderGeometry(0.6, 0.7, 0.5, 16), M(0xf6f1e7), 0, 2.2, 0, hall);
+  mesh(new THREE.SphereGeometry(0.62, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), M(0x5fa7a0, { metalness: 0.3, roughness: 0.4 }), 0, 2.45, 0, hall);
+  // pond
+  const pond = mesh(new THREE.CylinderGeometry(2.2, 2.2, 0.12, 28), M(th.water, { roughness: 0.2, metalness: 0.1 }), 4.6, 0.08, 4.6, decor); pond.scale.z = 0.7; pond.rotation.y = 0.6;
+  // fountain
+  const f = new THREE.Group(); f.position.set(4.8, 0.1, -4.8); decor.add(f);
+  mesh(new THREE.CylinderGeometry(1.1, 1.2, 0.35, 20), M(0xd3c8b4), 0, 0.17, 0, f); mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.05, 20), M(th.water), 0, 0.36, 0, f);
+  mesh(new THREE.CylinderGeometry(0.12, 0.18, 0.9, 10), M(0xd3c8b4), 0, 0.7, 0, f); const spray = mesh(new THREE.SphereGeometry(0.3, 12, 8), M(0xbfe6ff, { transparent: true, opacity: 0.7 }), 0, 1.2, 0, f); spinners.push({ o: spray, pulse: true });
+  // trees in park
+  [[-6.5, 0], [-6.5, 2.5], [-6, 5.8], [-3.2, 6.6], [0, 6.4], [6.8, 0.5], [6.6, -2.2], [2, -6.6], [-1, -6.8], [-7, -2], [2.2, 4.4]].forEach(([x, z]) => tree(decor, x, z, rnd(0.9, 1.3)));
+  // benches
+  [[0, 4.1, 0], [0, -4.1, Math.PI], [4.1, 0, Math.PI / 2], [-4.1, 0, -Math.PI / 2]].forEach(([x, z, r]) => { const b = new THREE.Group(); b.position.set(x, 0.1, z); b.rotation.y = r; box(1.2, 0.08, 0.35, M(0x9a6a3a), 0, 0.3, 0, b); box(1.2, 0.3, 0.06, M(0x9a6a3a), 0, 0.38, -0.16, b); box(0.06, 0.3, 0.3, M(0x333333), -0.5, 0, 0, b); box(0.06, 0.3, 0.3, M(0x333333), 0.5, 0, 0, b); decor.add(b); });
+  // cars on the ring road
+  const carColors = [0xff6f61, 0xf5b83d, 0x3aa6dd, 0xffffff, 0x2fae66];
+  for (let i = 0; i < 5; i++) { const c = new THREE.Group(); box(0.9, 0.32, 0.5, M(carColors[i]), 0, 0.12, 0, c); box(0.5, 0.25, 0.44, M(0xcfe8f7, { roughness: 0.3 }), -0.05, 0.44, 0, c); [[-0.3, 0.26], [0.3, 0.26], [-0.3, -0.26], [0.3, -0.26]].forEach(([x, z]) => { const w = mesh(new THREE.CylinderGeometry(0.11, 0.11, 0.08, 10), M(0x222222), x, 0.12, z, c); w.rotation.x = Math.PI / 2; }); decor.add(c); cars.push({ o: c, s: i / 5, v: rnd(0.018, 0.028) * (i % 2 ? 1 : 1) }); }
+  // far scenery ring
+  for (let i = 0; i < 70; i++) {
+    const a = rnd(0, Math.PI * 2), r = rnd(19, 42), x = Math.cos(a) * r, z = Math.sin(a) * r;
+    if (th.far === 'sea') continue;
+    if (th.far === 'river' && Math.abs(z + 24) < 6) continue;
+    if (th.far === 'city' && r > 26) { const h = rnd(3, 14); const hex = pick(['#8ea3b8', '#a7b6c4', '#7f93a8', '#b8c3cc']); const mats = [0, 0, 0, 0, 0, 0].map((_, k) => k === 2 || k === 3 ? M(0x7b8794) : new THREE.MeshStandardMaterial({ map: winTex(3, Math.max(2, Math.round(h / 1.5)), hex, th.dusk ? '#2c3a55' : '#c9dcea', th.dusk), roughness: 0.6 })); const b = mesh(G_BOX, mats, x, h / 2, z, decor); b.scale.set(rnd(2, 3.5), h, rnd(2, 3.5)); b.castShadow = false; continue; }
+    if (th.far === 'mountains' && r > 30) { const h = rnd(6, 14); const mt = mesh(new THREE.ConeGeometry(rnd(4, 7), h, 6), M(0x8a97a6, { flatShading: true }), x, h / 2, z, decor); mt.castShadow = false; mesh(new THREE.ConeGeometry(1.8, h * 0.3, 6), M(0xffffff, { flatShading: true }), x, h * 0.85, z, decor).castShadow = false; continue; }
+    tree(decor, x, z, rnd(1.1, 2), th.far === 'mountains' ? pick([0x2c6b4f, 0x3a7d5c, 0xf3f7fa]) : undefined);
+  }
+  if (th.far === 'river') { const riv = mesh(new THREE.PlaneGeometry(240, 8), M(th.water, { roughness: 0.2 }), 0, 0.03, -24, decor); riv.rotation.x = -Math.PI / 2; riv.castShadow = false; }
+  // clouds
+  for (let i = 0; i < 7; i++) { const c = new THREE.Group(); for (let k = 0; k < 4; k++) mesh(new THREE.SphereGeometry(rnd(1, 1.8), 10, 8), M(th.dusk ? 0xf6c6b0 : 0xffffff, { flatShading: true, emissive: th.dusk ? 0x7a4a3a : 0x9aa6b2 }), k * 1.4, rnd(-0.3, 0.3), rnd(-0.5, 0.5), c).castShadow = false; const ca = rnd(0, 6.28), cr = rnd(55, 80); c.position.set(Math.cos(ca) * cr, rnd(24, 34), Math.sin(ca) * cr); c.scale.setScalar(rnd(1.5, 2.5)); decor.add(c); spinners.push({ o: c, cloud: rnd(0.01, 0.025) }); }
+}
+
+/* ---- board ---- */
+const LAYOUT = ['payday', ['prop', 0], 'lesson', ['prop', 0], ['prop', 0], 'event',
+  'bank', ['prop', 1], ['prop', 1], 'lesson', ['prop', 1], 'inspect',
+  'market', ['prop', 2], 'event', ['prop', 2], ['prop', 2], 'lesson',
+  'tax', ['prop', 3], ['prop', 3], 'event', ['prop', 3], 'vacancy'];
+const LOT_TILES = [4, 10, 16, 22];
+const SPECIAL = {
+  payday: ['PAYDAY', 'Collect salary + rent', '$'], bank: ['BANK', 'Loans & refinancing', '%'], market: ['MARKET WATCH', 'The cycle turns', '↗'], tax: ['TAX OFFICE', 'Depreciation helps', 'T'],
+  lesson: ['ACADEMY', 'Answer to earn', '?'], event: ['HEADLINES', 'Something happens', '!'], inspect: ['INSPECTION', 'Upkeep check', '✓'], vacancy: ['TURNOVER', 'Tenants move out', '0'],
+};
+const STREET_NUMS = [12, 48, 7, 221, 35, 90, 16, 402, 58, 77, 131, 9];
+function tileGeo(i) {
+  const side = Math.floor(i / 6), k = i % 6; let gx, gz;
+  if (side === 0) { gx = 3 - k; gz = 3; } else if (side === 1) { gx = -3; gz = 3 - k; } else if (side === 2) { gx = -3 + k; gz = -3; } else { gx = 3; gz = -3 + k; }
+  return { x: gx * T, z: gz * T, rot: [Math.PI, Math.PI / 2, 0, -Math.PI / 2][side], corner: k === 0 };
+}
+function drawTileLabel(t) {
+  const x = t.lbl.canvas.getContext('2d'), W = t.lbl.canvas.width, H = t.lbl.canvas.height;
+  x.clearRect(0, 0, W, H);
+  if (t.kind === 'prop') {
+    const hood = HOODS[t.hood];
+    roundRect(x, 4, 4, W - 8, H - 8, 22); x.fillStyle = '#fbf8f1'; x.fill();
+    x.save(); roundRect(x, 4, 4, W - 8, H - 8, 22); x.clip(); x.fillStyle = hood.color; x.fillRect(0, 0, W, 44); x.restore();
+    x.fillStyle = '#fff'; x.font = `700 24px ${BODY_FONT}`; x.textBaseline = 'middle'; x.fillText(t.hoodName.toUpperCase(), 22, 26);
+    x.textAlign = 'right'; x.fillText(hood.cls, W - 22, 26); x.textAlign = 'left';
+    x.fillStyle = '#1b2433'; x.font = `800 38px ${DISPLAY_FONT}`; x.fillText(t.name, 22, 80);
+    if (t.owner >= 0) { const p = G.players[t.owner]; x.fillStyle = p.hex; x.beginPath(); x.arc(32, 118, 10, 0, 7); x.fill(); x.fillStyle = '#1b2433'; x.font = `700 26px ${BODY_FONT}`; x.fillText((p.isYou ? 'Yours' : p.name) + ' · ' + TIER[t.tier], 52, 118); }
+    else { x.fillStyle = '#1b2433'; x.font = `700 28px ${BODY_FONT}`; x.fillText(short(priceOf(t)) + (t.tier === 0 ? '  ·  lot' : '  ·  ' + short(monthlyRent(t)) + '/mo'), 22, 118); }
+  } else {
+    const [name, sub, icon] = SPECIAL[t.kind];
+    const corner = W === H;
+    roundRect(x, 4, 4, W - 8, H - 8, corner ? 40 : 22); x.fillStyle = corner ? '#14263d' : '#fbf8f1'; x.fill();
+    x.textBaseline = 'middle';
+    if (corner) {
+      x.strokeStyle = '#f5b83d'; x.lineWidth = 8; roundRect(x, 22, 22, W - 44, H - 44, 30); x.stroke();
+      x.fillStyle = '#f5b83d'; x.font = `800 190px ${DISPLAY_FONT}`; x.textAlign = 'center'; x.fillText(icon, W / 2, H * 0.42);
+      x.fillStyle = '#fff'; x.font = `800 54px ${DISPLAY_FONT}`; x.fillText(name, W / 2, H * 0.72);
+      x.fillStyle = '#9db1c7'; x.font = `600 30px ${BODY_FONT}`; x.fillText(sub, W / 2, H * 0.83); x.textAlign = 'left';
+    } else {
+      x.fillStyle = '#14263d'; x.beginPath(); x.arc(70, H / 2, 46, 0, 7); x.fill();
+      x.fillStyle = '#f5b83d'; x.font = `800 58px ${DISPLAY_FONT}`; x.textAlign = 'center'; x.fillText(icon, 70, H / 2 + 3); x.textAlign = 'left';
+      x.fillStyle = '#1b2433'; x.font = `800 40px ${DISPLAY_FONT}`; x.fillText(name, 136, H / 2 - 18);
+      x.fillStyle = '#5b6b7e'; x.font = `600 26px ${BODY_FONT}`; x.fillText(sub, 136, H / 2 + 24);
+    }
+  }
+  t.lbl.tex.needsUpdate = true;
+}
+function specialProp(kind, g) {
+  const d = new THREE.Group(); d.position.set(0, 0.3, -0.85); g.add(d);
+  if (kind === 'lesson') { box(1.5, 0.9, 1.1, M(0xc94f3d), 0, 0, 0, d); gableRoof(1.5, 1.1, 0.55, M(0x6b4a3a), 0.9, d); box(0.3, 0.45, 0.3, M(0xffffff), 0, 1.3, 0, d); box(0.3, 0.5, 0.05, M(0x3c2f2a), 0, 0, 0.56, d); }
+  else if (kind === 'event') { const c = box(0.9, 1.2, 0.08, M(0xf5b83d, { metalness: 0.3, roughness: 0.4 }), 0, 0.7, 0, d); spinners.push({ o: c, spin: 0.02 }); box(0.1, 0.7, 0.1, M(0x555555), 0, 0, 0, d); }
+  else if (kind === 'inspect') { const r = mesh(new THREE.TorusGeometry(0.42, 0.09, 8, 24), M(0x3c4c5c), 0, 1.1, 0, d); const h = box(0.14, 0.6, 0.14, M(0x9a6a3a), 0.38, 0.35, 0, d); h.rotation.z = 0.6; spinners.push({ o: r, spin: 0.015 }); box(0.1, 0.5, 0.1, M(0x555555), 0, 0, 0, d); }
+  else if (kind === 'vacancy') { box(0.08, 1, 0.08, M(0x6b4a3a), -0.4, 0, 0, d); box(0.08, 1, 0.08, M(0x6b4a3a), 0.4, 0, 0, d); box(1.2, 0.55, 0.06, M(0xffffff), 0, 0.55, 0.05, d); box(1.0, 0.14, 0.07, M(0xff6f61), 0, 0.75, 0.06, d); }
+  else if (kind === 'payday') { for (let i = 0; i < 5; i++) mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.14, 20), M(0xf5b83d, { metalness: 0.5, roughness: 0.35 }), 0, 0.07 + i * 0.15, 0, d); const c = mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.12, 24), M(0xffd166, { metalness: 0.5, roughness: 0.3 }), 0, 1.4, 0, d); c.rotation.x = Math.PI / 2; spinners.push({ o: c, spinY: 0.03 }); d.position.set(-1.1, 0.3, -1.1); }
+  else if (kind === 'bank') { d.position.set(-1.05, 0.3, -1.05); box(1.8, 0.2, 1.3, M(0xe8e1d3), 0, 0, 0, d); for (let i = 0; i < 4; i++) mesh(new THREE.CylinderGeometry(0.09, 0.09, 1, 8), M(0xffffff), -0.6 + i * 0.4, 0.7, 0.45, d); box(1.6, 1, 0.8, M(0xf3eee4), 0, 0.2, -0.15, d); gableRoof(1.8, 1.3, 0.45, M(0xe8e1d3), 1.2, d).rotation.y = 0; }
+  else if (kind === 'market') { d.position.set(-1.05, 0.3, -1.05); box(0.1, 1.1, 0.1, M(0x555555), -0.6, 0, 0, d); box(0.1, 1.1, 0.1, M(0x555555), 0.6, 0, 0, d); box(1.6, 0.9, 0.08, M(0x14263d), 0, 1.0, 0, d); [0.25, 0.45, 0.35, 0.65].forEach((h, k) => box(0.22, h, 0.05, M(k === 2 ? 0xff6f61 : 0x3fd49c), -0.5 + k * 0.33, 1.1, 0.05, d)); }
+  else if (kind === 'tax') { d.position.set(-1.05, 0.3, -1.05); box(1.5, 1.3, 1.2, M(0xd8cdb8), 0, 0, 0, d); mesh(new THREE.SphereGeometry(0.5, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2), M(0x8a9aa8, { metalness: 0.3 }), 0, 1.3, 0, d); box(0.35, 0.6, 0.05, M(0x3c2f2a), 0, 0, 0.61, d); }
+}
+function buildBoard() {
+  while (boardGroup.children.length) boardGroup.remove(boardGroup.children[0]);
+  const th = THEMES[currentTheme];
+  G.tiles.forEach(t => {
+    const geo = tileGeo(t.i);
+    const g = new THREE.Group(); g.position.set(geo.x, 0, geo.z); g.rotation.y = geo.rot; boardGroup.add(g);
+    t.group = g; t.geo = geo;
+    const base = box(T - 0.2, 0.3, T - 0.2, M(th.tile), 0, 0, 0, g); base.userData.tile = t.i;
+    if (t.kind === 'prop') { box(T - 0.2, 0.05, 0.22, M(new THREE.Color(HOODS[t.hood].color).getHex()), 0, 0.3, (T - 0.2) / 2 - 0.11, g); }
+    const corner = geo.corner;
+    t.lbl = canvasTex(512, corner ? 512 : 144, () => {});
+    const plane = new THREE.Mesh(corner ? new THREE.PlaneGeometry(2.4, 2.4) : new THREE.PlaneGeometry(3.7, 1.04), new THREE.MeshStandardMaterial({ map: t.lbl.tex, transparent: true, roughness: 0.9 }));
+    plane.rotation.x = -Math.PI / 2; plane.position.set(corner ? 0.55 : 0, 0.315, corner ? 0.55 : 1.38); plane.receiveShadow = true; plane.userData.tile = t.i; g.add(plane);
+    drawTileLabel(t);
+    if (t.kind === 'prop') {
+      const flag = new THREE.Group(); flag.position.set(1.62, 0.3, -1.6); g.add(flag);
+      mesh(new THREE.CylinderGeometry(0.03, 0.03, 1.3, 6), M(0xdddddd), 0, 0.65, 0, flag);
+      t.flagMesh = box(0.5, 0.3, 0.02, new THREE.MeshStandardMaterial({ color: 0xffffff }), 0.27, 0.95, 0, flag); flag.visible = false; t.flag = flag;
+      setBuilding(t, false);
+    } else specialProp(t.kind, g);
+  });
+}
+function setBuilding(t, animate) {
+  if (t.bld) t.group.remove(t.bld);
+  const b = makeBuilding(t.tier, t.i * 7 + 3);
+  b.position.set(0, 0.3, -0.85);
+  b.traverse(o => { if (o.isMesh) o.userData.tile = t.i; });
+  t.group.add(b); t.bld = b;
+  if (t.owner >= 0) { t.flag.visible = true; t.flagMesh.material.color.set(G.players[t.owner].hex); } else if (t.flag) t.flag.visible = false;
+  if (animate) { b.scale.set(1, 0.01, 1); tween(700, e => { const s = easeBack(e); b.scale.set(1, Math.max(0.01, s), 1); }); coinBurst(t); }
+  drawTileLabel(t);
+}
+
+/* ---- tokens & dice ---- */
+function makeToken(hex) {
+  const pts = [[0, 0], [0.42, 0], [0.44, 0.08], [0.3, 0.16], [0.2, 0.5], [0.16, 0.72], [0.26, 0.78], [0.14, 0.84], [0, 0.84]].map(p => new THREE.Vector2(p[0], p[1]));
+  const g = new THREE.Group();
+  mesh(new THREE.LatheGeometry(pts, 20), M(new THREE.Color(hex).getHex(), { roughness: 0.35, metalness: 0.25 }), 0, 0, 0, g);
+  mesh(new THREE.SphereGeometry(0.2, 16, 12), M(new THREE.Color(hex).getHex(), { roughness: 0.35, metalness: 0.25 }), 0, 0.98, 0, g);
+  g.scale.setScalar(1.25); scene.add(g); return g;
+}
+function slotPos(p, i) {
+  const geo = tileGeo(i), idx = G.players.indexOf(p);
+  const offs = [[-1.1, 0.55], [-0.37, 0.55], [0.37, 0.55], [1.1, 0.55]];
+  let [lx, lz] = offs[idx];
+  if (geo.corner) { lx = [1.3, 1.3, -0.5, 0.5][idx]; lz = [-0.3, 0.6, 1.5, 1.5][idx]; }
+  const c = Math.cos(geo.rot), s = Math.sin(geo.rot);
+  return new THREE.Vector3(geo.x + lx * c + lz * s, 0.3, geo.z - lx * s + lz * c);
+}
+const PIP = { 1: [[.5, .5]], 2: [[.25, .25], [.75, .75]], 3: [[.25, .25], [.5, .5], [.75, .75]], 4: [[.25, .25], [.75, .25], [.25, .75], [.75, .75]], 5: [[.25, .25], [.75, .25], [.5, .5], [.25, .75], [.75, .75]], 6: [[.25, .25], [.75, .25], [.25, .5], [.75, .5], [.25, .75], [.75, .75]] };
+const faceMats = [3, 4, 1, 6, 2, 5].map(v => new THREE.MeshStandardMaterial({ roughness: 0.4, map: canvasTex(128, 128, (x, w) => { x.fillStyle = '#fffaf0'; x.fillRect(0, 0, w, w); x.fillStyle = v === 1 ? '#e2463a' : '#1b2433'; PIP[v].forEach(([a, b]) => { x.beginPath(); x.arc(a * w, b * w, v === 1 ? 17 : 12, 0, 7); x.fill(); }); }).tex }));
+const DIE_TARGET = { 1: [0, 0, 0], 6: [Math.PI, 0, 0], 2: [-Math.PI / 2, 0, 0], 5: [Math.PI / 2, 0, 0], 3: [0, 0, Math.PI / 2], 4: [0, 0, -Math.PI / 2] };
+const dice = [0, 1].map(() => { const outer = new THREE.Group(); const inner = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), faceMats); inner.castShadow = true; outer.add(inner); outer.visible = false; scene.add(outer); return { outer, inner }; });
+function rollDice() {
+  const vals = [1 + Math.floor(Math.random() * 6), 1 + Math.floor(Math.random() * 6)];
+  const lookDir = new THREE.Vector3(camera.position.x - cam.target.x, 0, camera.position.z - cam.target.z).normalize();
+  const side = new THREE.Vector3(-lookDir.z, 0, lookDir.x);
+  return Promise.all(dice.map((d, k) => {
+    const v = vals[k], tgt = DIE_TARGET[v], spin = [rnd(8, 14), rnd(4, 9), rnd(8, 14)];
+    const end = new THREE.Vector3().addScaledVector(side, k ? 0.9 : -0.9).addScaledVector(lookDir, 0.6);
+    const start = end.clone().addScaledVector(lookDir, 5).add(new THREE.Vector3(0, 5, 0));
+    d.outer.visible = true; d.outer.rotation.y = rnd(0, 6.28);
+    return tween(950, e => {
+      const q = 1 - Math.pow(1 - e, 3);
+      d.outer.position.lerpVectors(start, end, q);
+      d.outer.position.y = 0.72 + (1 - q) * 5 + Math.abs(Math.sin(e * Math.PI * 3)) * (1 - e) * 1.2;
+      d.inner.rotation.set(tgt[0] + (1 - q) * spin[0], tgt[1] + (1 - q) * spin[1], tgt[2] + (1 - q) * spin[2]);
+    });
+  })).then(() => { sfx('land'); return vals; });
+}
+function hideDice() { dice.forEach(d => d.outer.visible = false); }
+
+/* ---- tweens & effects ---- */
+const tweens = [];
+function tween(ms, fn) { return new Promise(res => tweens.push({ t0: performance.now(), ms, fn, res })); }
+const easeBack = e => { const c = 1.70158; return 1 + (c + 1) * Math.pow(e - 1, 3) + c * Math.pow(e - 1, 2); };
+const wait = ms => new Promise(r => setTimeout(r, ms));
+const coinGeo = new THREE.CylinderGeometry(0.18, 0.18, 0.05, 14), coinMat = new THREE.MeshStandardMaterial({ color: 0xffc83d, metalness: 0.6, roughness: 0.3 });
+function coinBurst(t, n = 10) {
+  const base = t.group.position;
+  for (let i = 0; i < n; i++) {
+    const c = new THREE.Mesh(coinGeo, coinMat); c.position.set(base.x, 1, base.z); scene.add(c);
+    const vx = rnd(-0.06, 0.06), vz = rnd(-0.06, 0.06), vy = rnd(0.12, 0.22);
+    let y = 1, vyy = vy;
+    tween(900, e => { c.position.x += vx; c.position.z += vz; vyy -= 0.009; y += vyy; c.position.y = y; c.rotation.x += 0.3; c.rotation.z += 0.2; if (e >= 1) scene.remove(c); });
+  }
+}
+function floatAt(pos, text, color) {
+  const v = pos.clone().project(camera);
+  const el = document.createElement('div'); el.className = 'floater'; el.textContent = text; el.style.color = color || '#ffd166';
+  el.style.left = ((v.x + 1) / 2 * innerWidth) + 'px'; el.style.top = ((1 - v.y) / 2 * innerHeight) + 'px';
+  $('#floaters').appendChild(el); setTimeout(() => el.remove(), 1700);
+}
+function toast(html) { const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = html; $('#toasts').appendChild(el); setTimeout(() => el.remove(), 3300); }
+function log(html) { const box = $('#log'); const el = document.createElement('div'); el.innerHTML = html; box.appendChild(el); while (box.children.length > 4) box.firstChild.remove(); }
+
+/* tiny synth for feedback (starts after first interaction) */
+let actx = null;
+function sfx(kind) {
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime;
+    const cfg = { hop: [520, 0.05, 'triangle', 0.05], land: [180, 0.12, 'square', 0.05], coin: [880, 0.18, 'triangle', 0.07], bad: [200, 0.3, 'sawtooth', 0.04], win: [660, 0.5, 'triangle', 0.08] }[kind] || [440, 0.1, 'sine', 0.05];
+    o.type = cfg[2]; o.frequency.setValueAtTime(cfg[0], t);
+    if (kind === 'coin' || kind === 'win') o.frequency.exponentialRampToValueAtTime(cfg[0] * 1.5, t + cfg[1]);
+    if (kind === 'bad') o.frequency.exponentialRampToValueAtTime(90, t + cfg[1]);
+    g.gain.setValueAtTime(cfg[3], t); g.gain.exponentialRampToValueAtTime(0.0001, t + cfg[1]);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + cfg[1] + 0.02);
+  } catch (e) {}
+}
+
+/* ---- tap to inspect ---- */
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+function onTap(e) {
+  if (!G || !$('#modal').hidden) return;
+  const r = renderer.domElement.getBoundingClientRect();
+  ndc.set((e.clientX - r.left) / r.width * 2 - 1, -(e.clientY - r.top) / r.height * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(boardGroup.children, true).find(h => h.object.userData.tile !== undefined);
+  if (hit) { const t = G.tiles[hit.object.userData.tile]; if (t.kind === 'prop') propertyPanel(t); else modal({ eyebrow: 'Board tile', title: SPECIAL[t.kind][0].charAt(0) + SPECIAL[t.kind][0].slice(1).toLowerCase(), body: `<p>${tileHelp(t.kind)}</p>` }); }
+}
+function tileHelp(k) {
+  return {
+    payday: 'Passing here ends a year. You collect your salary plus every rental\'s cash flow. Loans pay down and values move with the market.',
+    bank: G.L.unlocks.has('refi') ? 'Stop here to refinance any property at today\'s rate and pull out equity.' : 'The bank sets today\'s mortgage rate. Refinancing unlocks in Level 7.',
+    market: G.L.unlocks.has('market') ? 'Landing here pushes the market cycle to its next phase.' : 'Market cycles unlock in Level 5. For now, prices grow a steady 3% a year.',
+    tax: G.L.unlocks.has('tax') ? 'Pay tax on rental profit. Depreciation and mortgage interest reduce what you owe.' : 'Taxes unlock in Level 8.',
+    lesson: 'Answer a real estate question. A correct answer earns cash and XP.',
+    event: 'News that moves your portfolio: repairs, booms, rate changes and more.',
+    inspect: 'Annual upkeep on one of your properties. Reserves keep this from hurting.',
+    vacancy: 'A tenant moves out, and one of your units sits empty for a month.',
+  }[k];
+}
+
+/* ================= Game state ================= */
+let G = null;
+const RIVALS = [{ name: 'Vince', hex: '#ff6f61', style: 'Flipper' }, { name: 'Rita', hex: '#9b7bff', style: 'Landlord' }, { name: 'Dex Capital', hex: '#36c5d9', style: 'Fund' }];
+function newGame(li) {
+  const L = getLevel(li);
+  if (G) G.players.forEach(p => p.token && scene.remove(p.token));
+  currentTheme = L.theme;
+  const th = THEMES[L.theme];
+  const phase = L.unlocks.has('market') ? (L.startPhase != null ? L.startPhase : 3) : -1;
+  G = { L, li, year: 1, turnsLeft: L.turns, phase, rate: phase >= 0 ? PHASES[phase].rate : 0.06, discount: 0, busy: false, over: false, quizUsed: new Set(), turnCount: 0 };
+  G.players = [{ id: 0, name: 'You', hex: '#f5b83d', cash: L.cash, pos: 0, isYou: true }]
+    .concat(RIVALS.slice(0, L.rivals).map((r, k) => ({ id: k + 1, name: r.name, hex: r.hex, style: r.style, cash: L.cash * 1.1, pos: 0 })));
+  G.me = G.players[0];
+  let n = 0;
+  G.tiles = LAYOUT.map((d, i) => {
+    if (typeof d === 'string') return { i, kind: d };
+    const hood = d[1], H = HOODS[hood];
+    const lot = L.unlocks.has('lots') && LOT_TILES.includes(i);
+    return { i, kind: 'prop', hood, hoodName: th.hoods[hood], name: STREET_NUMS[n++] + ' ' + th.hoods[hood].split(' ')[0], base: H.base * L.m * rnd(0.92, 1.08), tier: lot ? 0 : 1, owner: -1, loan: null, idx: 1, rentIdx: 1, basis: 0, invested: 0 };
+  });
+  buildDecor(L.theme);
+  buildBoard();
+  G.players.forEach(p => { p.token = makeToken(p.hex); p.token.position.copy(slotPos(p, 0)); });
+  hideDice();
+  cam.goal.set(0, 0, 0); cam.radius = innerWidth < innerHeight ? 68 : 44; cam.idle = false;
+  $('#log').innerHTML = '';
+  updateHUD();
+}
+
+/* ---- numbers ---- */
+const valueOf = t => t.base * V[t.tier] * t.idx;
+const priceOf = t => valueOf(t) * (G.discount ? 0.9 : 1);
+const monthlyRent = t => t.base * HOODS[t.hood].rent * R[t.tier] * t.rentIdx;
+function annual(t) {
+  const gross = monthlyRent(t) * 12, vac = gross * HOODS[t.hood].vac, opex = gross * OPEX, noi = gross - vac - opex;
+  const debt = t.loan ? t.loan.payment * 12 : 0;
+  return { gross, vac, opex, noi, debt, cf: noi - debt };
+}
+const owned = pid => G.tiles.filter(t => t.kind === 'prop' && t.owner === pid);
+const netWorth = p => p.cash + owned(p.id).reduce((s, t) => s + valueOf(t) - (t.loan ? t.loan.bal : 0), 0);
+const passive = pid => owned(pid).reduce((s, t) => s + annual(t).cf, 0);
+function setsOf(pid) { let n = 0; for (let h = 0; h < 4; h++) { const ts = G.tiles.filter(t => t.hood === h && t.kind === 'prop'); if (ts.every(t => t.owner === pid)) n++; } return n; }
+const ownsSet = (pid, hood) => G.tiles.filter(t => t.kind === 'prop' && t.hood === hood).every(t => t.owner === pid);
+const maxOwnedTier = pid => owned(pid).reduce((m, t) => Math.max(m, t.tier), 0);
+const upgradeCost = t => t.base * t.idx * (V[t.tier + 1] - V[t.tier]) * 0.7;
+const visitRent = t => t.tier === 0 ? 0 : monthlyRent(t) * (ownsSet(t.owner, t.hood) ? 2 : 1);
+function goalState(g) {
+  const [type, n] = g, pid = 0;
+  const cur = { props: owned(pid).length, nw: netWorth(G.me), cf: passive(pid), tier: maxOwnedTier(pid), sets: setsOf(pid) }[type];
+  const label = { props: `Own ${n} properties`, nw: `Reach ${short(n)} net worth`, cf: `Earn ${short(n)}/yr cash flow`, tier: `Build a ${TIER[n]}`, sets: `Own ${n} full neighborhood${n > 1 ? 's' : ''}` }[type];
+  const show = { props: `${cur}/${n}`, nw: `${short(cur)}`, cf: `${short(cur)}`, tier: `${TIER[cur] ? TIER[cur].split(' ')[0] : '—'}`, sets: `${cur}/${n}` }[type];
+  return { label, show, p: clamp(cur / n, 0, 1), done: cur >= n };
+}
+const goalsMet = () => G.L.goals.every(g => goalState(g).done);
+
+/* ---- HUD ---- */
+function updateHUD() {
+  if (!G) return;
+  const L = G.L;
+  $('#goalCard').innerHTML = `<div class="eyebrow">Level ${L.num} · ${esc(THEMES[L.theme].name)}</div><h2>${esc(L.title)}</h2>` +
+    L.goals.map(g => { const s = goalState(g); return `<div class="goal ${s.done ? 'done' : ''}"><div class="goal-row"><b>${s.label}</b><span class="num">${s.show}</span></div><div class="bar"><i style="width:${(s.p * 100).toFixed(1)}%"></i></div></div>`; }).join('');
+  const ph = G.phase >= 0 ? PHASES[G.phase] : null;
+  const cf = passive(0);
+  $('#stats').innerHTML = [
+    ['Cash', short(G.me.cash), 'cash'], ['Net worth', short(netWorth(G.me)), ''], ['Cash flow/yr', short(cf), ''],
+    ['Year', G.year, ''], ['Turns left', G.turnsLeft, ''], ['Market', ph ? `<span class="pill ${ph.cls}">${ph.name}</span>` : `<span class="pill flat">Stable</span>`, ''],
+  ].map(([k, v, c]) => `<div class="stat glass ${c}"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
+  $('#rivals').innerHTML = G.players.slice(1).map(p => `<div class="rival glass"><span class="dot" style="background:${p.hex}"></span><b>${esc(p.name)}</b><span class="num" style="color:var(--muted)">${owned(p.id).length} props · ${short(netWorth(p))}</span></div>`).join('');
+  $('#rollBtn').disabled = G.busy || G.over;
+  $('#rollSub').textContent = G.busy ? 'Working…' : (G.L.unlocks.has('mortgage') ? `Rate ${pct(G.rate, 2)}` : 'Space to roll');
+}
+
+/* ---- modal ---- */
+let modalOpen = false;
+function modal({ eyebrow = '', title = '', body = '', buttons, wide = false }) {
+  buttons = buttons || [{ label: 'Continue', value: true, kind: 'primary' }];
+  return new Promise(res => {
+    const m = $('#modal'); modalOpen = true;
+    m.innerHTML = `<div class="card ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="mTitle">${eyebrow ? `<div class="eyebrow">${eyebrow}</div>` : ''}<h3 id="mTitle">${title}</h3><div class="mbody">${body}</div><div class="btns"></div></div>`;
+    const wrap = m.querySelector('.btns');
+    buttons.forEach(b => {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'btn ' + (b.kind || ''); el.innerHTML = b.label + (b.sub ? `<small>${b.sub}</small>` : ''); el.disabled = !!b.disabled;
+      el.onclick = () => { m.hidden = true; m.innerHTML = ''; modalOpen = false; res(b.value); };
+      wrap.appendChild(el);
+    });
+    m.hidden = false;
+    const first = wrap.querySelector('.btn.primary:not([disabled])'); if (first) first.focus({ preventScroll: true });
+  });
+}
+const sheet = rows => `<table class="sheet">${rows.map(r => `<tr class="${r[2] || ''}"><td>${r[0]}</td><td class="${typeof r[1] === 'number' ? (r[1] < 0 ? 'neg' : 'pos') : ''}">${typeof r[1] === 'number' ? money(r[1]) : r[1]}</td></tr>`).join('')}</table>`;
+const lessonBox = (term, extra) => `<div class="lesson"><b>Playbook · ${TERMS[term][0]}</b>${extra || TERMS[term][1]}</div>`;
+
+/* ---- money flow ---- */
+function gain(p, amt, where, label) {
+  p.cash += amt;
+  if (p.isYou && where) { floatAt(where, (amt >= 0 ? '+' : '') + short(amt) + (label ? ' ' + label : ''), amt >= 0 ? '#ffd166' : '#ff8a7e'); sfx(amt >= 0 ? 'coin' : 'bad'); }
+}
+async function charge(p, amt, where, label) {
+  gain(p, -amt, where, label);
+  if (p.cash >= 0) return true;
+  if (!p.isYou) { // rivals sell their weakest asset
+    while (p.cash < 0 && owned(p.id).length) { const t = owned(p.id).sort((a, b) => valueOf(a) - valueOf(b))[0]; sellTile(t, p, true); log(`<b>${esc(p.name)}</b> was forced to sell ${esc(t.name)}`); }
+    if (p.cash < 0) p.cash = 0; return true;
+  }
+  while (G.me.cash < 0) {
+    const mine = owned(0);
+    if (!mine.length) { await failLevel('You ran out of cash with no property left to sell.', 'reserves'); return false; }
+    const choice = await modal({ eyebrow: 'Cash crunch', title: 'You\'re ' + short(-G.me.cash) + ' short', body: `<p>You can\'t cover this bill. Choose a property to sell. You\'ll receive its value minus 7% selling costs, minus the loan payoff.</p>${lessonBox('reserves', 'Investors who keep 3–6 months of expenses in reserve rarely face a forced sale, which usually happens at the worst possible time.')}`,
+      buttons: mine.map(t => ({ label: esc(t.name), sub: 'Net ' + short(valueOf(t) * 0.93 - (t.loan ? t.loan.bal : 0)), value: t.i, kind: 'danger' })) });
+    sellTile(G.tiles[choice], G.me, true);
+    learn('reserves');
+  }
+  updateHUD(); return true;
+}
+function sellTile(t, p, silent) {
+  const net = valueOf(t) * 0.93 - (t.loan ? t.loan.bal : 0);
+  p.cash += net; t.owner = -1; t.loan = null; t.basis = 0; t.invested = 0;
+  setBuilding(t, false);
+  if (p.isYou && !silent) { floatAt(t.group.position.clone().setY(2), '+' + short(net), '#ffd166'); sfx('coin'); }
+  updateHUD(); return net;
+}
+
+/* ---- the turn ---- */
+async function playerTurn() {
+  if (!G || G.busy || G.over || modalOpen) return;
+  const game = G, gone = () => G !== game || G.over;
+  G.busy = true; updateHUD(); cam.idle = false;
+  const [a, b] = await rollDice();
+  log(`You rolled <b>${a} + ${b}</b>`);
+  await wait(250);
+  await moveToken(G.me, a + b);
+  hideDice();
+  if (!gone()) await resolveTile(G.me);
+  if (gone()) return;
+  if (goalsMet()) return winLevel();
+  for (const r of G.players.slice(1)) { if (gone()) return; await rivalTurn(r); }
+  if (gone()) return;
+  G.turnsLeft--; G.turnCount++;
+  cam.goal.set(0, 0, 0);
+  if (goalsMet()) return winLevel();
+  if (G.turnsLeft <= 0) return failLevel('You ran out of turns before reaching the goal.');
+  G.busy = false; updateHUD();
+}
+async function moveToken(p, steps) {
+  for (let s = 0; s < steps; s++) {
+    const from = p.token.position.clone(); p.pos = (p.pos + 1) % 24; const to = slotPos(p, p.pos);
+    if (p.isYou && cam.follow) cam.goal.copy(to).multiplyScalar(0.45);
+    await tween(p.isYou ? 200 : 130, e => { p.token.position.lerpVectors(from, to, e); p.token.position.y = 0.3 + Math.sin(e * Math.PI) * 0.9; });
+    sfx('hop');
+    if (p.pos === 0) { if (p.isYou) await yearEnd(); else rivalPayday(p); if (G.over) return; }
+  }
+}
+async function resolveTile(p) {
+  const t = G.tiles[p.pos];
+  if (t.kind === 'prop') {
+    if (t.owner < 0) return p.isYou ? buyFlow(t) : rivalBuy(p, t);
+    if (t.owner === p.id) return p.isYou ? ownLanding(t) : null;
+    const rent = visitRent(t); if (rent <= 0) return;
+    const owner = G.players[t.owner];
+    if (p.isYou) {
+      await modal({ eyebrow: esc(owner.name) + '\'s property', title: 'You owe ' + money(rent) + ' rent', body: `<p>You landed on <b>${esc(t.name)}</b>, a ${TIER[t.tier]} owned by ${esc(owner.name)}.${ownsSet(t.owner, t.hood) ? ' They own the whole neighborhood, so the rent is doubled.' : ''}</p>` + lessonBox('neighborhood'), buttons: [{ label: 'Pay rent', value: 1, kind: 'primary' }] });
+      if (await charge(p, rent, p.token.position.clone().setY(2))) owner.cash += rent;
+      learn('neighborhood', true);
+    } else {
+      await charge(p, rent); owner.cash += rent;
+      if (owner.isYou) { floatAt(t.group.position.clone().setY(2), '+' + short(rent) + ' rent', '#ffd166'); sfx('coin'); log(`<b>${esc(p.name)}</b> paid you ${money(rent)} rent`); }
+      else log(`<b>${esc(p.name)}</b> paid ${esc(owner.name)} ${short(rent)}`);
+    }
+    updateHUD(); return;
+  }
+  if (!p.isYou) {
+    if (t.kind === 'tax' && G.L.unlocks.has('tax')) await charge(p, Math.max(0, passive(p.id)) * 0.12);
+    return;
+  }
+  return ({ lesson: quiz, event: eventCard, bank: bankTile, market: marketTile, tax: taxTile, inspect: inspectTile, vacancy: vacancyTile, payday: () => {} }[t.kind])(t);
+}
+
+/* ---- buying ---- */
+function dealRows(t, price, loanAmt, rate) {
+  const a = annual(t), pay = loanAmt ? pmt(loanAmt, rate) : 0, cf = a.noi - pay * 12, cash = price - loanAmt + price * 0.03;
+  return { a, pay, cf, cash, cap: a.noi / price, coc: cf / cash };
+}
+async function buyFlow(t) {
+  const price = priceOf(t), closing = price * 0.03, canLoan = G.L.unlocks.has('mortgage');
+  const loanAmt = price * 0.8, pay = pmt(loanAmt, G.rate);
+  const cashD = dealRows(t, price, 0, 0), loanD = dealRows(t, price, loanAmt, G.rate);
+  const rent = monthlyRent(t), one = t.tier > 0 && rent >= price * 0.01;
+  const body = `<p><b>${esc(t.name)}</b> · ${TIER[t.tier]} in ${esc(t.hoodName)} <span class="tag" style="background:${HOODS[t.hood].color};color:#fff">${HOODS[t.hood].cls}</span>${G.discount ? ' <span class="tag" style="background:var(--mint);color:#032417">10% off: motivated seller</span>' : ''}</p>` +
+    (t.tier === 0 ? `<p>Raw land earns no rent. Once you own it, build on it to create value. Lots can\'t be mortgaged.</p>` :
+    `<div class="checks"><span class="check ${one ? 'ok' : 'no'}">1% rule ${one ? 'passes' : 'fails'}</span><span class="check ${cashD.cap >= 0.065 ? 'ok' : 'no'}">Cap rate ${pct(cashD.cap)}</span><span class="check ok">Appreciation ${HOODS[t.hood].appr > 0.01 ? 'strong' : HOODS[t.hood].appr > 0 ? 'moderate' : 'low'}</span></div>`) +
+    sheet([['Price', money(price)], ['Closing costs (3%)', money(closing)], ...(t.tier ? [['Rent', money(rent) + '/mo'], ['NOI (after vacancy & expenses)', money(cashD.a.noi) + '/yr']] : []),
+      ...(canLoan && t.tier ? [['Mortgage: 20% down, ' + pct(G.rate, 2) + ', 30 yrs', money(pay) + '/mo'], ['Cash flow with mortgage', loanD.cf, 'total']] : t.tier ? [['Cash flow paying all cash', cashD.cf, 'total']] : [])]) +
+    (t.tier ? lessonBox(canLoan ? 'leverage' : 'caprate', canLoan ? `Paying cash: ${pct(cashD.coc)} cash-on-cash. With a mortgage: ${pct(loanD.coc)} on ${short(loanD.cash)} invested. Leverage stretches your cash further but shrinks the monthly cash flow.` : undefined) : '');
+  const btns = [{ label: 'Pay cash', sub: short(price + closing), value: 'cash', kind: canLoan ? '' : 'primary', disabled: G.me.cash < price + closing }];
+  if (canLoan && t.tier > 0) btns.push({ label: 'Mortgage', sub: short(price * 0.2 + closing) + ' down', value: 'loan', kind: 'primary', disabled: G.me.cash < price * 0.2 + closing });
+  btns.push({ label: 'Pass', value: 'pass' });
+  const c = await modal({ eyebrow: 'For sale', title: t.tier === 0 ? 'Buy this lot?' : 'Buy ' + esc(t.name) + '?', body, buttons: btns, wide: false });
+  if (c === 'pass') return;
+  G.discount = 0;
+  const pos = t.group.position.clone().setY(2.5);
+  if (c === 'cash') { gain(G.me, -(price + closing), pos); }
+  else { gain(G.me, -(price * 0.2 + closing), pos); t.loan = { bal: loanAmt, rate: G.rate, payment: pay, orig: loanAmt }; learn('mortgage'); learn('downpayment', true); }
+  t.owner = 0; t.basis = price; t.invested = c === 'cash' ? price + closing : price * 0.2 + closing;
+  learn('closing', true); learn('cashflow', true); if (t.tier) learn('caprate', true);
+  setBuilding(t, true); addXP(25);
+  log(`You bought <b>${esc(t.name)}</b>`);
+  updateHUD();
+}
+async function ownLanding(t) {
+  if (!G.L.unlocks.has('upgrade') || t.tier >= maxTier(G.L)) { floatAt(t.group.position.clone().setY(2), 'Home sweet home', '#bfe6ff'); return; }
+  const cost = upgradeCost(t), gainV = t.base * t.idx * (V[t.tier + 1] - V[t.tier]);
+  const c = await modal({ eyebrow: 'Your property', title: 'Upgrade to a ' + TIER[t.tier + 1] + '?', body: `<p>You\'re back at <b>${esc(t.name)}</b>. Construction costs ${money(cost)} and adds about ${money(gainV)} in value, plus rent rises from ${money(monthlyRent(t))} to ${money(t.base * HOODS[t.hood].rent * R[t.tier + 1] * t.rentIdx)}/mo.</p>` + lessonBox('forced'), buttons: [{ label: 'Build it', sub: short(cost), value: 1, kind: 'primary', disabled: G.me.cash < cost }, { label: 'Not now', value: 0 }] });
+  if (c) doUpgrade(t);
+}
+function doUpgrade(t) {
+  const cost = upgradeCost(t); if (G.me.cash < cost) return;
+  gain(G.me, -cost, t.group.position.clone().setY(3));
+  t.tier++; t.basis += cost; t.invested += cost;
+  learn('forced'); learn('arv', true); addXP(30);
+  setBuilding(t, true); log(`You built a <b>${TIER[t.tier]}</b> on ${esc(t.name)}`);
+  updateHUD();
+}
+
+/* ---- property panel ---- */
+async function propertyPanel(t) {
+  const a = annual(t), val = valueOf(t), bal = t.loan ? t.loan.bal : 0, mine = t.owner === 0;
+  const owner = t.owner >= 0 ? G.players[t.owner] : null;
+  const rows = [['Type', TIER[t.tier]], ['Neighborhood', esc(t.hoodName) + ' · ' + HOODS[t.hood].cls], ['Market value', money(val)]];
+  if (t.tier) rows.push(['Rent', money(monthlyRent(t)) + '/mo'], ['NOI', money(a.noi) + '/yr'], ['Cap rate', pct(a.noi / val)]);
+  if (mine) {
+    rows.push(['Loan balance', t.loan ? money(bal) + ' @ ' + pct(t.loan.rate, 2) : 'None, owned free and clear'], ['Equity', money(val - bal)], ['Annual cash flow', a.cf, 'total']);
+    if (t.invested > 0 && t.tier) rows.push(['Cash-on-cash', pct(a.cf / t.invested)]);
+  } else if (owner) rows.push(['Owner', esc(owner.name)]);
+  else rows.push(['Asking price', money(priceOf(t))]);
+  const btns = [];
+  const act = mine && !G.busy && !G.over;
+  if (mine && G.L.unlocks.has('upgrade') && t.tier < maxTier(G.L)) btns.push({ label: 'Build ' + TIER[t.tier + 1], sub: short(upgradeCost(t)), value: 'up', kind: 'primary', disabled: !act || G.me.cash < upgradeCost(t) });
+  const refiNew = val * 0.75, refiCash = refiNew - bal - refiNew * 0.02;
+  if (mine && G.L.unlocks.has('refi') && t.tier > 0) btns.push({ label: 'Cash-out refi', sub: refiCash > 0 ? '+' + short(refiCash) + ' @ ' + pct(G.rate, 2) : 'Not enough equity', value: 'refi', kind: 'good', disabled: !act || refiCash <= 0 });
+  if (mine) btns.push({ label: 'Sell', sub: 'Net ' + short(val * 0.93 - bal), value: 'sell', kind: 'danger', disabled: !act });
+  btns.push({ label: 'Close', value: 'close' });
+  const c = await modal({ eyebrow: mine ? 'Your property' : owner ? esc(owner.name) + '\'s property' : 'Available', title: esc(t.name), body: sheet(rows) + (mine && !act ? '<p style="font-size:12px;color:var(--muted)">Actions open up between turns.</p>' : '') + (mine && G.L.unlocks.has('refi') ? lessonBox('refi', 'A refinance replaces your loan with a new one at 75% of today\'s value, at today\'s rate. You pay 2% in costs, and your monthly payment changes.') : ''), buttons: btns });
+  if (c === 'up') { doUpgrade(t); return propertyPanel(t); }
+  if (c === 'refi') { doRefi(t); return propertyPanel(t); }
+  if (c === 'sell') {
+    const ok = await modal({ eyebrow: 'Confirm sale', title: 'Sell ' + esc(t.name) + '?', body: sheet([['Sale price', money(val)], ['Agent & closing costs (7%)', -val * 0.07], ['Loan payoff', -bal], ['You receive', val * 0.93 - bal, 'total']]) + lessonBox('sellcosts'), buttons: [{ label: 'Sell it', value: 1, kind: 'danger' }, { label: 'Keep it', value: 0 }] });
+    if (ok) { sellTile(t, G.me); learn('sellcosts', true); log(`You sold <b>${esc(t.name)}</b>`); }
+  }
+}
+function doRefi(t) {
+  const val = valueOf(t), newLoan = val * 0.75, cashOut = newLoan - (t.loan ? t.loan.bal : 0) - newLoan * 0.02;
+  if (cashOut <= 0) return;
+  t.loan = { bal: newLoan, rate: G.rate, payment: pmt(newLoan, G.rate), orig: newLoan };
+  gain(G.me, cashOut, t.group.position.clone().setY(2.5), 'refi');
+  t.invested = Math.max(0, t.invested - cashOut);
+  learn('refi'); learn('brrrr', true); learn('ltv', true); addXP(20);
+  log(`You refinanced <b>${esc(t.name)}</b> for ${short(cashOut)}`);
+  updateHUD();
+}
+
+/* ---- year end (Payday) ---- */
+async function yearEnd() {
+  const L = G.L, mine = owned(0);
+  const rows = [['Salary (saved from your job)', L.salary]];
+  let sum = L.salary, noiT = 0, debtT = 0;
+  mine.forEach(t => { const a = annual(t); noiT += a.noi; debtT += a.debt; });
+  if (mine.length) { rows.push(['Rent collected (' + mine.length + ' propert' + (mine.length > 1 ? 'ies' : 'y') + ')', mine.reduce((s, t) => s + annual(t).gross, 0)], ['Vacancy', -mine.reduce((s, t) => s + annual(t).vac, 0)], ['Taxes, insurance, repairs', -mine.reduce((s, t) => s + annual(t).opex, 0)]); if (debtT) rows.push(['Mortgage payments', -debtT]); sum += noiT - debtT; }
+  rows.push(['Cash in the bank', sum, 'total']);
+  // market & appreciation
+  const ph = G.phase >= 0 ? PHASES[G.phase] : { appr: 0.03 };
+  const nwBefore = netWorth(G.me);
+  let principal = 0;
+  G.tiles.forEach(t => {
+    if (t.kind !== 'prop') return;
+    t.idx *= 1 + ph.appr + HOODS[t.hood].appr + rnd(-0.01, 0.01); t.rentIdx *= 1.025;
+    if (t.loan) { let paid = 0; for (let m = 0; m < 12; m++) { const int = t.loan.bal * t.loan.rate / 12; const pr = Math.min(t.loan.bal, t.loan.payment - int); t.loan.bal -= pr; paid += pr; } if (t.owner === 0) principal += paid; t.loan.int = t.loan.bal * t.loan.rate; }
+  });
+  G.me.cash += sum;
+  const nwAfter = netWorth(G.me);
+  const apprGain = nwAfter - nwBefore - sum - principal;
+  G.year++;
+  let phaseNote = '';
+  if (G.phase >= 0 && Math.random() < 0.35) { G.phase = (G.phase + 1) % 4; G.rate = PHASES[G.phase].rate; phaseNote = `<p>The market moved into <b>${PHASES[G.phase].name}</b>. ${PHASES[G.phase].lesson}</p>`; }
+  G.tiles.forEach(t => t.kind === 'prop' && t.owner < 0 && drawTileLabel(t));
+  floatAt(G.me.token.position.clone().setY(2), '+' + short(sum), '#ffd166'); sfx('coin');
+  coinBurst(G.tiles[0], 14);
+  const wealth = mine.length ? `<p>Your wealth grew three ways this year:</p>` + sheet([['1 · Cash flow', noiT - debtT], ['2 · Loan paydown (tenants pay your principal)', principal], ['3 · Appreciation', apprGain]]) : '';
+  await modal({ eyebrow: 'Payday · end of year ' + (G.year - 1), title: 'Annual statement', body: sheet(rows) + wealth + phaseNote + lessonBox(mine.length ? pick(['cashflow', 'amort', 'appreciation', 'equity']) : 'househack'), buttons: [{ label: 'Collect ' + short(sum), value: 1, kind: 'primary' }] });
+  learn('amort', true); learn('equity', true); if (mine.length) learn('appreciation', true);
+  updateHUD();
+}
+function rivalPayday(p) {
+  const inc = G.L.salary * 0.9 + passive(p.id);
+  p.cash += inc;
+  // rivals invest in upgrades too
+  if (G.L.unlocks.has('upgrade')) { const t = owned(p.id).filter(t => t.tier < maxTier(G.L) && upgradeCost(t) < p.cash * 0.6)[0]; if (t && Math.random() < 0.6) { p.cash -= upgradeCost(t); t.tier++; setBuilding(t, true); log(`<b>${esc(p.name)}</b> built a ${TIER[t.tier]}`); } }
+}
+
+/* ---- rivals ---- */
+async function rivalTurn(p) {
+  const a = 1 + Math.floor(Math.random() * 6), b = 1 + Math.floor(Math.random() * 6);
+  if (cam.follow) cam.goal.copy(p.token.position).multiplyScalar(0.3);
+  await moveToken(p, a + b);
+  if (G.over) return;
+  await resolveTile(p);
+  updateHUD();
+  await wait(150);
+}
+function rivalBuy(p, t) {
+  const price = valueOf(t), lot = t.tier === 0;
+  const need = lot ? price * 1.03 : price * 0.23;
+  if (p.cash < need + G.L.salary * 0.3 || Math.random() > 0.72) return;
+  p.cash -= need; t.owner = p.id; t.basis = price;
+  if (!lot) t.loan = { bal: price * 0.8, rate: G.rate, payment: pmt(price * 0.8, G.rate), orig: price * 0.8 };
+  setBuilding(t, true);
+  log(`<b>${esc(p.name)}</b> bought ${esc(t.name)}`);
+}
+
+/* ---- special tiles ---- */
+async function quiz() {
+  const lv = G.L.num;
+  let pool = QUIZ.map((q, i) => i).filter(i => QUIZ[i][5] <= lv + 1 && !G.quizUsed.has(i));
+  if (!pool.length) { G.quizUsed.clear(); pool = QUIZ.map((q, i) => i).filter(i => QUIZ[i][5] <= lv + 1); }
+  const unseen = pool.filter(i => !SAVE.terms.includes(QUIZ[i][4]));
+  const qi = pick(unseen.length && Math.random() < 0.7 ? unseen : pool); G.quizUsed.add(qi);
+  const [q, opts, ans, why, term] = QUIZ[qi];
+  const reward = Math.round(2000 * G.L.m / 100) * 100;
+  const order = opts.map((o, i) => i).sort(() => Math.random() - 0.5);
+  const c = await modal({ eyebrow: 'Academy · win ' + short(reward), title: q, body: '', buttons: order.map(i => ({ label: esc(opts[i]), value: i })) });
+  const right = c === ans;
+  if (right) { gain(G.me, reward, G.me.token.position.clone().setY(2)); addXP(40); } else sfx('bad');
+  learn(term, true);
+  await modal({ eyebrow: right ? 'Correct' : 'Not quite', title: right ? '+' + money(reward) : 'The answer: ' + esc(opts[ans]), body: `<p>${why}</p>` + lessonBox(term), buttons: [{ label: 'Got it', value: 1, kind: 'primary' }] });
+  updateHUD();
+}
+const EVENTS = [
+  { need: 'own', term: 'capex', run: (t, m) => ({ title: 'The roof on ' + esc(t.name) + ' gave out', cost: valueOf(t) * 0.015, body: 'A full roof replacement is a classic CapEx surprise. Landlords who set aside 5–10% of rent for big repairs barely notice it.' }) },
+  { need: 'own', term: 'screening', run: t => ({ title: 'A tenant at ' + esc(t.name) + ' stopped paying', cost: monthlyRent(t) * 2, body: 'Two months of lost rent plus legal fees. Checking income, credit and references up front prevents most of these.' }) },
+  { need: 'own', term: 'insurance', run: (t, m) => ({ title: 'Storm damage at ' + esc(t.name), cost: 1000 * m, body: 'Your landlord insurance covered the repairs. You only paid the deductible. Without a policy, this would have cost ' + short(valueOf(t) * 0.05) + '.' }) },
+  { need: 'own', term: 'inspection', run: (t, m) => ({ title: 'Termites found at ' + esc(t.name), cost: 2500 * m, body: 'A pre-purchase inspection would have caught this. Always inspect before you buy.' }) },
+  { need: 'own', term: 'hoa', run: (t, m) => ({ title: 'HOA special assessment', cost: 1500 * m, body: 'The homeowners association needs a new clubhouse roof, and every owner chips in. Check an HOA\'s reserves before you buy.' }) },
+  { need: 'own', term: 'proptax', run: (t, m) => { const pv = owned(0).reduce((s, x) => s + valueOf(x), 0); return { title: 'Property tax reassessment', cost: pv * 0.004, body: 'Values went up, so the county raised your assessments. Rising values bring rising tax bills.' }; } },
+  { need: 'own', term: 'cashflow', run: t => { t.rentIdx *= 1.08; return { title: 'Rent increase at ' + esc(t.name), gain: 0, body: 'Your tenant renewed at 8% higher rent, in line with the local market. Small, regular increases compound over time.' }; } },
+  { need: 'own', term: 'cashflow', run: () => { const g = owned(0).reduce((s, t) => s + monthlyRent(t), 0); return { title: 'Tourist season boom', gain: g, body: 'A festival filled every short-term rental in town, and you earned an extra month of rent across your portfolio.' }; } },
+  { term: 'location', run: () => { const h = Math.floor(Math.random() * 4); G.tiles.forEach(t => { if (t.hood === h) t.idx *= 1.12; }); return { title: 'New transit line coming to ' + esc(G.tiles.find(t => t.hood === h).hoodName), gain: 0, body: 'Values there jumped 12%. Transit, jobs and schools drive value, which is why location matters so much.' }; } },
+  { term: 'location', run: () => { const h = Math.floor(Math.random() * 4); G.tiles.forEach(t => { if (t.hood === h) t.idx *= 0.93; }); return { title: 'Factory closes near ' + esc(G.tiles.find(t => t.hood === h).hoodName), gain: 0, body: 'Local values fell 7% as jobs left. When too much of your wealth sits in one area, local shocks hit harder.' }; } },
+  { term: 'appreciation', run: () => { G.tiles.forEach(t => { if (t.kind === 'prop') t.idx *= 1.04; }); return { title: 'Major employer opens a campus', gain: 0, body: 'Thousands of new jobs mean more renters and buyers. Every property in town gained 4% in value.' }; } },
+  { term: 'comps', run: () => { G.discount = 1; return { title: 'You found a motivated seller', gain: 0, body: 'Your next purchase is 10% below market. Studying comps helps you recognize a real bargain when you see one.' }; } },
+  { term: 'househack', run: (t, m) => ({ title: 'Year-end bonus at work', gain: Math.round(G.L.salary * 0.25 / 100) * 100, body: 'Keeping your job while you invest gives you steady savings to fund down payments and reserves.' }) },
+  { need: 'mortgage', term: 'rates', run: () => { G.rate = Math.max(0.03, G.rate - 0.0075); return { title: 'The central bank cuts rates', gain: 0, body: 'Mortgage rates fall to ' + pct(G.rate, 2) + '. Cheaper debt makes deals cash flow better' + (G.L.unlocks.has('refi') ? ', and it may be a good moment to refinance.' : '.') }; } },
+  { need: 'mortgage', term: 'fixedrate', run: () => { G.rate = Math.min(0.1, G.rate + 0.0075); return { title: 'Rates jump', gain: 0, body: 'New loans now cost ' + pct(G.rate, 2) + '. Your existing fixed-rate loans don\'t change, but new deals get harder to make work.' }; } },
+];
+async function eventCard(tile) {
+  const mine = owned(0), m = G.L.m;
+  const pool = EVENTS.filter(e => (e.need !== 'own' || mine.length) && (e.need !== 'mortgage' || G.L.unlocks.has('mortgage')));
+  const ev = pick(pool), t = mine.length ? pick(mine) : null, r = ev.run(t, m);
+  const pos = G.me.token.position.clone().setY(2);
+  await modal({ eyebrow: 'Headlines', title: r.title, body: `<p>${r.body}</p>` + (r.cost ? sheet([['Cost', -r.cost]]) : r.gain ? sheet([['You receive', r.gain]]) : '') + lessonBox(ev.term), buttons: [{ label: r.cost ? 'Pay ' + short(r.cost) : 'Continue', value: 1, kind: 'primary' }] });
+  learn(ev.term, true);
+  if (r.cost) await charge(G.me, r.cost, pos); else if (r.gain) gain(G.me, r.gain, pos);
+  G.tiles.forEach(x => x.kind === 'prop' && drawTileLabel(x));
+  updateHUD();
+}
+async function bankTile() {
+  if (!G.L.unlocks.has('mortgage')) return modal({ eyebrow: 'Bank', title: 'Meet your future lender', body: '<p>Mortgages unlock in the next level. Lenders look at your income, credit score and debt-to-income ratio, and want 20–25% down on investment property.</p>' + lessonBox('mortgage') });
+  const mine = owned(0).filter(t => t.tier > 0);
+  const opts = G.L.unlocks.has('refi') ? mine.map(t => { const val = valueOf(t), nl = val * 0.75, co = nl - (t.loan ? t.loan.bal : 0) - nl * 0.02; return { t, co }; }).filter(o => o.co > 0) : [];
+  const btns = opts.slice(0, 5).map(o => ({ label: 'Refinance ' + esc(o.t.name), sub: '+' + short(o.co), value: o.t.i, kind: 'good' }));
+  btns.push({ label: 'Leave', value: -1, kind: btns.length ? '' : 'primary' });
+  learn('rates', true);
+  const c = await modal({ eyebrow: 'Bank', title: 'Today\'s rate: ' + pct(G.rate, 2), body: `<p>A ${short(100000 * G.L.m)} loan at this rate costs ${money(pmt(100000 * G.L.m, G.rate))}/mo over 30 years.</p>` + (G.L.unlocks.has('refi') ? (opts.length ? '<p>These properties have enough equity for a cash-out refinance at 75% LTV:</p>' : '<p>None of your properties has enough equity to refinance yet. Build or wait for appreciation.</p>') + lessonBox('ltv') : lessonBox('fixedrate')), buttons: btns });
+  if (c >= 0) doRefi(G.tiles[c]);
+}
+async function marketTile() {
+  if (G.phase < 0) { const b = Math.round(1000 * G.L.m); gain(G.me, b, G.me.token.position.clone().setY(2)); learn('comps', true); return modal({ eyebrow: 'Market Watch', title: 'Coffee with a mentor', body: `<p>A veteran investor walks you through reading comps. You gain a tip worth ${money(b)}.</p>` + lessonBox('comps') }); }
+  G.phase = (G.phase + 1) % 4; G.rate = PHASES[G.phase].rate; learn('cycle', true);
+  const ph = PHASES[G.phase];
+  await modal({ eyebrow: 'Market Watch', title: 'The market enters ' + ph.name, body: `<p>${ph.lesson}</p>` + sheet([['Yearly appreciation', (ph.appr >= 0 ? '+' : '') + pct(ph.appr)], ['New mortgage rate', pct(ph.rate, 2)]]) + lessonBox('cycle') });
+  updateHUD();
+}
+async function taxTile() {
+  if (!G.L.unlocks.has('tax')) return modal({ eyebrow: 'Tax Office', title: 'Nothing due, yet', body: '<p>Rental profit is taxable income, but investors get powerful deductions. Taxes unlock in Level 8.</p>' + lessonBox('depreciation') });
+  const mine = owned(0);
+  const noi = mine.reduce((s, t) => s + annual(t).noi, 0), interest = mine.reduce((s, t) => s + (t.loan ? t.loan.bal * t.loan.rate : 0), 0), dep = mine.reduce((s, t) => s + t.basis * 0.8 / 27.5, 0);
+  const taxable = noi - interest - dep, tax = Math.max(0, taxable) * 0.24;
+  learn('depreciation', true);
+  await modal({ eyebrow: 'Tax Office', title: tax > 0 ? 'Tax bill: ' + money(tax) : 'You owe nothing', body: sheet([['Rental NOI', noi], ['Mortgage interest deduction', -interest], ['Depreciation (building ÷ 27.5 yrs)', -dep], ['Taxable rental income', taxable, 'total']]) + `<p>${tax > 0 ? 'Taxed at 24%.' : 'Deductions wiped out your taxable rental income on paper, even though you still collected the cash.'}</p>` + lessonBox('depreciation'), buttons: [{ label: tax > 0 ? 'Pay ' + short(tax) : 'Nice', value: 1, kind: 'primary' }] });
+  if (tax > 0) await charge(G.me, tax, G.me.token.position.clone().setY(2));
+  updateHUD();
+}
+async function inspectTile() {
+  const mine = owned(0).filter(t => t.tier > 0);
+  if (!mine.length) return modal({ eyebrow: 'Inspection', title: 'Shadow an inspector', body: '<p>You tag along on a home inspection: foundation cracks, roof age, electrical panels, water heaters. Now you know what to look for.</p>' + lessonBox('inspection') });
+  const t = pick(mine), cost = valueOf(t) * 0.006;
+  await modal({ eyebrow: 'Inspection', title: 'Annual upkeep at ' + esc(t.name), body: '<p>The water heater and HVAC need servicing. Regular maintenance keeps small problems from becoming CapEx disasters.</p>' + sheet([['Maintenance', -cost]]) + lessonBox('capex'), buttons: [{ label: 'Pay ' + short(cost), value: 1, kind: 'primary' }] });
+  learn('capex', true);
+  await charge(G.me, cost, t.group.position.clone().setY(2));
+}
+async function vacancyTile() {
+  const mine = owned(0).filter(t => t.tier > 0);
+  if (!mine.length) return modal({ eyebrow: 'Turnover', title: 'Empty units cost money', body: '<p>Every month a unit sits empty, the mortgage and bills still come due. Budget for vacancy in every deal.</p>' + lessonBox('vacancy') });
+  const t = pick(mine), cost = monthlyRent(t) + (t.loan ? t.loan.payment * 0 : 0) + monthlyRent(t) * 0.3;
+  await modal({ eyebrow: 'Turnover', title: 'A tenant moved out of ' + esc(t.name), body: '<p>One month of lost rent plus cleaning and painting before the next tenant arrives.</p>' + sheet([['Lost rent', -monthlyRent(t)], ['Turnover costs', -monthlyRent(t) * 0.3]]) + lessonBox('vacancy'), buttons: [{ label: 'Pay ' + short(cost), value: 1, kind: 'primary' }] });
+  learn('vacancy', true);
+  await charge(G.me, cost, t.group.position.clone().setY(2));
+}
+
+/* ---- win / lose ---- */
+async function winLevel() {
+  G.over = true; G.busy = false; updateHUD(); sfx('win');
+  const L = G.L, frac = G.turnsLeft / L.turns, stars = frac >= 0.4 ? 3 : frac >= 0.15 ? 2 : 1;
+  const prev = SAVE.stars[G.li] || 0; SAVE.stars[G.li] = Math.max(prev, stars); SAVE.max = Math.max(SAVE.max, G.li + 1); persist();
+  addXP(150 * stars + (L.endless ? 200 : 0));
+  owned(0).forEach(t => coinBurst(t, 6));
+  const nextL = getLevel(G.li + 1);
+  const c = await modal({ eyebrow: 'Level ' + L.num + ' complete', title: esc(L.title), body: `<div class="stars-big">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3 - stars)}</span></div>` +
+    sheet([['Net worth', money(netWorth(G.me))], ['Properties owned', owned(0).length + ''], ['Cash flow per year', passive(0), ''], ['Years played', G.year - 1 + ''], ['Turns to spare', G.turnsLeft + '']]) +
+    `<p>Next up: <b>${esc(nextL.title)}</b> in ${esc(THEMES[nextL.theme].name)}.</p>`, buttons: [{ label: 'Next level', value: 'next', kind: 'primary' }, { label: 'Replay', value: 'replay' }, { label: 'Level map', value: 'map' }] });
+  if (c === 'next') startLevel(G.li + 1); else if (c === 'replay') startLevel(G.li); else showLevels();
+}
+function failLevel(why, term) {
+  G.over = true; G.busy = false; updateHUD(); sfx('bad');
+  setTimeout(() => failModal(why, term), 60);
+}
+async function failModal(why, term) {
+  const c = await modal({ eyebrow: 'Level not completed', title: 'So close', body: `<p>${why}</p>` + G.L.goals.map(g => { const s = goalState(g); return `<div class="goal ${s.done ? 'done' : ''}"><div class="goal-row"><b>${s.label}</b><span class="num">${s.show}</span></div><div class="bar"><i style="width:${s.p * 100}%"></i></div></div>`; }).join('') + lessonBox(term || 'leverage', term ? undefined : 'Tip: mortgages let you buy more properties sooner, renovating creates instant equity, and cheaper neighborhoods cash flow best.'), buttons: [{ label: 'Try again', value: 'replay', kind: 'primary' }, { label: 'Level map', value: 'map' }] });
+  if (c === 'replay') startLevel(G.li); else showLevels();
+}
+
+/* ================= Screens & panels ================= */
+async function startLevel(li) {
+  $('#title').hidden = true; $('#levels').hidden = true;
+  newGame(li);
+  $('#hudTop').hidden = false; $('#hudBottom').hidden = false; $('#rivals').hidden = false; $('#log').hidden = false;
+  document.fonts && document.fonts.ready.then(() => G.tiles.forEach(drawTileLabel));
+  const L = G.L;
+  G.busy = true; updateHUD();
+  await modal({ eyebrow: 'Level ' + L.num + ' · ' + esc(THEMES[L.theme].name), title: esc(L.title), body: `<p>${L.intro}</p>` +
+    `<div class="goal" style="margin-top:12px"><div class="eyebrow">Goal · ${L.turns} turns</div></div>` + L.goals.map(g => `<div class="goal-row" style="margin-top:6px"><b>${goalState(g).label}</b></div>`).join('') +
+    sheet([['Starting cash', money(L.cash)], ['Salary saved each year', money(L.salary)], ['Rival investors', L.rivals ? L.rivals + '' : 'None']]), buttons: [{ label: 'Start', value: 1, kind: 'primary' }] });
+  (L.terms || []).forEach(t => learn(t, true));
+  G.busy = false; updateHUD();
+}
+function showLevels() {
+  const grid = $('#lvlGrid'); grid.innerHTML = '';
+  const total = Math.max(LEVELS.length, SAVE.max + 1) + (SAVE.max >= LEVELS.length - 1 ? 1 : 0);
+  for (let i = 0; i < total; i++) {
+    const L = getLevel(i), locked = i > SAVE.max, st = SAVE.stars[i] || 0;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'lvl'; b.disabled = locked;
+    b.innerHTML = `<span class="n">${L.endless ? 'EXPANSION' : 'LEVEL ' + L.num}</span><b>${esc(L.endless ? THEMES[L.theme].name : L.title)}</b><span class="sub">${esc(L.endless ? 'Endless mode · ' + L.goals.map(g => goalShort(g)).join(', ') : THEMES[L.theme].name + ' · ' + L.goals.map(g => goalShort(g)).join(', '))}</span>` +
+      (locked ? `<span class="stars"><span class="off">Locked</span></span>` : `<span class="stars">${'★'.repeat(st)}<span class="off">${'★'.repeat(3 - st)}</span></span>`) + (i === SAVE.max && !st ? '<span class="new tag" style="background:var(--gold);color:#2a1a00">Next</span>' : '');
+    b.onclick = () => startLevel(i);
+    grid.appendChild(b);
+  }
+  const r = rankOf(SAVE.xp);
+  $('#rankLine').textContent = `${r.name} · ${SAVE.xp} XP${r.next ? ' · ' + (r.next[1] - SAVE.xp) + ' XP to ' + r.next[0] : ''} · ${SAVE.terms.length}/${Object.keys(TERMS).length} Playbook terms`;
+  $('#levelsBack').hidden = !G || G.over;
+  $('#levels').hidden = false; $('#title').hidden = true;
+}
+function goalShort(g) { const [t, n] = g; return { props: n + ' properties', nw: short(n) + ' net worth', cf: short(n) + '/yr cash flow', tier: 'build a ' + TIER[n].split(' ').slice(-1)[0].toLowerCase(), sets: n + ' neighborhood' + (n > 1 ? 's' : '') }[t]; }
+function openDrawer(kind) {
+  const d = $('#drawer'), body = $('#drawerBody');
+  if (kind === 'portfolio') {
+    $('#drawerTitle').textContent = 'Portfolio';
+    const mine = owned(0);
+    const eq = mine.reduce((s, t) => s + valueOf(t) - (t.loan ? t.loan.bal : 0), 0), debt = mine.reduce((s, t) => s + (t.loan ? t.loan.bal : 0), 0);
+    body.innerHTML = `<div class="glass" style="padding:12px 14px">${sheet([['Cash', money(G.me.cash)], ['Property value', money(eq + debt)], ['Mortgage debt', -debt], ['Equity', money(eq)], ['Cash flow per year', passive(0), 'total']])}</div>` +
+      (mine.length ? '' : '<p style="color:var(--muted);line-height:1.5">You don\'t own anything yet. Roll the dice and buy a property you land on. Tap any tile on the board to see its numbers.</p>');
+    mine.sort((a, b) => a.i - b.i).forEach(t => {
+      const a = annual(t), row = document.createElement('button'); row.type = 'button'; row.className = 'prop-row';
+      row.innerHTML = `<span class="dot" style="background:${HOODS[t.hood].color}"></span><span><b>${esc(t.name)}</b><div class="sub">${TIER[t.tier]} · ${short(valueOf(t))} value</div></span><span class="num" style="color:${a.cf >= 0 ? 'var(--mint)' : 'var(--coral)'}">${short(a.cf)}/yr</span>`;
+      row.onclick = () => { d.classList.remove('open'); propertyPanel(t); };
+      body.appendChild(row);
+    });
+  } else {
+    $('#drawerTitle').textContent = 'Playbook';
+    const ids = Object.keys(TERMS);
+    body.innerHTML = `<p style="color:var(--muted);margin:0 0 4px">${SAVE.terms.length} of ${ids.length} terms learned. Land on Academy tiles and read the lessons to unlock more.</p>` +
+      ids.sort((a, b) => SAVE.terms.includes(b) - SAVE.terms.includes(a)).map(id => SAVE.terms.includes(id) ? `<div class="term"><b>${TERMS[id][0]}</b><p>${TERMS[id][1]}</p></div>` : `<div class="term locked"><b>Locked term</b><p>Keep playing to discover it.</p></div>`).join('');
+  }
+  d.classList.add('open');
+}
+
+/* ================= Wiring ================= */
+$('#rollBtn').onclick = () => { sfx('hop'); playerTurn(); };
+$('#btnPortfolio').onclick = () => openDrawer('portfolio');
+$('#btnBook').onclick = () => openDrawer('book');
+$('#drawerClose').onclick = () => $('#drawer').classList.remove('open');
+$('#btnMenu').onclick = () => { if (G && G.busy) return; showLevels(); };
+$('#levelsBack').onclick = () => { $('#levels').hidden = true; };
+$('#btnCam').onclick = () => { cam.follow = !cam.follow; $('#camLbl').textContent = cam.follow ? 'Follow' : 'Free cam'; if (!cam.follow) cam.goal.set(0, 0, 0); };
+$('#playBtn').onclick = () => { sfx('coin'); if (SAVE.max === 0 && !SAVE.stars[0]) startLevel(0); else showLevels(); };
+window.addEventListener('keydown', e => {
+  if ((e.code === 'Space' || e.code === 'Enter') && G && $('#modal').hidden && $('#title').hidden && $('#levels').hidden && document.activeElement.tagName !== 'BUTTON') { e.preventDefault(); playerTurn(); }
+  if (e.code === 'Escape') $('#drawer').classList.remove('open');
+});
+function refreshRank() { const r = rankOf(SAVE.xp); $('#rankBadge').innerHTML = `<b>${r.name}</b> · ${SAVE.xp} XP · ${Object.keys(SAVE.stars).length} of ${LEVELS.length} cities cleared`; }
+
+/* ---- render loop ---- */
+let last = performance.now(), tAcc = 0;
+function frame(now) {
+  const dt = Math.min(50, now - last); last = now; tAcc += dt / 1000;
+  for (let i = tweens.length - 1; i >= 0; i--) { const tw = tweens[i], e = Math.min(1, (now - tw.t0) / tw.ms); tw.fn(e); if (e >= 1) { tweens.splice(i, 1); tw.res(); } }
+  if (cam.idle || !$('#title').hidden) cam.theta += dt * 0.00006;
+  placeCamera();
+  spinners.forEach(s => {
+    if (s.spin) s.o.rotation.y += s.spin; if (s.spinY) s.o.rotation.y += s.spinY;
+    if (s.pulse) s.o.scale.setScalar(1 + Math.sin(tAcc * 5) * 0.12);
+    if (s.cloud) { s.o.position.x += s.cloud; if (s.o.position.x > 90) s.o.position.x = -90; }
+    if (s.boat !== undefined) { s.boat += 0.0008; s.o.position.set(Math.cos(s.boat) * 30, -0.3 + Math.sin(tAcc * 2 + s.boat * 9) * 0.08, Math.sin(s.boat) * 30); s.o.rotation.y = -s.boat; }
+  });
+  cars.forEach(c => { c.s = (c.s + c.v * dt / 1000) % 1; const L = 8.8, per = c.s * 4, side = Math.floor(per), f = per - side; const pts = [[L, L], [-L, L], [-L, -L], [L, -L]]; const [ax, az] = pts[side], [bx, bz] = pts[(side + 1) % 4]; c.o.position.set(ax + (bx - ax) * f, 0.1, az + (bz - az) * f); c.o.rotation.y = [Math.PI, Math.PI / 2, 0, -Math.PI / 2][side]; });
+  blinkers.forEach(b => b.visible = Math.sin(tAcc * 4) > 0);
+  if (G) G.players.forEach(p => { if (p.token && !G.busy) p.token.rotation.y += 0.01; });
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+
+/* ---- boot: show a living demo board behind the title ---- */
+resize();
+newGame(Math.min(SAVE.max, LEVELS.length - 1));
+cam.idle = true; cam.radius = innerWidth < innerHeight ? 70 : 46;
+G.tiles.filter(t => t.kind === 'prop').forEach((t, k) => { if (k % 3 !== 2) { t.owner = k % 2 ? 0 : (G.players[1] ? 1 : 0); t.tier = 1 + (k % 4); setBuilding(t, false); } });
+G.over = true;
+refreshRank();
+requestAnimationFrame(frame);
+document.fonts && document.fonts.ready.then(() => G && G.tiles.forEach(drawTileLabel));
+window.__dd = { get G() { return G; }, startLevel, playerTurn, setBuilding, SAVE };
+})();
+</script>
+
+</body>
+</html>
