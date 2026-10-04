@@ -74,10 +74,10 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tool{padding:10px 12px;border-radius:13px;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:74px}
 .tool svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tool:hover{border-color:rgba(245,184,61,.5)}
-#rivals{position:fixed;left:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:4;pointer-events:none}
+#rivals{position:fixed;left:16px;bottom:calc(180px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:4;pointer-events:none}
 .rival{padding:6px 10px;display:flex;align-items:center;gap:8px;font-size:12px}
 .dot{width:10px;height:10px;border-radius:50%;flex:none}
-#log{position:fixed;right:16px;bottom:calc(92px + env(safe-area-inset-bottom,0px));width:min(290px,calc(100% - 32px));display:flex;flex-direction:column;gap:4px;z-index:4;pointer-events:none;align-items:flex-end}
+#log{position:fixed;right:16px;bottom:calc(180px + env(safe-area-inset-bottom,0px));width:min(290px,calc(100% - 32px));display:flex;flex-direction:column;gap:4px;z-index:4;pointer-events:none;align-items:flex-end}
 #log div{background:var(--panel);border:1px solid var(--line);padding:5px 10px;border-radius:10px;font-size:12px;color:var(--muted);animation:logIn .3s ease-out}
 #log div b{color:var(--text);font-weight:600}
 @keyframes logIn{from{transform:translateY(8px);opacity:.2}}
@@ -162,6 +162,61 @@ table.sheet{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
 .stars-big{font-size:40px;letter-spacing:6px;color:var(--gold);text-align:center;margin:6px 0}
 .stars-big .off{color:rgba(255,255,255,.15)}
 
+/* deal cards + momentum */
+#handBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(98px + env(safe-area-inset-bottom,0px));z-index:5;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none}
+#handBar>*{pointer-events:auto}
+#hand{display:flex;gap:8px}
+.dcard,.dslot{width:92px;height:62px;border-radius:12px}
+.dslot{border:1.5px dashed rgba(255,255,255,.3);background:rgba(13,26,43,.35)}
+.dcard{background:linear-gradient(160deg,#1f3758,#132339);border:1.5px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 6px 16px rgba(0,0,0,.35);transition:transform .15s;animation:deal .4s cubic-bezier(.2,1.4,.4,1)}
+.dcard:hover{transform:translateY(-5px) rotate(-2deg)}
+.dcard .ic{font-family:var(--display);font-weight:800;font-size:20px;color:var(--gold);line-height:1}
+.dcard b{font-size:11px;line-height:1.1;text-align:center;padding:0 4px}
+@keyframes deal{from{transform:translateY(30px) rotate(8deg);opacity:0}}
+.dcard.big{width:auto;height:auto;padding:18px 16px;margin:6px 0 4px;gap:6px;cursor:default}
+.dcard.big:hover{transform:none}
+.dcard.big .ic{font-size:42px}
+.dcard.big b{font-family:var(--display);font-size:21px}
+.dcard.big small{font-size:13px;color:#d6e2ee;text-align:center;max-width:34ch;line-height:1.4}
+.momentum{display:flex;align-items:center;gap:8px;padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.momentum .bar{width:150px}
+.momentum .bar i{background:linear-gradient(90deg,#36c5d9,var(--sky))}
+#handBar.boom .momentum{color:var(--gold);animation:glow .9s ease-in-out infinite alternate}
+#handBar.boom .momentum .bar i{background:linear-gradient(90deg,var(--gold-deep),#ffd166)}
+@keyframes glow{to{box-shadow:0 0 20px rgba(245,184,61,.7)}}
+#rollBtn.hot{background:linear-gradient(180deg,#ff9a8b,var(--coral) 55%,#c4473b);box-shadow:0 6px 0 #7d2a22,0 14px 30px rgba(0,0,0,.35);animation:pulse .8s ease-in-out infinite alternate}
+@keyframes pulse{to{transform:scale(1.05)}}
+/* speech bubbles, confetti, shake */
+.bubble{position:absolute;transform:translate(-50%,-100%);background:#fffaf0;color:#1b2433;padding:6px 11px;border-radius:12px;font-size:13px;font-weight:600;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.3);animation:bubble 2.6s ease forwards}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#fffaf0}
+@keyframes bubble{0%{opacity:0;transform:translate(-50%,-70%) scale(.7)}10%{opacity:1;transform:translate(-50%,-100%) scale(1)}85%{opacity:1}100%{opacity:0}}
+.confetti{position:absolute;top:-14px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{top:105vh;margin-left:60px;rotate:600deg}}
+#stage.shake{animation:shake .45s}
+@keyframes shake{20%{transform:translate(-7px,3px)}40%{transform:translate(6px,-4px)}60%{transform:translate(-4px,2px)}80%{transform:translate(3px,-1px)}}
+.banner{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%);z-index:7;font-family:var(--display);font-weight:800;font-size:clamp(34px,8vw,64px);color:#fff;text-shadow:0 5px 0 var(--gold-deep),0 10px 30px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap;animation:banner 1.5s ease forwards}
+@keyframes banner{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}18%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}30%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%)}}
+/* payday wheel */
+.wheel-wrap{position:relative;width:250px;height:250px;margin:14px auto 4px;max-width:100%}
+.wheel{width:100%;height:100%;border-radius:50%;border:6px solid #fffaf0;box-shadow:0 10px 30px rgba(0,0,0,.4);position:relative;transition:transform 3.2s cubic-bezier(.12,.8,.18,1)}
+.wheel span{position:absolute;left:50%;top:0;width:0;height:50%;transform-origin:50% 100%}
+.wheel em{position:absolute;top:16px;left:0;transform:translateX(-50%);font-style:normal;font-weight:800;font-size:11.5px;color:#14263d;white-space:nowrap}
+.wheel::after{content:"";position:absolute;left:50%;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:#fffaf0;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.wheel-pin{position:absolute;top:-12px;left:50%;margin-left:-13px;border:13px solid transparent;border-top:24px solid #fff;border-bottom:0;z-index:2;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+/* auction + appraisal */
+.auction{text-align:center;margin:10px 0;padding:14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.a-bid{font-size:36px;color:var(--gold)}
+.a-lead{margin:4px 0 10px;font-weight:700;display:flex;gap:8px;justify-content:center;align-items:center}
+.a-clock i{background:linear-gradient(90deg,var(--coral),var(--gold));transition:width .1s linear}
+.slider-out{font-family:var(--mono);font-size:30px;color:var(--gold);text-align:center;margin:12px 0 4px}
+input[type=range]{width:100%;accent-color:var(--gold)}
+table.comps{width:100%;border-collapse:collapse;margin:6px 0}
+table.comps th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right;padding:4px}
+table.comps th:first-child,table.comps td:first-child{text-align:left}
+table.comps td{padding:7px 4px;border-bottom:1px dashed var(--line);font-size:13px;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.comps td:first-child{font-family:var(--body);font-weight:600}
+table.comps tr.subject td{color:var(--gold)}
+
 @media (max-width:720px){
   #stats{grid-template-columns:repeat(3,1fr);width:100%}
   #stats{gap:4px}
@@ -172,7 +227,10 @@ table.sheet{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
   #goalCard{width:100%;padding:10px 12px}
   #goalCard h2{font-size:17px;margin-bottom:4px}
   #rivals{display:none}
-  #log{bottom:calc(86px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px)}
+  #log{bottom:calc(158px + env(safe-area-inset-bottom,0px));width:calc(100% - 32px)}
+  #handBar{bottom:calc(80px + env(safe-area-inset-bottom,0px))}
+  .dcard,.dslot{width:78px;height:52px}
+  .momentum .bar{width:110px}
   #log div:nth-child(n+3){display:none}
   #rollBtn{min-width:0;padding:12px 18px;font-size:18px}
   .tool{min-width:0;padding:11px;border-radius:12px}
@@ -198,6 +256,10 @@ table.sheet{width:100%;border-collapse:collapse;font-size:13px;margin:6px 0}
     <button class="tool glass" id="btnCam" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 12a9 9 0 0118 0M21 12a9 9 0 01-18 0"/></svg><span id="camLbl" class="tl">Follow</span></button>
     <button class="tool glass" id="btnMenu" type="button"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg><span class="tl">Levels</span></button>
   </div>
+</div>
+<div id="handBar" hidden>
+  <div id="hand" aria-label="Deal cards"></div>
+  <div class="momentum glass"><span id="momLbl">Momentum</span><div class="bar"><i id="momFill" style="width:0"></i></div></div>
 </div>
 <div id="rivals" hidden></div>
 <div id="log" aria-live="polite" hidden></div>
@@ -299,6 +361,10 @@ const TERMS = {
   rates: ['Interest Rates', 'Higher rates mean bigger payments, so the same budget buys less property.'],
   hoa: ['HOA Fees', 'Dues paid to a homeowners association for shared upkeep, sometimes with surprise special assessments.'],
   inspection: ['Inspection', 'A professional check before buying that uncovers costly problems while you can still walk away.'],
+  maxbid: ['Auction Strategy', 'Set your maximum price before bidding starts. Auction fever makes people pay more than a property is worth.'],
+  ppsf: ['Price per Square Foot', 'Sale price ÷ living area. Multiply nearby comps\' average $/sq ft by a home\'s size for a quick value estimate.'],
+  negotiation: ['Negotiation', 'Asking price is a starting point. In slow markets, offers 5–15% below asking are common.'],
+  offmarket: ['Off-Market Offer', 'Buying straight from an owner who isn\'t selling publicly, usually by making an offer too good to refuse.'],
   neighborhood: ['Market Concentration', 'Owning many properties in one area builds local knowledge and pricing power, but also concentrates risk.'],
 };
 
@@ -338,6 +404,8 @@ const QUIZ = [
   ['HOA fees are paid to...', ['A homeowners association for shared upkeep', 'The IRS', 'Your tenant'], 0, 'Fees can rise, and special assessments can hit when big shared repairs come due.', 'hoa', 3],
   ['Why get an inspection before buying?', ['To find costly defects before you commit', 'It is required to collect rent', 'To raise the price'], 0, 'An inspection can save you from a bad foundation, or give you leverage to negotiate the price down.', 'inspection', 1],
   ['Owning every property in a neighborhood mainly gives you...', ['Local knowledge and pricing power', 'An exemption from taxes', 'Frozen rents'], 0, 'Concentration makes management efficient and lets you shape an area. It also concentrates your risk.', 'neighborhood', 6],
+  ['Three nearby homes sold for $200, $210 and $220 per sq ft. Roughly what is a similar 1,500 sq ft home worth?', ['$315,000', '$210,000', '$450,000'], 0, 'Average $/sq ft is $210. Multiply by 1,500 sq ft to get about $315,000.', 'ppsf', 2],
+  ['What is the smartest way to bid at a property auction?', ['Decide your maximum before bidding starts', 'Keep raising until you win', 'Bid on everything'], 0, 'Run the numbers first and walk away at your limit. The winner of a bidding war is often the person who overpaid.', 'maxbid', 3],
   ['A lender typically offers a cash-out refinance up to about...', ['75% of current value', '100% of current value', '150% of current value'], 0, 'Most lenders cap investment refinances around 70–80% LTV so you keep some equity cushion.', 'ltv', 7],
 ];
 
@@ -353,29 +421,29 @@ const THEMES = {
 const THEME_ORDER = ['maple', 'river', 'harbor', 'summit', 'metro', 'skyline'];
 
 const LEVELS = [
-  { theme: 'maple', title: 'Your First Door', m: 1, cash: 100000, salary: 15000, turns: 16, rivals: 0, goals: [['props', 2]], unlock: [],
-    intro: 'Every investor starts with one door. Land on a property and buy it with cash. Each time you pass <b>Payday</b>, a year passes: you collect your salary plus every rental\'s cash flow.', terms: ['cashflow', 'noi'] },
-  { theme: 'maple', title: 'The Power of Leverage', m: 1, cash: 70000, salary: 16000, turns: 18, rivals: 0, goals: [['props', 4]], unlock: ['mortgage'],
+  { theme: 'maple', title: 'Your First Door', m: 1, cash: 100000, salary: 15000, turns: 24, rivals: 0, goals: [['props', 2]], unlock: [],
+    intro: 'Every investor starts with one door. Roll the die, land on a property and buy it with cash. Roll a <b>6</b> and you get a bonus roll. Each time you pass <b>Payday</b>, a year passes: you collect your salary plus every rental\'s cash flow.', terms: ['cashflow', 'noi'] },
+  { theme: 'maple', title: 'The Power of Leverage', m: 1, cash: 70000, salary: 16000, turns: 28, rivals: 0, goals: [['props', 4]], unlock: ['mortgage'],
     intro: '<b>Mortgages unlocked.</b> Put 20% down and let the bank fund the rest. You can control far more property, but every loan payment comes out of your cash flow.', terms: ['mortgage', 'downpayment', 'leverage'] },
-  { theme: 'maple', title: 'Cash Flow Is King', m: 1, cash: 90000, salary: 16000, turns: 22, rivals: 0, goals: [['cf', 9000]], unlock: [],
-    intro: 'Owning a lot of property doesn\'t help if it doesn\'t pay you. Use the deal analyzer: <b>Class C</b> neighborhoods rent high for their price, while <b>Class A</b> areas grow in value but pay less today.', terms: ['caprate', 'onepercent'] },
-  { theme: 'maple', title: 'Forced Appreciation', m: 1, cash: 100000, salary: 18000, turns: 22, rivals: 0, goals: [['tier', 3]], unlock: ['upgrade'],
+  { theme: 'maple', title: 'Cash Flow Is King', m: 1, cash: 90000, salary: 16000, turns: 34, rivals: 1, goals: [['cf', 9000]], unlock: [],
+    intro: 'Owning a lot of property doesn\'t help if it doesn\'t pay you. Use the deal analyzer: <b>Class C</b> neighborhoods rent high for their price, while <b>Class A</b> areas grow in value but pay less today. <b>Your first rival, Vince, arrives.</b> Pass on a deal and it goes to a live auction.', terms: ['caprate', 'onepercent'] },
+  { theme: 'maple', title: 'Forced Appreciation', m: 1, cash: 100000, salary: 18000, turns: 34, rivals: 1, goals: [['tier', 3]], unlock: ['upgrade'],
     intro: '<b>Renovations unlocked.</b> Tap any property you own to add units. Construction costs less than the value it creates, so you gain equity instantly. Build a Fourplex.', terms: ['forced', 'arv'] },
-  { theme: 'river', title: 'Riding the Cycle', m: 1.3, cash: 100000, salary: 20000, turns: 24, rivals: 0, goals: [['nw', 320000]], unlock: ['market'],
+  { theme: 'river', title: 'Riding the Cycle', m: 1.3, cash: 100000, salary: 20000, turns: 38, rivals: 1, goals: [['nw', 320000]], unlock: ['market'],
     intro: '<b>Market cycles unlocked.</b> Riverside moves through Expansion, Peak, Correction and Recovery. Rates and prices shift with each phase. Land on <b>Market Watch</b> to push the cycle forward.', terms: ['cycle', 'appreciation', 'fixedrate'] },
-  { theme: 'river', title: 'Competition Arrives', m: 1.3, cash: 120000, salary: 20000, turns: 26, rivals: 1, goals: [['sets', 1]], unlock: [],
-    intro: 'A rival investor has come to town. Owning all three lots in a neighborhood <b>doubles the rent</b> visitors pay you. Lock one down before they do.', terms: ['neighborhood', 'location'] },
-  { theme: 'river', title: 'The BRRRR Method', m: 1.3, cash: 120000, salary: 22000, turns: 26, rivals: 1, goals: [['props', 6], ['cf', 15000]], unlock: ['refi'],
+  { theme: 'river', title: 'Competition Arrives', m: 1.3, cash: 120000, salary: 20000, turns: 40, rivals: 2, goals: [['sets', 1]], unlock: [],
+    intro: 'A second rival has come to town. Owning all three lots in a neighborhood <b>doubles the rent</b> visitors pay you. Lock one down before they do.', terms: ['neighborhood', 'location'] },
+  { theme: 'river', title: 'The BRRRR Method', m: 1.3, cash: 120000, salary: 22000, turns: 40, rivals: 2, goals: [['props', 6], ['cf', 15000]], unlock: ['refi'],
     intro: '<b>Refinancing unlocked.</b> Renovate a property, then refinance at 75% of its new value to pull your cash back out. Buy, Rehab, Rent, Refinance, Repeat.', terms: ['refi', 'brrrr', 'ltv'] },
-  { theme: 'harbor', title: 'Tax Time', m: 1.8, cash: 250000, salary: 30000, turns: 26, rivals: 2, goals: [['nw', 800000]], unlock: ['tax'],
+  { theme: 'harbor', title: 'Tax Time', m: 1.8, cash: 250000, salary: 30000, turns: 40, rivals: 2, goals: [['nw', 800000]], unlock: ['tax'],
     intro: '<b>Taxes unlocked.</b> The Tax Office charges tax on rental profit, but <b>depreciation</b> deducts 1/27.5 of your buildings\' cost each year. Big portfolios often owe little.', terms: ['depreciation', 'x1031'] },
-  { theme: 'harbor', title: 'Build From Dirt', m: 1.8, cash: 320000, salary: 32000, turns: 26, rivals: 2, goals: [['tier', 4]], unlock: ['lots'],
+  { theme: 'harbor', title: 'Build From Dirt', m: 1.8, cash: 320000, salary: 32000, turns: 40, rivals: 2, goals: [['tier', 4]], unlock: ['lots'],
     intro: '<b>Vacant lots unlocked.</b> Raw land is cheap and earns nothing until you build on it. Develop one all the way up to an Apartment Building.', terms: ['forced', 'arv'] },
-  { theme: 'summit', title: 'Weather the Downturn', m: 2.4, cash: 500000, salary: 40000, turns: 28, rivals: 2, goals: [['nw', 1500000]], unlock: [], startPhase: 2,
+  { theme: 'summit', title: 'Weather the Downturn', m: 2.4, cash: 500000, salary: 40000, turns: 44, rivals: 2, goals: [['nw', 1500000]], unlock: [], startPhase: 2,
     intro: 'Summit Heights is in a <b>correction</b>. Prices are falling and rates are high. Survive on cash flow, buy while others panic, and ride the recovery.', terms: ['reserves', 'dscr'] },
-  { theme: 'metro', title: 'Empire Builder', m: 3, cash: 700000, salary: 50000, turns: 30, rivals: 3, goals: [['sets', 2], ['cf', 60000]], unlock: [],
+  { theme: 'metro', title: 'Empire Builder', m: 3, cash: 700000, salary: 50000, turns: 46, rivals: 3, goals: [['sets', 2], ['cf', 60000]], unlock: [],
     intro: 'Three rivals fight over Metro Bay. Control two full neighborhoods and earn serious passive income.', terms: ['neighborhood', 'coc'] },
-  { theme: 'skyline', title: 'Skyline Tycoon', m: 4, cash: 1200000, salary: 70000, turns: 32, rivals: 3, goals: [['tier', 5], ['nw', 5000000]], unlock: ['towers'],
+  { theme: 'skyline', title: 'Skyline Tycoon', m: 4, cash: 1200000, salary: 70000, turns: 50, rivals: 3, goals: [['tier', 5], ['nw', 5000000]], unlock: ['towers'],
     intro: '<b>Towers unlocked.</b> Build a Mixed-Use Tower and reach $5M net worth to become a Skyline Tycoon.', terms: ['x1031', 'sellcosts'] },
 ];
 const ALL_UNLOCKS = ['mortgage', 'upgrade', 'market', 'refi', 'tax', 'lots', 'towers'];
@@ -397,7 +465,7 @@ function getLevel(i) {
     [['nw', Math.round(6e6 * Math.pow(1.5, e) / 1e5) * 1e5], ['sets', 1]],
   ];
   return { theme: themeKey, title: 'Expansion ' + e + ': ' + THEMES[themeKey].name, m, cash: Math.round(1.2e6 * Math.pow(1.4, e) / 1e4) * 1e4, salary: Math.round(70000 * Math.pow(1.3, e) / 1000) * 1000,
-    turns: 32, rivals: 3, goals: goalSets[(e - 1) % goalSets.length], unlocks: new Set(ALL_UNLOCKS), startPhase: Math.floor(Math.random() * 4), num: i + 1, endless: true,
+    turns: 50, rivals: 3, goals: goalSets[(e - 1) % goalSets.length], unlocks: new Set(ALL_UNLOCKS), startPhase: Math.floor(Math.random() * 4), num: i + 1, endless: true,
     intro: 'A new city opens. Prices are higher, rivals are richer, and the goals keep growing. How far can your empire go?', terms: [] };
 }
 const maxTier = L => L.unlocks.has('towers') ? 5 : L.unlocks.has('lots') ? 4 : L.unlocks.has('upgrade') ? 3 : 1;
@@ -621,12 +689,13 @@ function buildDecor(themeKey) {
 
 /* ---- board ---- */
 const LAYOUT = ['payday', ['prop', 0], 'lesson', ['prop', 0], ['prop', 0], 'event',
-  'bank', ['prop', 1], ['prop', 1], 'lesson', ['prop', 1], 'inspect',
+  'bank', ['prop', 1], ['prop', 1], 'cards', ['prop', 1], 'inspect',
   'market', ['prop', 2], 'event', ['prop', 2], ['prop', 2], 'lesson',
-  'tax', ['prop', 3], ['prop', 3], 'event', ['prop', 3], 'vacancy'];
+  'tax', ['prop', 3], ['prop', 3], 'openhouse', ['prop', 3], 'vacancy'];
 const LOT_TILES = [4, 10, 16, 22];
 const SPECIAL = {
   payday: ['PAYDAY', 'Collect salary + rent', '$'], bank: ['BANK', 'Loans & refinancing', '%'], market: ['MARKET WATCH', 'The cycle turns', '↗'], tax: ['TAX OFFICE', 'Depreciation helps', 'T'],
+  cards: ['DEAL DESK', 'Draw a Deal Card', '★'], openhouse: ['OPEN HOUSE', 'Guess the value', '≈'],
   lesson: ['ACADEMY', 'Answer to earn', '?'], event: ['HEADLINES', 'Something happens', '!'], inspect: ['INSPECTION', 'Upkeep check', '✓'], vacancy: ['TURNOVER', 'Tenants move out', '0'],
 };
 const STREET_NUMS = [12, 48, 7, 221, 35, 90, 16, 402, 58, 77, 131, 9];
@@ -669,6 +738,8 @@ function drawTileLabel(t) {
 function specialProp(kind, g) {
   const d = new THREE.Group(); d.position.set(0, 0.3, -0.85); g.add(d);
   if (kind === 'lesson') { box(1.5, 0.9, 1.1, M(0xc94f3d), 0, 0, 0, d); gableRoof(1.5, 1.1, 0.55, M(0x6b4a3a), 0.9, d); box(0.3, 0.45, 0.3, M(0xffffff), 0, 1.3, 0, d); box(0.3, 0.5, 0.05, M(0x3c2f2a), 0, 0, 0.56, d); }
+  else if (kind === 'cards') { [0, 1, 2].forEach(k => { const c = box(1.0, 0.06, 1.4, M(k === 2 ? 0xf5b83d : 0xfffaf0), 0, k * 0.07, 0, d); c.rotation.y = k * 0.3 - 0.3; }); const fl = box(0.8, 1.1, 0.06, M(0xf5b83d, { metalness: 0.3, roughness: 0.4 }), 0, 0.75, 0, d); spinners.push({ o: fl, spin: 0.03 }); }
+  else if (kind === 'openhouse') { box(1.4, 0.9, 1.1, M(0xf3d28b), 0, 0, 0, d); const r = mesh(new THREE.ConeGeometry(1, 0.7, 4), M(0x3b6e8f), 0, 1.25, 0, d); r.rotation.y = Math.PI / 4; r.scale.set(1.1, 1, 0.9); box(0.3, 0.5, 0.05, M(0x3c2f2a), 0, 0, 0.56, d); [[0.85, 0xff6f61], [1.0, 0x7cc4ff], [0.72, 0xf5b83d]].forEach(([x, c], k) => { box(0.02, 1.0, 0.02, M(0x777777), x, 0.2 + k * 0.1, 0.45, d); mesh(new THREE.SphereGeometry(0.17, 10, 8), M(c, { roughness: 0.3 }), x, 1.35 + k * 0.1, 0.45, d); }); }
   else if (kind === 'event') { const c = box(0.9, 1.2, 0.08, M(0xf5b83d, { metalness: 0.3, roughness: 0.4 }), 0, 0.7, 0, d); spinners.push({ o: c, spin: 0.02 }); box(0.1, 0.7, 0.1, M(0x555555), 0, 0, 0, d); }
   else if (kind === 'inspect') { const r = mesh(new THREE.TorusGeometry(0.42, 0.09, 8, 24), M(0x3c4c5c), 0, 1.1, 0, d); const h = box(0.14, 0.6, 0.14, M(0x9a6a3a), 0.38, 0.35, 0, d); h.rotation.z = 0.6; spinners.push({ o: r, spin: 0.015 }); box(0.1, 0.5, 0.1, M(0x555555), 0, 0, 0, d); }
   else if (kind === 'vacancy') { box(0.08, 1, 0.08, M(0x6b4a3a), -0.4, 0, 0, d); box(0.08, 1, 0.08, M(0x6b4a3a), 0.4, 0, 0, d); box(1.2, 0.55, 0.06, M(0xffffff), 0, 0.55, 0.05, d); box(1.0, 0.14, 0.07, M(0xff6f61), 0, 0.75, 0.06, d); }
@@ -729,25 +800,22 @@ function slotPos(p, i) {
 const PIP = { 1: [[.5, .5]], 2: [[.25, .25], [.75, .75]], 3: [[.25, .25], [.5, .5], [.75, .75]], 4: [[.25, .25], [.75, .25], [.25, .75], [.75, .75]], 5: [[.25, .25], [.75, .25], [.5, .5], [.25, .75], [.75, .75]], 6: [[.25, .25], [.75, .25], [.25, .5], [.75, .5], [.25, .75], [.75, .75]] };
 const faceMats = [3, 4, 1, 6, 2, 5].map(v => new THREE.MeshStandardMaterial({ roughness: 0.4, map: canvasTex(128, 128, (x, w) => { x.fillStyle = '#fffaf0'; x.fillRect(0, 0, w, w); x.fillStyle = v === 1 ? '#e2463a' : '#1b2433'; PIP[v].forEach(([a, b]) => { x.beginPath(); x.arc(a * w, b * w, v === 1 ? 17 : 12, 0, 7); x.fill(); }); }).tex }));
 const DIE_TARGET = { 1: [0, 0, 0], 6: [Math.PI, 0, 0], 2: [-Math.PI / 2, 0, 0], 5: [Math.PI / 2, 0, 0], 3: [0, 0, Math.PI / 2], 4: [0, 0, -Math.PI / 2] };
-const dice = [0, 1].map(() => { const outer = new THREE.Group(); const inner = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.1), faceMats); inner.castShadow = true; outer.add(inner); outer.visible = false; scene.add(outer); return { outer, inner }; });
-function rollDice() {
-  const vals = [1 + Math.floor(Math.random() * 6), 1 + Math.floor(Math.random() * 6)];
+const die = (() => { const outer = new THREE.Group(); const inner = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 1.5), faceMats); inner.castShadow = true; outer.add(inner); outer.visible = false; scene.add(outer); return { outer, inner }; })();
+function rollDie(forced) {
+  const v = forced || 1 + Math.floor(Math.random() * 6);
   const lookDir = new THREE.Vector3(camera.position.x - cam.target.x, 0, camera.position.z - cam.target.z).normalize();
-  const side = new THREE.Vector3(-lookDir.z, 0, lookDir.x);
-  return Promise.all(dice.map((d, k) => {
-    const v = vals[k], tgt = DIE_TARGET[v], spin = [rnd(8, 14), rnd(4, 9), rnd(8, 14)];
-    const end = new THREE.Vector3().addScaledVector(side, k ? 0.9 : -0.9).addScaledVector(lookDir, 0.6);
-    const start = end.clone().addScaledVector(lookDir, 5).add(new THREE.Vector3(0, 5, 0));
-    d.outer.visible = true; d.outer.rotation.y = rnd(0, 6.28);
-    return tween(950, e => {
-      const q = 1 - Math.pow(1 - e, 3);
-      d.outer.position.lerpVectors(start, end, q);
-      d.outer.position.y = 0.72 + (1 - q) * 5 + Math.abs(Math.sin(e * Math.PI * 3)) * (1 - e) * 1.2;
-      d.inner.rotation.set(tgt[0] + (1 - q) * spin[0], tgt[1] + (1 - q) * spin[1], tgt[2] + (1 - q) * spin[2]);
-    });
-  })).then(() => { sfx('land'); return vals; });
+  const tgt = DIE_TARGET[v], spin = [rnd(10, 16), rnd(5, 10), rnd(10, 16)];
+  const end = new THREE.Vector3().addScaledVector(lookDir, 0.4);
+  const start = end.clone().addScaledVector(lookDir, 6).add(new THREE.Vector3(0, 6, 0));
+  die.outer.visible = true; die.outer.rotation.y = rnd(0, 6.28);
+  return tween(1100, e => {
+    const q = 1 - Math.pow(1 - e, 3);
+    die.outer.position.lerpVectors(start, end, q);
+    die.outer.position.y = 0.92 + (1 - q) * 6 + Math.abs(Math.sin(e * Math.PI * 3)) * (1 - e) * 1.4;
+    die.inner.rotation.set(tgt[0] + (1 - q) * spin[0], tgt[1] + (1 - q) * spin[1], tgt[2] + (1 - q) * spin[2]);
+  }).then(() => { sfx('land'); return v; });
 }
-function hideDice() { dice.forEach(d => d.outer.visible = false); }
+function hideDie() { die.outer.visible = false; }
 
 /* ---- tweens & effects ---- */
 const tweens = [];
@@ -804,7 +872,9 @@ function tileHelp(k) {
     bank: G.L.unlocks.has('refi') ? 'Stop here to refinance any property at today\'s rate and pull out equity.' : 'The bank sets today\'s mortgage rate. Refinancing unlocks in Level 7.',
     market: G.L.unlocks.has('market') ? 'Landing here pushes the market cycle to its next phase.' : 'Market cycles unlock in Level 5. For now, prices grow a steady 3% a year.',
     tax: G.L.unlocks.has('tax') ? 'Pay tax on rental profit. Depreciation and mortgage interest reduce what you owe.' : 'Taxes unlock in Level 8.',
-    lesson: 'Answer a real estate question. A correct answer earns cash and XP.',
+    lesson: 'Answer a real estate question. Correct answers earn cash, and every third in a row earns a Deal Card.',
+    cards: 'Draw a Deal Card. You can hold up to three and play them to bend the rules.',
+    openhouse: 'Estimate a home\'s value from recent comparable sales. A close guess wins cash.',
     event: 'News that moves your portfolio: repairs, booms, rate changes and more.',
     inspect: 'Annual upkeep on one of your properties. Reserves keep this from hurting.',
     vacancy: 'A tenant moves out, and one of your units sits empty for a month.',
@@ -820,7 +890,8 @@ function newGame(li) {
   currentTheme = L.theme;
   const th = THEMES[L.theme];
   const phase = L.unlocks.has('market') ? (L.startPhase != null ? L.startPhase : 3) : -1;
-  G = { L, li, year: 1, turnsLeft: L.turns, phase, rate: phase >= 0 ? PHASES[phase].rate : 0.06, discount: 0, busy: false, over: false, quizUsed: new Set(), turnCount: 0 };
+  G = { L, li, year: 1, turnsLeft: L.turns, phase, rate: phase >= 0 ? PHASES[phase].rate : 0.06, discount: 0, busy: false, over: false, quizUsed: new Set(), turnCount: 0,
+    hand: ['insider'], momentum: 0, boom: false, rocket: false, contractor: false, lowball: false, bonus: false, qStreak: 0 };
   G.players = [{ id: 0, name: 'You', hex: '#f5b83d', cash: L.cash, pos: 0, isYou: true }]
     .concat(RIVALS.slice(0, L.rivals).map((r, k) => ({ id: k + 1, name: r.name, hex: r.hex, style: r.style, cash: L.cash * 1.1, pos: 0 })));
   G.me = G.players[0];
@@ -834,7 +905,7 @@ function newGame(li) {
   buildDecor(L.theme);
   buildBoard();
   G.players.forEach(p => { p.token = makeToken(p.hex); p.token.position.copy(slotPos(p, 0)); });
-  hideDice();
+  hideDie();
   cam.goal.set(0, 0, 0); cam.radius = innerWidth < innerHeight ? 68 : 44; cam.idle = false;
   $('#log').innerHTML = '';
   updateHUD();
@@ -842,7 +913,7 @@ function newGame(li) {
 
 /* ---- numbers ---- */
 const valueOf = t => t.base * V[t.tier] * t.idx;
-const priceOf = t => valueOf(t) * (G.discount ? 0.9 : 1);
+const priceOf = t => valueOf(t) * (G.discount ? 0.9 : 1) * (G.lowball ? 0.75 : 1);
 const monthlyRent = t => t.base * HOODS[t.hood].rent * R[t.tier] * t.rentIdx;
 function annual(t) {
   const gross = monthlyRent(t) * 12, vac = gross * HOODS[t.hood].vac, opex = gross * OPEX, noi = gross - vac - opex;
@@ -856,6 +927,7 @@ function setsOf(pid) { let n = 0; for (let h = 0; h < 4; h++) { const ts = G.til
 const ownsSet = (pid, hood) => G.tiles.filter(t => t.kind === 'prop' && t.hood === hood).every(t => t.owner === pid);
 const maxOwnedTier = pid => owned(pid).reduce((m, t) => Math.max(m, t.tier), 0);
 const upgradeCost = t => t.base * t.idx * (V[t.tier + 1] - V[t.tier]) * 0.7;
+const myCost = t => upgradeCost(t) * (G.contractor ? 0.5 : 1);
 const visitRent = t => t.tier === 0 ? 0 : monthlyRent(t) * (ownsSet(t.owner, t.hood) ? 2 : 1);
 function goalState(g) {
   const [type, n] = g, pid = 0;
@@ -880,24 +952,35 @@ function updateHUD() {
   ].map(([k, v, c]) => `<div class="stat glass ${c}"><div class="k">${k}</div><div class="v">${v}</div></div>`).join('');
   $('#rivals').innerHTML = G.players.slice(1).map(p => `<div class="rival glass"><span class="dot" style="background:${p.hex}"></span><b>${esc(p.name)}</b><span class="num" style="color:var(--muted)">${owned(p.id).length} props · ${short(netWorth(p))}</span></div>`).join('');
   $('#rollBtn').disabled = G.busy || G.over;
-  $('#rollSub').textContent = G.busy ? 'Working…' : (G.L.unlocks.has('mortgage') ? `Rate ${pct(G.rate, 2)}` : 'Space to roll');
+  $('#rollBtn').classList.toggle('hot', !!G.bonus && !G.busy);
+  $('#rollSub').textContent = G.busy ? 'Working…' : G.bonus ? 'Bonus roll!' : G.rocket ? 'Rocket ×2 armed' : (G.L.unlocks.has('mortgage') ? `Rate ${pct(G.rate, 2)}` : 'Space to roll');
+  const hb = $('#hand');
+  hb.innerHTML = [0, 1, 2].map(i => { const id = G.hand[i]; if (!id) return '<span class="dslot"></span>'; const c = CARDS[id]; return `<button type="button" class="dcard" data-i="${i}" title="${esc(c.text)}"><span class="ic">${c.icon}</span><b>${c.name}</b></button>`; }).join('');
+  hb.querySelectorAll('.dcard').forEach(b => { b.onclick = () => playCard(+b.dataset.i); });
+  $('#momFill').style.width = (G.boom ? 100 : G.momentum) + '%';
+  $('#momLbl').textContent = G.boom ? 'Boom Year ready' : 'Momentum';
+  $('#handBar').classList.toggle('boom', !!G.boom);
 }
 
 /* ---- modal ---- */
 let modalOpen = false;
-function modal({ eyebrow = '', title = '', body = '', buttons, wide = false }) {
+function modal({ eyebrow = '', title = '', body = '', buttons, wide = false, onOpen }) {
   buttons = buttons || [{ label: 'Continue', value: true, kind: 'primary' }];
   return new Promise(res => {
     const m = $('#modal'); modalOpen = true;
     m.innerHTML = `<div class="card ${wide ? 'wide' : ''}" role="dialog" aria-modal="true" aria-labelledby="mTitle">${eyebrow ? `<div class="eyebrow">${eyebrow}</div>` : ''}<h3 id="mTitle">${title}</h3><div class="mbody">${body}</div><div class="btns"></div></div>`;
-    const wrap = m.querySelector('.btns');
-    buttons.forEach(b => {
-      const el = document.createElement('button'); el.type = 'button'; el.className = 'btn ' + (b.kind || ''); el.innerHTML = b.label + (b.sub ? `<small>${b.sub}</small>` : ''); el.disabled = !!b.disabled;
-      el.onclick = () => { m.hidden = true; m.innerHTML = ''; modalOpen = false; res(b.value); };
+    const wrap = m.querySelector('.btns'), card = m.querySelector('.card');
+    let done = false;
+    const close = v => { if (done) return; done = true; m.hidden = true; m.innerHTML = ''; modalOpen = false; res(v); };
+    buttons.forEach((b, i) => {
+      const el = document.createElement('button'); el.type = 'button'; el.className = 'btn ' + (b.kind || ''); el.innerHTML = b.label + (b.sub ? `<small>${b.sub}</small>` : ''); el.disabled = !!b.disabled; el.dataset.i = i;
+      // onClick handlers keep the modal open unless they return a value
+      el.onclick = () => { if (b.onClick) { const r = b.onClick(card, close); if (r !== undefined) close(r); return; } close(typeof b.value === 'function' ? b.value(card) : b.value); };
       wrap.appendChild(el);
     });
     m.hidden = false;
     const first = wrap.querySelector('.btn.primary:not([disabled])'); if (first) first.focus({ preventScroll: true });
+    if (onOpen) onOpen(card, close);
   });
 }
 const sheet = rows => `<table class="sheet">${rows.map(r => `<tr class="${r[2] || ''}"><td>${r[0]}</td><td class="${typeof r[1] === 'number' ? (r[1] < 0 ? 'neg' : 'pos') : ''}">${typeof r[1] === 'number' ? money(r[1]) : r[1]}</td></tr>`).join('')}</table>`;
@@ -934,18 +1017,25 @@ function sellTile(t, p, silent) {
 }
 
 /* ---- the turn ---- */
-async function playerTurn() {
+async function playerTurn(opts = {}) {
   if (!G || G.busy || G.over || modalOpen) return;
   const game = G, gone = () => G !== game || G.over;
   G.busy = true; updateHUD(); cam.idle = false;
-  const [a, b] = await rollDice();
-  log(`You rolled <b>${a} + ${b}</b>`);
-  await wait(250);
-  await moveToken(G.me, a + b);
-  hideDice();
+  const v = await rollDie(opts.forced);
+  let steps = v;
+  if (G.rocket) { steps = v * 2; G.rocket = false; banner('Rocket ×2'); }
+  const streak = v === 6 && !opts.forced;
+  log(`You rolled <b>${v}</b>${steps !== v ? ` and rocket ${steps} spaces` : ''}`);
+  if (streak) banner('Hot streak!');
+  await wait(300);
+  await moveToken(G.me, steps);
+  hideDie();
+  if (!gone() && G.me.pos === 0) await paydayWheel();
   if (!gone()) await resolveTile(G.me);
   if (gone()) return;
   if (goalsMet()) return winLevel();
+  if (streak) { G.bonus = true; G.busy = false; toast('You rolled a 6: <em>take a bonus roll</em>'); updateHUD(); return; }
+  G.bonus = false;
   for (const r of G.players.slice(1)) { if (gone()) return; await rivalTurn(r); }
   if (gone()) return;
   G.turnsLeft--; G.turnCount++;
@@ -971,12 +1061,18 @@ async function resolveTile(p) {
     const rent = visitRent(t); if (rent <= 0) return;
     const owner = G.players[t.owner];
     if (p.isYou) {
-      await modal({ eyebrow: esc(owner.name) + '\'s property', title: 'You owe ' + money(rent) + ' rent', body: `<p>You landed on <b>${esc(t.name)}</b>, a ${TIER[t.tier]} owned by ${esc(owner.name)}.${ownsSet(t.owner, t.hood) ? ' They own the whole neighborhood, so the rent is doubled.' : ''}</p>` + lessonBox('neighborhood'), buttons: [{ label: 'Pay rent', value: 1, kind: 'primary' }] });
-      if (await charge(p, rent, p.token.position.clone().setY(2))) owner.cash += rent;
+      const tkPrice = valueOf(t) * 1.35, tkLoan = G.L.unlocks.has('mortgage') && t.tier > 0, tkCash = tkLoan ? tkPrice * 0.23 : tkPrice * 1.03;
+      const btns = [{ label: 'Pay rent', sub: money(rent), value: 'pay', kind: 'primary' }];
+      if (hasCard('shield')) btns.push({ label: 'Play Rent Shield', sub: 'Skip this payment', value: 'shield', kind: 'good' });
+      if (hasCard('takeover')) btns.push({ label: 'Play Hostile Bid', sub: 'Buy it for ' + short(tkPrice), value: 'takeover', kind: 'good', disabled: G.me.cash < tkCash });
+      const c = await modal({ eyebrow: esc(owner.name) + '\'s property', title: 'You owe ' + money(rent) + ' rent', body: `<p>You landed on <b>${esc(t.name)}</b>, a ${TIER[t.tier]} owned by ${esc(owner.name)}.${ownsSet(t.owner, t.hood) ? ' They own the whole neighborhood, so the rent is doubled.' : ''}</p>` + lessonBox('neighborhood'), buttons: btns });
+      if (c === 'shield') { useCard('shield'); speak(owner, pick(['Hey, no fair!', 'You got lucky.', 'Next time...'])); log(`You blocked ${esc(owner.name)}'s rent with a Rent Shield`); }
+      else if (c === 'takeover') { useCard('takeover'); takeover(t, owner, tkPrice, tkLoan); }
+      else if (await charge(p, rent, p.token.position.clone().setY(2))) { owner.cash += rent; speak(owner, pick(RENT_LINES)); shake(); }
       learn('neighborhood', true);
     } else {
       await charge(p, rent); owner.cash += rent;
-      if (owner.isYou) { floatAt(t.group.position.clone().setY(2), '+' + short(rent) + ' rent', '#ffd166'); sfx('coin'); log(`<b>${esc(p.name)}</b> paid you ${money(rent)} rent`); }
+      if (owner.isYou) { floatAt(t.group.position.clone().setY(2), '+' + short(rent) + ' rent', '#ffd166'); sfx('coin'); log(`<b>${esc(p.name)}</b> paid you ${money(rent)} rent`); speak(p, pick(PAY_LINES)); hype(8); }
       else log(`<b>${esc(p.name)}</b> paid ${esc(owner.name)} ${short(rent)}`);
     }
     updateHUD(); return;
@@ -985,7 +1081,7 @@ async function resolveTile(p) {
     if (t.kind === 'tax' && G.L.unlocks.has('tax')) await charge(p, Math.max(0, passive(p.id)) * 0.12);
     return;
   }
-  return ({ lesson: quiz, event: eventCard, bank: bankTile, market: marketTile, tax: taxTile, inspect: inspectTile, vacancy: vacancyTile, payday: () => {} }[t.kind])(t);
+  return ({ cards: drawCard, openhouse: openHouse, lesson: quiz, event: eventCard, bank: bankTile, market: marketTile, tax: taxTile, inspect: inspectTile, vacancy: vacancyTile, payday: () => {} }[t.kind])(t);
 }
 
 /* ---- buying ---- */
@@ -998,7 +1094,7 @@ async function buyFlow(t) {
   const loanAmt = price * 0.8, pay = pmt(loanAmt, G.rate);
   const cashD = dealRows(t, price, 0, 0), loanD = dealRows(t, price, loanAmt, G.rate);
   const rent = monthlyRent(t), one = t.tier > 0 && rent >= price * 0.01;
-  const body = `<p><b>${esc(t.name)}</b> · ${TIER[t.tier]} in ${esc(t.hoodName)} <span class="tag" style="background:${HOODS[t.hood].color};color:#fff">${HOODS[t.hood].cls}</span>${G.discount ? ' <span class="tag" style="background:var(--mint);color:#032417">10% off: motivated seller</span>' : ''}</p>` +
+  const body = `<p><b>${esc(t.name)}</b> · ${TIER[t.tier]} in ${esc(t.hoodName)} <span class="tag" style="background:${HOODS[t.hood].color};color:#fff">${HOODS[t.hood].cls}</span>${G.discount ? ' <span class="tag" style="background:var(--mint);color:#032417">10% off: motivated seller</span>' : ''}${G.lowball ? ' <span class="tag" style="background:var(--gold);color:#2a1a00">Lowball: 25% off</span>' : ''}</p>` +
     (t.tier === 0 ? `<p>Raw land earns no rent. Once you own it, build on it to create value. Lots can\'t be mortgaged.</p>` :
     `<div class="checks"><span class="check ${one ? 'ok' : 'no'}">1% rule ${one ? 'passes' : 'fails'}</span><span class="check ${cashD.cap >= 0.065 ? 'ok' : 'no'}">Cap rate ${pct(cashD.cap)}</span><span class="check ok">Appreciation ${HOODS[t.hood].appr > 0.01 ? 'strong' : HOODS[t.hood].appr > 0 ? 'moderate' : 'low'}</span></div>`) +
     sheet([['Price', money(price)], ['Closing costs (3%)', money(closing)], ...(t.tier ? [['Rent', money(rent) + '/mo'], ['NOI (after vacancy & expenses)', money(cashD.a.noi) + '/yr']] : []),
@@ -1006,30 +1102,35 @@ async function buyFlow(t) {
     (t.tier ? lessonBox(canLoan ? 'leverage' : 'caprate', canLoan ? `Paying cash: ${pct(cashD.coc)} cash-on-cash. With a mortgage: ${pct(loanD.coc)} on ${short(loanD.cash)} invested. Leverage stretches your cash further but shrinks the monthly cash flow.` : undefined) : '');
   const btns = [{ label: 'Pay cash', sub: short(price + closing), value: 'cash', kind: canLoan ? '' : 'primary', disabled: G.me.cash < price + closing }];
   if (canLoan && t.tier > 0) btns.push({ label: 'Mortgage', sub: short(price * 0.2 + closing) + ' down', value: 'loan', kind: 'primary', disabled: G.me.cash < price * 0.2 + closing });
-  btns.push({ label: 'Pass', value: 'pass' });
+  if (hasCard('lowball') && !G.lowball) btns.push({ label: 'Play Lowball Offer', sub: '25% off this deal', value: 'lowball', kind: 'good' });
+  const rivalsIn = G.players.length > 1;
+  btns.push({ label: 'Pass', sub: rivalsIn ? 'Sends it to auction' : '', value: 'pass' });
   const c = await modal({ eyebrow: 'For sale', title: t.tier === 0 ? 'Buy this lot?' : 'Buy ' + esc(t.name) + '?', body, buttons: btns, wide: false });
-  if (c === 'pass') return;
+  if (c === 'lowball') { useCard('lowball'); G.lowball = true; learn('negotiation'); banner('Lowball!'); return buyFlow(t); }
+  G.lowball = false;
+  if (c === 'pass') { if (rivalsIn) await auction(t); return; }
   G.discount = 0;
   const pos = t.group.position.clone().setY(2.5);
   if (c === 'cash') { gain(G.me, -(price + closing), pos); }
   else { gain(G.me, -(price * 0.2 + closing), pos); t.loan = { bal: loanAmt, rate: G.rate, payment: pay, orig: loanAmt }; learn('mortgage'); learn('downpayment', true); }
   t.owner = 0; t.basis = price; t.invested = c === 'cash' ? price + closing : price * 0.2 + closing;
   learn('closing', true); learn('cashflow', true); if (t.tier) learn('caprate', true);
-  setBuilding(t, true); addXP(25);
+  setBuilding(t, true); addXP(25); hype(10);
   log(`You bought <b>${esc(t.name)}</b>`);
   updateHUD();
 }
 async function ownLanding(t) {
   if (!G.L.unlocks.has('upgrade') || t.tier >= maxTier(G.L)) { floatAt(t.group.position.clone().setY(2), 'Home sweet home', '#bfe6ff'); return; }
-  const cost = upgradeCost(t), gainV = t.base * t.idx * (V[t.tier + 1] - V[t.tier]);
+  const cost = myCost(t), gainV = t.base * t.idx * (V[t.tier + 1] - V[t.tier]);
   const c = await modal({ eyebrow: 'Your property', title: 'Upgrade to a ' + TIER[t.tier + 1] + '?', body: `<p>You\'re back at <b>${esc(t.name)}</b>. Construction costs ${money(cost)} and adds about ${money(gainV)} in value, plus rent rises from ${money(monthlyRent(t))} to ${money(t.base * HOODS[t.hood].rent * R[t.tier + 1] * t.rentIdx)}/mo.</p>` + lessonBox('forced'), buttons: [{ label: 'Build it', sub: short(cost), value: 1, kind: 'primary', disabled: G.me.cash < cost }, { label: 'Not now', value: 0 }] });
   if (c) doUpgrade(t);
 }
 function doUpgrade(t) {
-  const cost = upgradeCost(t); if (G.me.cash < cost) return;
+  const cost = myCost(t); if (G.me.cash < cost) return;
+  if (G.contractor) { G.contractor = false; toast('Contractor Buddy saved you <em>' + short(cost) + '</em>'); }
   gain(G.me, -cost, t.group.position.clone().setY(3));
   t.tier++; t.basis += cost; t.invested += cost;
-  learn('forced'); learn('arv', true); addXP(30);
+  learn('forced'); learn('arv', true); addXP(30); hype(15);
   setBuilding(t, true); log(`You built a <b>${TIER[t.tier]}</b> on ${esc(t.name)}`);
   updateHUD();
 }
@@ -1047,7 +1148,7 @@ async function propertyPanel(t) {
   else rows.push(['Asking price', money(priceOf(t))]);
   const btns = [];
   const act = mine && !G.busy && !G.over;
-  if (mine && G.L.unlocks.has('upgrade') && t.tier < maxTier(G.L)) btns.push({ label: 'Build ' + TIER[t.tier + 1], sub: short(upgradeCost(t)), value: 'up', kind: 'primary', disabled: !act || G.me.cash < upgradeCost(t) });
+  if (mine && G.L.unlocks.has('upgrade') && t.tier < maxTier(G.L)) btns.push({ label: 'Build ' + TIER[t.tier + 1], sub: short(myCost(t)) + (G.contractor ? ' (half price)' : ''), value: 'up', kind: 'primary', disabled: !act || G.me.cash < myCost(t) });
   const refiNew = val * 0.75, refiCash = refiNew - bal - refiNew * 0.02;
   if (mine && G.L.unlocks.has('refi') && t.tier > 0) btns.push({ label: 'Cash-out refi', sub: refiCash > 0 ? '+' + short(refiCash) + ' @ ' + pct(G.rate, 2) : 'Not enough equity', value: 'refi', kind: 'good', disabled: !act || refiCash <= 0 });
   if (mine) btns.push({ label: 'Sell', sub: 'Net ' + short(val * 0.93 - bal), value: 'sell', kind: 'danger', disabled: !act });
@@ -1078,6 +1179,7 @@ async function yearEnd() {
   let sum = L.salary, noiT = 0, debtT = 0;
   mine.forEach(t => { const a = annual(t); noiT += a.noi; debtT += a.debt; });
   if (mine.length) { rows.push(['Rent collected (' + mine.length + ' propert' + (mine.length > 1 ? 'ies' : 'y') + ')', mine.reduce((s, t) => s + annual(t).gross, 0)], ['Vacancy', -mine.reduce((s, t) => s + annual(t).vac, 0)], ['Taxes, insurance, repairs', -mine.reduce((s, t) => s + annual(t).opex, 0)]); if (debtT) rows.push(['Mortgage payments', -debtT]); sum += noiT - debtT; }
+  if (G.boom) { const bonus = Math.max(0, noiT - debtT) + Math.round(L.salary * 0.25); rows.push(['Boom Year bonus', bonus]); sum += bonus; G.boom = false; banner('Boom Year!'); confetti(40); }
   rows.push(['Cash in the bank', sum, 'total']);
   // market & appreciation
   const ph = G.phase >= 0 ? PHASES[G.phase] : { appr: 0.03 };
@@ -1111,9 +1213,9 @@ function rivalPayday(p) {
 
 /* ---- rivals ---- */
 async function rivalTurn(p) {
-  const a = 1 + Math.floor(Math.random() * 6), b = 1 + Math.floor(Math.random() * 6);
+  const a = 1 + Math.floor(Math.random() * 6);
   if (cam.follow) cam.goal.copy(p.token.position).multiplyScalar(0.3);
-  await moveToken(p, a + b);
+  await moveToken(p, a);
   if (G.over) return;
   await resolveTile(p);
   updateHUD();
@@ -1126,6 +1228,7 @@ function rivalBuy(p, t) {
   p.cash -= need; t.owner = p.id; t.basis = price;
   if (!lot) t.loan = { bal: price * 0.8, rate: G.rate, payment: pmt(price * 0.8, G.rate), orig: price * 0.8 };
   setBuilding(t, true);
+  speak(p, pick(BUY_LINES));
   log(`<b>${esc(p.name)}</b> bought ${esc(t.name)}`);
 }
 
@@ -1137,11 +1240,12 @@ async function quiz() {
   const unseen = pool.filter(i => !SAVE.terms.includes(QUIZ[i][4]));
   const qi = pick(unseen.length && Math.random() < 0.7 ? unseen : pool); G.quizUsed.add(qi);
   const [q, opts, ans, why, term] = QUIZ[qi];
-  const reward = Math.round(2000 * G.L.m / 100) * 100;
+  const mult = 1 + 0.5 * Math.min(G.qStreak, 4);
+  const reward = Math.round(2000 * G.L.m * mult / 100) * 100;
   const order = opts.map((o, i) => i).sort(() => Math.random() - 0.5);
-  const c = await modal({ eyebrow: 'Academy · win ' + short(reward), title: q, body: '', buttons: order.map(i => ({ label: esc(opts[i]), value: i })) });
+  const c = await modal({ eyebrow: 'Academy · win ' + short(reward) + (G.qStreak ? ` · streak ×${mult}` : ''), title: q, body: '', buttons: order.map(i => ({ label: esc(opts[i]), value: i })) });
   const right = c === ans;
-  if (right) { gain(G.me, reward, G.me.token.position.clone().setY(2)); addXP(40); } else sfx('bad');
+  if (right) { gain(G.me, reward, G.me.token.position.clone().setY(2)); addXP(40); G.qStreak++; hype(12); if (G.qStreak % 3 === 0) { banner(G.qStreak + ' in a row!'); grantCard(); } } else { sfx('bad'); G.qStreak = 0; }
   learn(term, true);
   await modal({ eyebrow: right ? 'Correct' : 'Not quite', title: right ? '+' + money(reward) : 'The answer: ' + esc(opts[ans]), body: `<p>${why}</p>` + lessonBox(term), buttons: [{ label: 'Got it', value: 1, kind: 'primary' }] });
   updateHUD();
@@ -1218,6 +1322,208 @@ async function vacancyTile() {
   await charge(G.me, cost, t.group.position.clone().setY(2));
 }
 
+/* ================= Fun systems: deal cards, momentum, auctions, wheel, open house ================= */
+const CARDS = {
+  insider: { name: 'Insider Tip', icon: '◎', when: 'pre', text: 'Choose your roll, from 1 to 6.', term: 'location' },
+  rocket: { name: 'Rocket', icon: '»', when: 'pre', text: 'Your next roll moves double the spaces.' },
+  lowball: { name: 'Lowball Offer', icon: '%', when: 'buy', text: 'Buy the next property you land on at 25% off. It appears as an option when you buy.', term: 'negotiation' },
+  takeover: { name: 'Hostile Bid', icon: '⚑', when: 'rent', text: 'Land on a rival\'s property and buy it for 135% of its value instead of paying rent.', term: 'offmarket' },
+  shield: { name: 'Rent Shield', icon: '◆', when: 'rent', text: 'Skip one rent payment to a rival. It appears as an option when you owe rent.', term: 'reserves' },
+  openhouse: { name: 'Packed House', icon: '$', when: 'any', text: 'Collect one extra month of rent from every property you own, right now.', term: 'cashflow' },
+  contractor: { name: 'Contractor Buddy', icon: '⚒', when: 'any', text: 'Your next build costs half price.', term: 'forced' },
+};
+const BUY_LINES = ['Mine now!', 'Too slow!', 'Love this block.', 'Sold, to me!', 'Another one for the portfolio.'];
+const RENT_LINES = ['Thanks for the rent!', 'Pleasure doing business.', 'Come back soon!', 'Cha-ching!'];
+const PAY_LINES = ['Ugh, fine.', 'Nice place. Pricey.', 'I\'ll buy this one off you someday.', 'Highway robbery!'];
+const hasCard = id => G.hand.includes(id);
+function useCard(id) { const i = G.hand.indexOf(id); if (i >= 0) G.hand.splice(i, 1); updateHUD(); }
+function cardPool() { return Object.keys(CARDS).filter(id => (id !== 'contractor' || G.L.unlocks.has('upgrade')) && (!['takeover', 'shield'].includes(id) || G.players.length > 1)); }
+function grantCard() {
+  if (G.hand.length >= 3) { toast('Your hand is full. Play a card to make room.'); return; }
+  const id = pick(cardPool()); G.hand.push(id); toast('New Deal Card: <em>' + CARDS[id].name + '</em>'); updateHUD();
+}
+const cardFace = c => `<div class="dcard big"><span class="ic">${c.icon}</span><b>${c.name}</b><small>${c.text}</small></div>`;
+async function drawCard() {
+  const id = pick(cardPool()), c = CARDS[id];
+  const body = cardFace(c) + (c.term ? lessonBox(c.term) : '');
+  sfx('coin');
+  if (G.hand.length < 3) { await modal({ eyebrow: 'Deal Desk', title: 'You drew ' + c.name, body, buttons: [{ label: 'Add to hand', value: 1, kind: 'primary' }] }); G.hand.push(id); }
+  else {
+    const r = await modal({ eyebrow: 'Deal Desk', title: 'Hand full: swap a card?', body, buttons: G.hand.map((h, i) => ({ label: 'Swap out ' + CARDS[h].name, value: i })).concat([{ label: 'Keep my hand', value: -1, kind: 'primary' }]) });
+    if (r >= 0) G.hand[r] = id;
+  }
+  if (c.term) learn(c.term, true);
+  updateHUD();
+}
+function tileName(n) { const t = G.tiles[(G.me.pos + n) % 24]; return t.kind === 'prop' ? t.name + (t.owner === 0 ? ' (yours)' : t.owner > 0 ? ' (' + G.players[t.owner].name + ')' : ' · ' + short(priceOf(t))) : SPECIAL[t.kind][0].charAt(0) + SPECIAL[t.kind][0].slice(1).toLowerCase(); }
+async function playCard(i) {
+  if (!G || G.over) return;
+  const id = G.hand[i], c = CARDS[id]; if (!c) return;
+  if (G.busy || modalOpen) { toast('Play cards between rolls'); return; }
+  if (c.when === 'buy' || c.when === 'rent') return modal({ eyebrow: 'Deal Card', title: c.name, body: cardFace(c) + (c.term ? lessonBox(c.term) : ''), buttons: [{ label: 'Keep it ready', value: 1, kind: 'primary' }] });
+  const ok = await modal({ eyebrow: 'Deal Card', title: 'Play ' + c.name + '?', body: cardFace(c), buttons: [{ label: 'Play it', value: 1, kind: 'primary' }, { label: 'Keep it', value: 0 }] });
+  if (!ok || G.hand[i] !== id) return;
+  if (id === 'insider') {
+    const k = G.rocket ? 2 : 1;
+    const n = await modal({ eyebrow: 'Insider Tip', title: 'Choose your roll', body: '<p>You know where the deals are. Pick exactly where you land.</p>', buttons: [1, 2, 3, 4, 5, 6].map(n => ({ label: n + '', sub: esc(tileName(n * k)), value: n })).concat([{ label: 'Cancel', value: 0 }]) });
+    if (!n) return;
+    G.hand.splice(i, 1); updateHUD(); sfx('coin');
+    return playerTurn({ forced: n });
+  }
+  if (id === 'rocket') { G.hand.splice(i, 1); G.rocket = true; banner('Rocket armed'); }
+  if (id === 'openhouse') {
+    const mine = owned(0).filter(t => t.tier > 0);
+    if (!mine.length) { toast('You need a rental property first'); return; }
+    G.hand.splice(i, 1);
+    const amt = mine.reduce((s, t) => s + monthlyRent(t), 0);
+    gain(G.me, amt, G.me.token.position.clone().setY(2), 'rent'); mine.forEach(t => coinBurst(t, 5)); hype(10);
+  }
+  if (id === 'contractor') { G.hand.splice(i, 1); G.contractor = true; toast('Your next build is <em>half price</em>'); }
+  if (c.term) learn(c.term, true);
+  updateHUD();
+}
+function hype(n) {
+  if (!G || G.over || G.boom) return;
+  G.momentum += n;
+  if (G.momentum >= 100) { G.momentum = 0; G.boom = true; banner('Momentum!'); sfx('win'); toast('<em>Boom Year ready:</em> your next Payday pays a big bonus'); grantCard(); }
+  updateHUD();
+}
+function speak(p, text) {
+  if (!p || !p.token) return;
+  const v = p.token.position.clone().setY(2.6).project(camera);
+  const el = document.createElement('div'); el.className = 'bubble';
+  el.innerHTML = `<b style="color:${p.hex}">${esc(p.name)}:</b> ${esc(text)}`;
+  el.style.left = clamp((v.x + 1) / 2 * innerWidth, 90, innerWidth - 90) + 'px'; el.style.top = clamp((1 - v.y) / 2 * innerHeight, 60, innerHeight) + 'px';
+  $('#floaters').appendChild(el); setTimeout(() => el.remove(), 2700);
+}
+function banner(text) { const el = document.createElement('div'); el.className = 'banner'; el.textContent = text; document.body.appendChild(el); setTimeout(() => el.remove(), 1550); }
+function confetti(n = 90) {
+  const colors = ['#f5b83d', '#3fd49c', '#ff6f61', '#7cc4ff', '#9b7bff', '#ffffff'];
+  for (let i = 0; i < n; i++) { const el = document.createElement('i'); el.className = 'confetti'; el.style.left = rnd(0, 100) + 'vw'; el.style.background = pick(colors); el.style.animationDelay = rnd(0, 0.7) + 's'; el.style.animationDuration = rnd(1.8, 3.2) + 's'; el.style.transform = `rotate(${rnd(0, 360)}deg)`; $('#floaters').appendChild(el); setTimeout(() => el.remove(), 4200); }
+}
+function shake() { const s = $('#stage'); s.classList.remove('shake'); void s.offsetWidth; s.classList.add('shake'); setTimeout(() => s.classList.remove('shake'), 500); }
+
+function takeover(t, owner, price, useLoan) {
+  owner.cash += price - (t.loan ? t.loan.bal : 0);
+  const closing = price * 0.03, pos = t.group.position.clone().setY(2.5);
+  if (useLoan) { gain(G.me, -(price * 0.2 + closing), pos); t.loan = { bal: price * 0.8, rate: G.rate, payment: pmt(price * 0.8, G.rate), orig: price * 0.8 }; t.invested = price * 0.2 + closing; }
+  else { gain(G.me, -(price + closing), pos); t.loan = null; t.invested = price + closing; }
+  t.owner = 0; t.basis = price;
+  setBuilding(t, true); banner('Hostile takeover!'); speak(owner, 'You drive a hard bargain!');
+  learn('offmarket'); addXP(30); hype(15);
+  log(`You bought <b>${esc(t.name)}</b> out from under ${esc(owner.name)}`);
+  updateHUD();
+}
+
+async function auction(t) {
+  const val = valueOf(t), financed = G.L.unlocks.has('mortgage') && t.tier > 0;
+  const cashNeed = b => financed ? b * 0.23 : b * 1.03;
+  const step = Math.max(1000, Math.round(val * 0.05 / 1000) * 1000);
+  const myMax = financed ? G.me.cash / 0.23 : G.me.cash / 1.03;
+  const bidders = G.players.slice(1).map(p => ({ p, max: Math.min(val * rnd(0.75, 1.15), financed ? p.cash / 0.23 : p.cash / 1.03), next: performance.now() + rnd(700, 1600) }));
+  const CLOCK = 4;
+  const st = { bid: Math.round(val * 0.5 / 1000) * 1000, leader: null, time: CLOCK, out: false };
+  let iv;
+  const render = card => {
+    const b = card.querySelector('#aBid'); if (!b) return;
+    b.textContent = money(st.bid);
+    card.querySelector('#aLead').innerHTML = st.leader ? `<span class="dot" style="background:${st.leader.hex}"></span>${st.leader.isYou ? 'You lead' : esc(st.leader.name) + ' leads'}` : 'Opening bid · no bids yet';
+    card.querySelector('#aClock').style.width = clamp(st.time / CLOCK * 100, 0, 100) + '%';
+    const btn = card.querySelector('[data-i="0"]'); if (btn) { btn.disabled = st.out || (st.leader && st.leader.isYou) || st.bid + step > myMax; btn.innerHTML = 'Bid ' + short(st.bid + (st.leader ? step : 0)) + `<small>${st.bid + step > myMax ? 'Over your budget' : st.leader && st.leader.isYou ? 'You\'re winning' : 'Space to bid'}</small>`; }
+  };
+  learn('maxbid', true);
+  await modal({ eyebrow: 'Live auction', title: esc(t.name) + ' is up for grabs', body: `<p>A ${TIER[t.tier]} worth about <b>${money(val)}</b>. Every bid resets the clock. Highest bid when time runs out wins.</p><div class="auction"><div class="a-bid num" id="aBid"></div><div class="a-lead" id="aLead"></div><div class="bar a-clock"><i id="aClock"></i></div></div>` + lessonBox('maxbid'),
+    buttons: [
+      { label: 'Bid', kind: 'primary', onClick: card => { if (st.out || (st.leader && st.leader.isYou)) return; const nb = st.leader ? st.bid + step : st.bid; if (nb > myMax) return; st.bid = nb; st.leader = G.me; st.time = Math.max(st.time, 2.6); sfx('hop'); render(card); } },
+      { label: 'Drop out', onClick: (card, close) => { st.out = true; return 'out'; } },
+    ],
+    onOpen: (card, close) => {
+      render(card);
+      iv = setInterval(() => {
+        st.time -= 0.1;
+        const now = performance.now();
+        for (const b of bidders) {
+          const nb = st.leader ? st.bid + step : st.bid;
+          if (st.leader !== b.p && nb <= b.max && now >= b.next) { st.bid = nb; st.leader = b.p; st.time = Math.max(st.time, 2.2); b.next = now + rnd(600, 1500); sfx('land'); break; }
+        }
+        render(card);
+        if (st.time <= 0) close('end');
+      }, 100);
+    } });
+  clearInterval(iv);
+  // after you drop out, the rivals settle it between themselves
+  let guard = 0;
+  while (guard++ < 200) { const nb = st.leader ? st.bid + step : st.bid; const b = bidders.find(b => st.leader !== b.p && nb <= b.max); if (!b) break; st.bid = nb; st.leader = b.p; }
+  const w = st.leader;
+  if (!w) { log(`Nobody bid on <b>${esc(t.name)}</b>`); return; }
+  w.cash -= cashNeed(st.bid);
+  t.owner = w.id; t.basis = st.bid;
+  t.loan = financed ? { bal: st.bid * 0.8, rate: G.rate, payment: pmt(st.bid * 0.8, G.rate), orig: st.bid * 0.8 } : null;
+  if (w.isYou) { t.invested = cashNeed(st.bid); floatAt(t.group.position.clone().setY(2.5), '-' + short(cashNeed(st.bid)), '#ff8a7e'); banner(st.bid < val ? 'Bargain!' : 'Won it!'); hype(10); addXP(25); }
+  else speak(w, st.bid < val * 0.8 ? 'What a steal!' : pick(BUY_LINES));
+  setBuilding(t, true);
+  log(`<b>${w.isYou ? 'You' : esc(w.name)}</b> won ${esc(t.name)} at auction for ${short(st.bid)} (${st.bid <= val ? Math.round((1 - st.bid / val) * 100) + '% below' : Math.round((st.bid / val - 1) * 100) + '% above'} value)`);
+  updateHUD();
+}
+
+async function paydayWheel() {
+  const m = G.L.m, R = n => Math.round(n * m / 100) * 100;
+  const segs = [
+    { label: 'Deal Card', color: '#f5b83d', run: () => drawCard() },
+    { label: 'Bonus ' + short(R(3000)), color: '#3fd49c', run: () => gain(G.me, R(3000), G.me.token.position.clone().setY(2)) },
+    { label: 'Momentum +40', color: '#7cc4ff', run: () => hype(40) },
+    { label: 'JACKPOT ' + short(R(12000)), color: '#ff8a7e', run: () => { gain(G.me, R(12000), G.me.token.position.clone().setY(2)); confetti(70); } },
+    G.L.unlocks.has('upgrade') ? { label: 'Half-price build', color: '#b9a3ff', run: () => { G.contractor = true; } } : { label: 'Bonus ' + short(R(2000)), color: '#b9a3ff', run: () => gain(G.me, R(2000), G.me.token.position.clone().setY(2)) },
+    { label: 'Rate cut −0.5%', color: '#5fd3e6', run: () => { G.rate = Math.max(0.03, G.rate - 0.005); learn('rates', true); } },
+  ];
+  const idx = Math.floor(Math.random() * segs.length), deg = 360 / segs.length;
+  const grad = segs.map((g, i) => `${g.color} ${i * deg}deg ${(i + 1) * deg}deg`).join(',');
+  const labels = segs.map((g, i) => `<span style="transform:rotate(${i * deg + deg / 2}deg)"><em>${esc(g.label)}</em></span>`).join('');
+  let spun = false;
+  await modal({ eyebrow: 'Exact landing', title: 'Spin the Payday Wheel', body: `<p>You landed exactly on Payday. Spin for a bonus.</p><div class="wheel-wrap"><div class="wheel-pin"></div><div class="wheel" id="wheel" style="background:conic-gradient(${grad})">${labels}</div></div>`,
+    buttons: [
+      { label: 'Spin!', kind: 'primary', onClick: card => {
+        if (spun) return; spun = true;
+        card.querySelector('#wheel').style.transform = `rotate(${360 * 6 + 360 - (idx * deg + deg / 2)}deg)`;
+        card.querySelector('[data-i="0"]').disabled = true; sfx('hop');
+        setTimeout(() => { const b = card.querySelector('[data-i="1"]'); if (b) { b.disabled = false; b.classList.add('primary'); b.innerHTML = 'Collect: ' + esc(segs[idx].label); b.focus({ preventScroll: true }); } sfx('win'); }, 3300);
+      } },
+      { label: 'Collect', value: 1, disabled: true },
+    ] });
+  await segs[idx].run();
+  updateHUD();
+}
+
+async function openHouse() {
+  const h = Math.floor(Math.random() * 4), ht = G.tiles.find(t => t.hood === h);
+  const ppsf = HOODS[h].base * G.L.m / 1300 * ht.idx * rnd(0.9, 1.1);
+  const r100 = n => Math.round(n / 100) * 100;
+  const subj = Math.round(rnd(1100, 2300) / 10) * 10;
+  const streets = ['Oak Ct', 'Pine Ave', 'Hill Rd', 'Lake Dr', 'Park Pl', 'Sunset Blvd'];
+  const comps = [0, 1, 2].map(k => { const sq = Math.round(rnd(900, 2600) / 10) * 10; return { addr: (100 + Math.floor(Math.random() * 800)) + ' ' + streets[(k + h) % streets.length], sq, price: r100(sq * ppsf * rnd(0.96, 1.04)) }; });
+  const avg = comps.reduce((s, c) => s + c.price / c.sq, 0) / 3, truth = subj * avg;
+  const lo = Math.round(truth * 0.45 / 1000) * 1000, hi = Math.round(truth * 1.6 / 1000) * 1000;
+  const start = Math.round(rnd(lo, hi) / 1000) * 1000;
+  const prize = r100(4000 * G.L.m);
+  const guess = await modal({ eyebrow: 'Open House · appraisal challenge', title: 'What is this home worth?', body:
+    `<p>A ${subj.toLocaleString('en-US')} sq ft home in ${esc(ht.hoodName)} just listed. Estimate its value from these recent sales. Land within 5% to win ${short(prize)}.</p>` +
+    `<table class="comps"><tr><th>Recent sale</th><th>Sq ft</th><th>Price</th></tr>${comps.map(c => `<tr><td>${c.addr}</td><td>${c.sq.toLocaleString('en-US')}</td><td>${money(c.price)}</td></tr>`).join('')}<tr class="subject"><td>This home</td><td>${subj.toLocaleString('en-US')}</td><td>?</td></tr></table>` +
+    `<div class="slider-out" id="apprOut"></div><input type="range" id="apprSlider" min="${lo}" max="${hi}" step="1000" value="${start}" aria-label="Your estimate">`,
+    buttons: [{ label: 'Lock in my estimate', kind: 'primary', value: card => +card.querySelector('#apprSlider').value }],
+    onOpen: card => { const sl = card.querySelector('#apprSlider'), out = card.querySelector('#apprOut'); const upd = () => { out.textContent = money(+sl.value); }; sl.oninput = upd; upd(); } });
+  const err = Math.abs(guess - truth) / truth;
+  let title, win = 0;
+  if (err <= 0.025) { title = 'Bullseye!'; win = prize * 1.5; }
+  else if (err <= 0.05) { title = 'Sharp eye!'; win = prize; }
+  else if (err <= 0.12) { title = 'Close'; win = r100(prize * 0.25); }
+  else title = 'Way off';
+  if (win) { gain(G.me, win, G.me.token.position.clone().setY(2)); hype(err <= 0.05 ? 20 : 6); addXP(err <= 0.05 ? 40 : 10); } else sfx('bad');
+  learn('ppsf', true); learn('comps', true);
+  await modal({ eyebrow: 'Open House', title: title + (win ? ' +' + money(win) : ''), body: sheet([['Your estimate', money(guess)], ['Comps average', money(avg) + '/sq ft'], ['× ' + subj.toLocaleString('en-US') + ' sq ft', money(truth), 'total'], ['You were off by', pct(err)]]) + lessonBox('ppsf'), buttons: [{ label: err <= 0.025 ? 'Collect + Deal Card' : 'Got it', value: 1, kind: 'primary' }] });
+  if (err <= 0.025) grantCard();
+  updateHUD();
+}
+
 /* ---- win / lose ---- */
 async function winLevel() {
   G.over = true; G.busy = false; updateHUD(); sfx('win');
@@ -1225,6 +1531,7 @@ async function winLevel() {
   const prev = SAVE.stars[G.li] || 0; SAVE.stars[G.li] = Math.max(prev, stars); SAVE.max = Math.max(SAVE.max, G.li + 1); persist();
   addXP(150 * stars + (L.endless ? 200 : 0));
   owned(0).forEach(t => coinBurst(t, 6));
+  confetti(110); banner('Level complete!');
   const nextL = getLevel(G.li + 1);
   const c = await modal({ eyebrow: 'Level ' + L.num + ' complete', title: esc(L.title), body: `<div class="stars-big">${'★'.repeat(stars)}<span class="off">${'★'.repeat(3 - stars)}</span></div>` +
     sheet([['Net worth', money(netWorth(G.me))], ['Properties owned', owned(0).length + ''], ['Cash flow per year', passive(0), ''], ['Years played', G.year - 1 + ''], ['Turns to spare', G.turnsLeft + '']]) +
@@ -1244,7 +1551,7 @@ async function failModal(why, term) {
 async function startLevel(li) {
   $('#title').hidden = true; $('#levels').hidden = true;
   newGame(li);
-  $('#hudTop').hidden = false; $('#hudBottom').hidden = false; $('#rivals').hidden = false; $('#log').hidden = false;
+  $('#hudTop').hidden = false; $('#hudBottom').hidden = false; $('#rivals').hidden = false; $('#log').hidden = false; $('#handBar').hidden = false;
   document.fonts && document.fonts.ready.then(() => G.tiles.forEach(drawTileLabel));
   const L = G.L;
   G.busy = true; updateHUD();

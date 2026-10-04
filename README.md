@@ -5,14 +5,30 @@ A 3D real estate board game in the browser. It combines Monopoly's roll-and-move
 **Play:** open `index.html` in any modern browser. No build step or install is needed; Three.js loads from a CDN.
 
 ## How it plays
-- Roll the dice and move around a 24-tile board. Land on a property to buy it with cash or a mortgage. The deal analyzer shows cap rate, the 1% rule, NOI and cash-on-cash return.
-- Every pass of **Payday** is one year. You collect your salary plus every rental's cash flow, loans pay down, and values move with the market.
+- Roll a single die and move around a 24-tile board. **Roll a 6 and you get a bonus roll.**
+- Land on a property to buy it with cash or a mortgage. The deal analyzer shows cap rate, the 1% rule, NOI and cash-on-cash return.
+- **Pass on a deal and it goes to a live auction.** Bid against rival investors before the clock runs out.
+- **Deal Cards:** hold up to 3 and play them to bend the rules.
+  - Insider Tip: choose your roll.
+  - Rocket: move double.
+  - Lowball Offer: 25% off a purchase.
+  - Hostile Bid: buy a rival's property out from under them.
+  - Rent Shield: skip one rent payment.
+  - Packed House: collect a bonus month of rent.
+  - Contractor Buddy: half-price build.
+- **Momentum:** buying, building, collecting rent and answering correctly fill the meter. A full meter makes your next Payday a **Boom Year**, with a big bonus and a free card.
+- Every pass of **Payday** is one year. You collect your salary plus every rental's cash flow, loans pay down, and values move with the market. **Land exactly on Payday to spin the Payday Wheel.**
 - Tap any property to renovate it (single-family → duplex → fourplex → apartments → tower), take a cash-out refinance, or sell it.
-- Special tiles: Academy quizzes, news headlines, Bank, Market Watch (market cycles), Tax Office (depreciation), Inspection and Turnover.
-- Rival investors compete for the same properties. Owning a full neighborhood doubles the rent they pay you.
+- Special tiles:
+  - Academy: quizzes, where 3 right in a row earns a card.
+  - Deal Desk: draw a card.
+  - Open House: guess a home's value from comps.
+  - Headlines: news events.
+  - Bank, Market Watch (market cycles), Tax Office (depreciation), Inspection and Turnover.
+- Rival investors, starting in level 3, compete for the same properties and talk trash. Owning a full neighborhood doubles the rent they pay you.
 
 ## Progression
-There are 12 hand-built levels across 6 cities. Each level unlocks one new concept: leverage, cash flow, forced appreciation, market cycles, competition, BRRRR, taxes, land development, downturns and more. After that, **Expansion** mode generates new cities endlessly, with bigger prices and bigger goals. XP ranks run from Renter to Legend, and the **Playbook** collects 37 real estate terms as you learn them.
+There are 12 hand-built levels across 6 cities. Each level unlocks one new concept: leverage, cash flow, forced appreciation, market cycles, competition, BRRRR, taxes, land development, downturns and more. After that, **Expansion** mode generates new cities endlessly, with bigger prices and bigger goals. XP ranks run from Renter to Legend, and the **Playbook** collects 41 real estate terms as you learn them.
 
 Progress saves in your browser's localStorage.
 
