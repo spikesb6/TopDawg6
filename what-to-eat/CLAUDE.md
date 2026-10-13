@@ -52,6 +52,8 @@ screens.
   `src/data/ideas.ts`: idea types, moods, budgets. `src/data/modes.ts`: the four modes.
 - `src/lib/picker.ts`: filters, Surprise me pool (7-day rule), spin picking, relative days,
   faves and picks for ideas and places.
+- `src/lib/grocery.ts`: grocery list (add a recipe once, check, clear, share text).
+  `src/lib/delivery.ts`: DoorDash, Uber Eats and Grubhub search links. Both pure and tested.
 - `src/lib/places.ts`: place moods from Google cuisine types, place filters, distance labels,
   directions links (pure, tested).
 - `src/lib/sync.ts`: Supabase row mapping and guest-to-account upload rows (pure, tested).
@@ -62,13 +64,16 @@ screens.
 - `src/store/dinner-store.tsx`: ideas, faves and picks. Guests keep them in AsyncStorage; after
   sign-in they're uploaded once, then read from Supabase with TanStack Query. Tested as two
   phones in `dinner-store.test.tsx`. `src/store/location-store.tsx`: location permission and the
-  typed-city fallback. `src/hooks/use-places.ts`: nearby open-now places for a mode.
+  typed-city fallback. `src/store/grocery-store.tsx`: grocery list, on this phone only.
+  `src/hooks/use-places.ts`: nearby open-now places for a mode.
 - `src/app/(tabs)/`: Home (`index`), `faves`, `past`. `src/app/mode/[mode].tsx`: mode list.
   `src/app/result.tsx`: idea result card. `src/app/place.tsx`: place card with Get directions.
-  Both use `useSpin` and `components/result-parts.tsx`.
+  Both use `useSpin` and `components/result-parts.tsx`. `src/app/recipe.tsx`: ingredients,
+  steps and Add to grocery list. `src/app/grocery.tsx`: the list (Home shows a shortcut once
+  it has items).
 - `src/components/`: wordmark, tab bar, header, chips, idea rows, bouncy buttons, icons,
   sign-in sheet (offered after the first fave), account card on Faves, nearby places list with
-  the location ask and city form.
+  the location ask and city form, delivery buttons.
 - `supabase/`: migrations (tables + RLS), seed, `tests/rls.test.sql`, setup steps in README.
   `supabase/functions/places/`: Edge Function for Google Places. `logic.ts` (pure) and
   `handler.ts` are tested with Deno (`npm run test:functions`); `index.ts` wires in the secret

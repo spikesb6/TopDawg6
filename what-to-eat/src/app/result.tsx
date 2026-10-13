@@ -1,8 +1,10 @@
-import { Redirect, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 
+import { DeliveryButtons } from '@/components/delivery-buttons';
 import { moodLabel } from '@/components/idea-row';
 import {
+  ActionButton,
   CardDetails,
   CardText,
   CardTitle,
@@ -18,7 +20,7 @@ import { useSpin } from '@/hooks/use-spin';
 import { costLabel, filterIdeas, pickRandom, surprisePool } from '@/lib/picker';
 import type { ResultSource } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
-import type { ModeKey } from '@/theme/theme';
+import { palette, type ModeKey } from '@/theme/theme';
 
 type Params = {
   id: string;
@@ -92,8 +94,19 @@ export default function ResultScreen() {
         onLockIn={() => {
           store.lockIn(idea.id);
           setLockedId(idea.id);
-        }}
-      />
+        }}>
+        {!spin.spinning && idea.mode === 'cook' && idea.ingredients?.length ? (
+          <ActionButton
+            label="See the recipe"
+            color={palette.coral}
+            disabled={spin.spinning}
+            onPress={() => router.push({ pathname: '/recipe', params: { id: String(idea.id) } })}
+          />
+        ) : null}
+        {!spin.spinning && idea.mode === 'deliv' ? (
+          <DeliveryButtons dish={idea.name} disabled={spin.spinning} />
+        ) : null}
+      </ResultActions>
     </Screen>
   );
 }

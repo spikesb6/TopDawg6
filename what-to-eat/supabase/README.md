@@ -7,8 +7,9 @@ the sign-in options are hidden.
 
 1. Create a project at [supabase.com](https://supabase.com).
 2. Open **SQL Editor** and run each file in `migrations/`, oldest first:
-   `20261013000000_init.sql`, then `20261014000000_places.sql`.
-3. Paste all of `seed.sql` and run it. This adds the 28 ideas with the same ids the app uses.
+   `20261013000000_init.sql`, `20261014000000_places.sql`, then `20261015000000_recipes.sql`.
+3. Paste all of `seed.sql` and run it. This adds the 28 ideas (with Cook it recipes) using the
+   same ids as the app. It's safe to run again after the seed changes.
 4. Optional check: paste `tests/rls.test.sql` and run it. The last result should say
    `rls tests passed`. It runs inside a transaction and leaves nothing behind.
 

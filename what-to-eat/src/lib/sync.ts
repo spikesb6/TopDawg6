@@ -1,4 +1,4 @@
-import type { Cost, Idea, Mood } from '@/data/ideas';
+import type { Cost, Idea, Ingredient, Mood } from '@/data/ideas';
 import type { Fave, PastPick, PlaceFave } from '@/lib/picker';
 import type { PlacesMode } from '@/lib/places';
 import type { ModeKey } from '@/theme/theme';
@@ -13,6 +13,8 @@ export type IdeaRow = {
   cost: number;
   minutes: number | null;
   details: string | null;
+  ingredients?: Ingredient[] | null;
+  steps?: string[] | null;
 };
 export type FaveRow = { idea_id: number; created_at: string };
 export type PickRow = {
@@ -38,6 +40,8 @@ export function ideaFromRow(row: IdeaRow): Idea {
     cost: Math.min(3, Math.max(1, row.cost)) as Cost,
     minutes: row.minutes ?? 0,
     details: row.details ?? '',
+    ...(row.ingredients?.length ? { ingredients: row.ingredients } : {}),
+    ...(row.steps?.length ? { steps: row.steps } : {}),
   };
 }
 

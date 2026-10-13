@@ -5,6 +5,8 @@ import seed from './seed-ideas.json';
 export type Mood = 'comfy' | 'fresh' | 'spicy';
 export type Cost = 1 | 2 | 3;
 
+export type Ingredient = { qty: string; name: string };
+
 export type Idea = {
   id: number;
   mode: ModeKey;
@@ -14,6 +16,9 @@ export type Idea = {
   cost: Cost;
   minutes: number;
   details: string;
+  /** Cook it ideas carry a recipe. */
+  ingredients?: Ingredient[];
+  steps?: string[];
 };
 
 /**

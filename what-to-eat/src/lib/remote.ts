@@ -23,7 +23,7 @@ function client() {
 export async function fetchIdeas() {
   const { data, error } = await client()
     .from('ideas')
-    .select('id, mode, name, blurb, mood, cost, minutes, details')
+    .select('id, mode, name, blurb, mood, cost, minutes, details, ingredients, steps')
     .order('id');
   if (error) throw error;
   return (data as IdeaRow[]).map(ideaFromRow);

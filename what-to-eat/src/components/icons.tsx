@@ -10,7 +10,9 @@ export type IconName =
   | 'forkKnife'
   | 'bag'
   | 'dice'
-  | 'chevronLeft';
+  | 'chevronLeft'
+  | 'check'
+  | 'list';
 
 type IconProps = {
   name: IconName;
@@ -28,6 +30,8 @@ const paths: Record<Exclude<IconName, 'dice' | 'clock'>, string[]> = {
     'M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6',
   ],
   chevronLeft: ['M15 6l-6 6 6 6'],
+  check: ['M5 12l5 5L20 7'],
+  list: ['M9 6h11', 'M9 12h11', 'M9 18h11', 'M5 6v.01', 'M5 12v.01', 'M5 18v.01'],
   heart: ['M19.5 12.572 12 20l-7.5-7.428A5 5 0 1 1 12 6.006a5 5 0 1 1 7.5 6.572'],
   chefHat: [
     'M12 3c1.918 0 3.52 1.35 3.91 3.151a4 4 0 0 1 2.09 7.723V21H6v-7.126a4 4 0 1 1 2.092-7.723A4 4 0 0 1 12 3z',
