@@ -1,0 +1,796 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mani Match</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..700&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a salon swatch-ring hero, then one working "consultation" panel (pick → matched shades with salon codes), then reference sections. */
+:root {
+  --bg: #FAF6F6;          /* porcelain, faint blush bias */
+  --surface: #FFFFFF;
+  --surface-2: #F4ECEE;
+  --ink: #2B1822;         /* plum ink */
+  --muted: #7A6670;
+  --line: #E9DCE0;
+  --accent: #B3124F;      /* lacquer magenta */
+  --accent-soft: #F8DCE6;
+  --on-accent: #FFFFFF;
+  --shadow: 0 1px 2px rgba(43,24,34,.06), 0 8px 24px rgba(43,24,34,.08);
+  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161014; --surface: #211A1E; --surface-2: #2A2126; --ink: #F7ECEF; --muted: #B7A3AC;
+    --line: #3A2D34; --accent: #F2679A; --accent-soft: #46202F; --on-accent: #1B0D13;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161014; --surface: #211A1E; --surface-2: #2A2126; --ink: #F7ECEF; --muted: #B7A3AC;
+  --line: #3A2D34; --accent: #F2679A; --accent-soft: #46202F; --on-accent: #1B0D13;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 var(--f-body);
+  padding-inline: 16px;
+}
+.wrap { max-width: 1160px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.08; text-wrap: balance; margin: 0; }
+h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
+h3 { font-size: 1.3rem; }
+p { margin: 0; }
+.eyebrow { font: 600 .74rem/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.lede { color: var(--muted); max-width: 60ch; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Top bar ---------- */
+.bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding-block: 18px; border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: 1.45rem; font-style: italic; }
+.brand-dot { width: 14px; height: 20px; border-radius: 7px 7px 3px 3px; background: var(--accent); transition: background .8s; }
+.bar nav { display: flex; gap: 18px; flex-wrap: wrap; }
+.bar nav a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; }
+.bar nav a:hover { color: var(--ink); }
+@media (max-width: 640px) { .bar nav { display: none; } }
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center;
+  padding-block: 48px 24px;
+}
+.hero h1 { font-size: clamp(2.6rem, 6.4vw, 4.6rem); letter-spacing: -.01em; }
+.hero h1 em { font-style: italic; color: var(--accent); transition: color .8s; }
+.hero .lede { margin-top: 18px; font-size: 1.08rem; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface);
+  padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .92rem; cursor: pointer; text-decoration: none; color: var(--ink);
+  transition: transform .15s, background .2s, border-color .2s;
+}
+.btn:hover { transform: translateY(-1px); border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn.small { padding: 7px 12px; font-size: .82rem; }
+.hero-stats { display: flex; gap: 28px; margin-top: 34px; flex-wrap: wrap; }
+.hero-stats div { display: grid; gap: 2px; }
+.hero-stats b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 500; }
+.hero-stats span { font-size: .8rem; color: var(--muted); }
+
+.fan-stage { position: relative; width: 100%; max-width: 440px; aspect-ratio: 1 / .78; margin-inline: auto; }
+.fan { position: absolute; inset: 0; transform-origin: 50% 92%; animation: sway 7s ease-in-out infinite alternate; }
+.stick {
+  position: absolute; left: 50%; bottom: 8%; width: 13%; height: 80%; margin-left: -6.5%;
+  transform-origin: 50% 100%; transform: rotate(var(--a));
+  animation: fanOut 1.3s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 70ms);
+  display: flex; flex-direction: column; align-items: center;
+}
+.stick .tip {
+  width: 100%; aspect-ratio: 1 / 1.45; border-radius: 50% 50% 18% 18% / 42% 42% 14% 14%;
+  background: var(--c); box-shadow: inset 0 -6px 10px rgba(0,0,0,.12), 0 6px 14px rgba(43,24,34,.18);
+  position: relative; overflow: hidden; transition: background .8s ease;
+}
+.stick .tip::after {
+  content: ""; position: absolute; top: 10%; left: 16%; width: 22%; height: 58%; border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0)); filter: blur(.5px);
+}
+.stick .rod { flex: 1; width: 9%; background: linear-gradient(90deg, var(--line), var(--surface), var(--line)); border-radius: 0 0 4px 4px; }
+.hub {
+  position: absolute; left: 50%; bottom: 4%; width: 11%; aspect-ratio: 1; transform: translateX(-50%);
+  border-radius: 50%; background: var(--surface); border: 3px solid var(--line); box-shadow: var(--shadow);
+}
+.fan-label {
+  position: absolute; right: 0; top: 4%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 14px; box-shadow: var(--shadow); font-size: .78rem; max-width: 60%;
+}
+.fan-label b { display: block; font-family: var(--f-display); font-size: 1.05rem; font-weight: 500; }
+.fan-label .mono { color: var(--accent); }
+@keyframes fanOut { from { transform: rotate(0deg); } to { transform: rotate(var(--a)); } }
+@keyframes sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; padding-block: 32px 8px; }
+  .fan-stage { max-width: 340px; }
+}
+
+/* ---------- Consultation panel ---------- */
+section { padding-block: 56px; }
+.section-head { display: grid; gap: 10px; margin-bottom: 28px; }
+.consult {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow);
+  padding: clamp(18px, 3vw, 32px); display: grid; gap: 28px;
+}
+.pickers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; }
+@media (max-width: 760px) { .pickers { grid-template-columns: 1fr; } }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+legend { font-weight: 700; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { position: relative; }
+.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip span {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); font-size: .9rem; font-weight: 500; transition: all .2s; white-space: nowrap;
+}
+.chip input:hover + span { border-color: var(--muted); }
+.chip input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hint { font-size: .8rem; color: var(--muted); margin-top: 8px; }
+
+.results-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 24px; }
+.results-head h3 { font-size: 1.55rem; }
+.results-head p { color: var(--muted); font-size: .9rem; }
+.results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 960px) { .results { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .results { grid-template-columns: 1fr; } }
+
+.card {
+  border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--bg);
+  display: flex; flex-direction: column; animation: rise .55s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 60ms);
+  transition: transform .2s, box-shadow .2s;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+@keyframes rise { from { opacity: .001; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.swatch {
+  position: relative; height: 160px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 18%, var(--surface)), color-mix(in srgb, var(--c) 40%, var(--surface-2)));
+}
+.swatch .rank {
+  position: absolute; left: 12px; top: 12px; font: 500 .72rem/1 var(--f-mono); padding: 5px 8px; border-radius: 999px;
+  background: rgba(255,255,255,.82); color: #2B1822;
+}
+.swatch .nail { width: 104px; height: 174px; margin-bottom: -48px; filter: drop-shadow(0 10px 16px rgba(43,24,34,.28)); transition: transform .4s cubic-bezier(.2,.8,.2,1); }
+.card:hover .swatch .nail { transform: translateY(-6px) rotate(-3deg); }
+.swatch::before {
+  content: ""; position: absolute; inset: -40% auto -40% -60%; width: 40%; transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent); transition: left .7s ease;
+}
+.card:hover .swatch::before { left: 120%; }
+.shimmer .swatch::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: .55;
+  background-image: radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.5px), radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.5px);
+  background-size: 23px 19px, 31px 27px; background-position: 0 0, 11px 7px; animation: twinkle 3.5s linear infinite;
+}
+@keyframes twinkle { 50% { opacity: .15; background-position: 6px 4px, 3px 12px; } }
+.card-body { padding: 16px; display: grid; gap: 12px; flex: 1; align-content: start; }
+.card-title { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.card-title h4 { font-family: var(--f-display); font-weight: 500; font-size: 1.22rem; line-height: 1.15; margin: 0; }
+.card-title small { display: block; color: var(--muted); font-size: .8rem; margin-top: 4px; }
+.heart {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface);
+  display: grid; place-items: center; cursor: pointer; transition: transform .2s;
+}
+.heart svg { width: 17px; height: 17px; fill: none; stroke: var(--muted); stroke-width: 2; transition: all .2s; }
+.heart[aria-pressed="true"] svg { fill: var(--accent); stroke: var(--accent); }
+.heart:active { transform: scale(.88); }
+.code-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 8px 12px; border-radius: 10px;
+  background: var(--surface); border: 1px dashed var(--line);
+}
+.code-row .label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.code-row .code { font-family: var(--f-mono); font-weight: 500; font-size: 1.12rem; letter-spacing: .04em; }
+.copy {
+  border: 0; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: .78rem; padding: 7px 11px; border-radius: 8px; cursor: pointer;
+}
+.meta { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: .84rem; }
+.meta dt { color: var(--muted); }
+.meta dd { margin: 0; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.meta dd svg { width: 14px; height: 22px; }
+.why { display: flex; flex-wrap: wrap; gap: 6px; }
+.why span { font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.why span.hit { background: var(--accent-soft); color: var(--accent); }
+.card-actions { padding: 0 16px 16px; }
+.card-actions .btn { width: 100%; justify-content: center; }
+
+/* ---------- Shortlist ---------- */
+.shortlist { display: flex; gap: 10px; flex-wrap: wrap; }
+.mini {
+  display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); cursor: pointer; font-size: .86rem; font-weight: 600;
+}
+.mini i { width: 26px; height: 26px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.mini .mono { color: var(--muted); font-weight: 400; font-size: .78rem; }
+.empty { color: var(--muted); font-size: .92rem; padding: 18px; border: 1px dashed var(--line); border-radius: var(--r); width: 100%; }
+
+/* ---------- Month calendar ---------- */
+.months { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .months { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .months { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.month {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 0; overflow: hidden; text-align: left; cursor: pointer;
+  display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s;
+}
+.month:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.month .chip-color { height: 64px; background: var(--c); position: relative; }
+.month .chip-color::after { content: ""; position: absolute; left: 12px; top: 10px; width: 6px; height: 34px; border-radius: 3px; background: rgba(255,255,255,.4); }
+.month .m-body { padding: 10px 12px 12px; display: grid; gap: 2px; }
+.month .m-name { font: 600 .7rem/1.2 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.month .m-shade { font-family: var(--f-display); font-size: 1rem; line-height: 1.2; }
+.month .m-why { font-size: .76rem; color: var(--muted); }
+.month.now { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.month.now .m-name { color: var(--accent); }
+
+/* ---------- Shapes ---------- */
+.shapes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 980px) { .shapes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.shape {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 16px 12px; display: grid; gap: 8px; justify-items: center; text-align: center;
+}
+.shape svg { width: 54px; height: 92px; }
+.shape svg path { fill: var(--accent); stroke: var(--muted); stroke-width: .8; transition: fill .8s; }
+.shape svg .finger { fill: var(--surface-2); }
+.shape b { font-family: var(--f-display); font-weight: 500; font-size: 1.1rem; }
+.shape p { font-size: .78rem; color: var(--muted); line-height: 1.45; }
+.lengths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
+@media (max-width: 640px) { .lengths { grid-template-columns: 1fr; } }
+.length { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.length .bar-vis { flex: none; width: 10px; height: 46px; border-radius: 5px; background: var(--surface-2); position: relative; overflow: hidden; }
+.length .bar-vis i { position: absolute; left: 0; right: 0; top: 0; height: var(--h); background: var(--accent); border-radius: 5px; }
+.length b { display: block; }
+.length span { font-size: .82rem; color: var(--muted); }
+
+/* ---------- Library ---------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.library { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.lib {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0; overflow: hidden; cursor: pointer; text-align: left;
+  transition: transform .2s, box-shadow .2s; animation: rise .4s both;
+}
+.lib:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.lib i { display: block; height: 56px; background: var(--c); }
+.lib div { padding: 9px 11px 11px; display: grid; gap: 2px; }
+.lib b { font-size: .84rem; line-height: 1.25; }
+.lib .mono { font-size: .76rem; color: var(--accent); }
+
+/* ---------- Salon card dialog ---------- */
+dialog {
+  border: 0; padding: 0; width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); border-radius: 26px; overflow: auto;
+  background: var(--c); color: var(--t); box-shadow: 0 30px 80px rgba(0,0,0,.35);
+}
+dialog::backdrop { background: rgba(20,10,16,.55); backdrop-filter: blur(4px); }
+dialog[open] { animation: pop .35s cubic-bezier(.2,.9,.3,1.2); }
+@keyframes pop { from { transform: scale(.94); opacity: .4; } }
+.salon { padding: 28px; display: grid; gap: 18px; }
+.salon .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.salon .tag { font: 700 .7rem/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.salon .x { width: 38px; height: 38px; border-radius: 50%; border: 1px solid currentColor; background: transparent; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: .8; }
+.salon .big { font-family: var(--f-mono); font-weight: 500; font-size: clamp(3rem, 15vw, 4.8rem); line-height: 1; letter-spacing: .02em; }
+.salon .brandline { font-weight: 600; opacity: .85; }
+.salon h3 { font-size: clamp(1.6rem, 6vw, 2.2rem); font-style: italic; }
+.salon .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; padding-block: 14px; }
+.salon .facts div { display: grid; gap: 2px; min-width: 0; }
+.salon .facts span { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; opacity: .75; font-weight: 700; }
+.salon .facts b { font-size: .98rem; }
+.salon .note { font-size: .84rem; opacity: .85; }
+.salon .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+.salon .acts button { border: 1px solid currentColor; background: transparent; color: inherit; padding: 10px 16px; border-radius: 999px; font-weight: 700; cursor: pointer; }
+.salon .acts button.solid { background: var(--t); color: var(--c); border-color: var(--t); }
+
+/* ---------- Footer / toast ---------- */
+footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .84rem; display: grid; gap: 8px; }
+.toast {
+  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, calc(100% + 40px));
+  background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem;
+  transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .2s; z-index: 50; white-space: nowrap; opacity: 0; pointer-events: none;
+}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="bar">
+    <div class="brand"><span class="brand-dot" id="brandDot"></span>Mani Match</div>
+    <nav aria-label="Sections">
+      <a href="#finder">Find a shade</a>
+      <a href="#months">Shade of the month</a>
+      <a href="#shapes">Shapes &amp; length</a>
+      <a href="#library">All shades</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div>
+      <p class="eyebrow" id="heroEyebrow">Your nail consultation</p>
+      <h1 style="margin-top:14px">Walk in knowing your <em>exact shade.</em></h1>
+      <p class="lede">Pick the season, the event and your mood. Mani Match suggests the color, shape and length that fit, then gives you the salon code to show your nail tech.</p>
+      <div class="hero-cta">
+        <a class="btn primary" href="#finder">Find my shade</a>
+        <a class="btn" href="#months">See this month's pick</a>
+      </div>
+      <div class="hero-stats">
+        <div><b id="statShades">45</b><span>salon shades</span></div>
+        <div><b>7</b><span>nail shapes</span></div>
+        <div><b>12</b><span>monthly picks</span></div>
+      </div>
+    </div>
+    <div class="fan-stage" aria-hidden="true">
+      <div class="fan" id="fan"></div>
+      <div class="hub"></div>
+      <div class="fan-label" id="fanLabel"></div>
+    </div>
+  </div>
+
+  <section id="finder">
+    <div class="section-head">
+      <p class="eyebrow">Step 1 · Tell us about it</p>
+      <h2>Find your shade</h2>
+      <p class="lede">Your picks update the matches instantly. Save the ones you love, then open the salon card at your appointment.</p>
+    </div>
+
+    <div class="consult">
+      <form class="pickers" id="pickers" onsubmit="return false">
+        <fieldset id="fsSeason"><legend>Season</legend><div class="chips" data-group="season"></div></fieldset>
+        <fieldset id="fsOccasion"><legend>Occasion</legend><div class="chips" data-group="occasion"></div></fieldset>
+        <fieldset id="fsMood"><legend>Mood this month</legend><div class="chips" data-group="mood"></div></fieldset>
+        <fieldset id="fsTone">
+          <legend>Skin undertone</legend>
+          <div class="chips" data-group="tone"></div>
+          <p class="hint">Not sure? Veins that look blue usually mean cool, green means warm, a mix means neutral.</p>
+        </fieldset>
+      </form>
+
+      <div class="results-head">
+        <div>
+          <p class="eyebrow">Step 2 · Your matches</p>
+          <h3 id="resultsTitle" style="margin-top:8px">Top shades</h3>
+        </div>
+        <p id="resultsSub"></p>
+      </div>
+      <div class="results" id="results" aria-live="polite"></div>
+
+      <div style="display:grid;gap:12px;border-top:1px solid var(--line);padding-top:22px">
+        <p class="eyebrow">Your shortlist</p>
+        <div class="shortlist" id="shortlist"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="months">
+    <div class="section-head">
+      <p class="eyebrow">Mood of the month</p>
+      <h2>A shade for every month</h2>
+      <p class="lede">Can't decide? Start with the month. Each pick follows the season and the events that usually fill it.</p>
+    </div>
+    <div class="months" id="monthGrid"></div>
+  </section>
+
+  <section id="shapes">
+    <div class="section-head">
+      <p class="eyebrow">Shape &amp; length guide</p>
+      <h2>Ask for the right shape</h2>
+      <p class="lede">Use these names at the salon. Your matches above already suggest a shape and length for the occasion you picked.</p>
+    </div>
+    <div class="shapes" id="shapeGrid"></div>
+    <div class="lengths">
+      <div class="length"><span class="bar-vis"><i style="--h:30%"></i></span><div><b>Short</b><span>Free edge 1–3 mm past the fingertip. Typing, work, sports.</span></div></div>
+      <div class="length"><span class="bar-vis"><i style="--h:60%"></i></span><div><b>Medium</b><span>3–6 mm. Elegant without getting in the way.</span></div></div>
+      <div class="length"><span class="bar-vis"><i style="--h:100%"></i></span><div><b>Long</b><span>6 mm and up. Statement looks, usually gel or extensions.</span></div></div>
+    </div>
+  </section>
+
+  <section id="library">
+    <div class="section-head">
+      <p class="eyebrow">Shade library</p>
+      <h2>Browse every shade</h2>
+      <p class="lede">Tap any shade to open its salon card.</p>
+    </div>
+    <div class="filters chips" id="filters"></div>
+    <div class="library" id="libraryGrid"></div>
+  </section>
+
+  <footer>
+    <p><b>About the codes.</b> Codes are OPI Nail Lacquer shade numbers (for example NL S86). Most salons carry OPI, and many OPI gel shades use the same name and number, so ask for the shade name if you want gel.</p>
+    <p>Screen colors are approximate. Check the bottle or the salon's swatch ring before your tech starts, since shades can be discontinued or out of stock. Mani Match is an independent guide and is not affiliated with OPI.</p>
+  </footer>
+</div>
+
+<dialog id="salonCard" aria-labelledby="scName">
+  <div class="salon">
+    <div class="top">
+      <span class="tag">Show this to your nail tech</span>
+      <button class="x" type="button" id="scClose" aria-label="Close">✕</button>
+    </div>
+    <div>
+      <p class="brandline" id="scBrand">OPI Nail Lacquer</p>
+      <div class="big" id="scCode">NL S86</div>
+    </div>
+    <h3 id="scName">Bubble Bath</h3>
+    <div class="facts">
+      <div><span>Finish</span><b id="scFinish">Sheer</b></div>
+      <div><span>Shape</span><b id="scShape">Oval</b></div>
+      <div><span>Length</span><b id="scLength">Short</b></div>
+    </div>
+    <p class="note" id="scNote"></p>
+    <div class="acts">
+      <button type="button" class="solid" id="scCopy">Copy code</button>
+      <button type="button" id="scSave">Save to shortlist</button>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+// ---------- Data ----------
+// tone: cool | warm | all. Seasons, occasions, moods are the tags the finder scores against.
+const SHADES = [
+  // Nudes & sheers
+  { name: "Bubble Bath", code: "S86", hex: "#F2D4CD", finish: "Sheer", family: "nude", seasons: ["spring","summer","fall","winter"], occasions: ["everyday","work","wedding","interview"], moods: ["calm","elegant"], tone: "all" },
+  { name: "Funny Bunny", code: "H22", hex: "#F3EFE8", finish: "Creme", family: "nude", seasons: ["spring","summer","winter"], occasions: ["wedding","work","everyday"], moods: ["calm","elegant"], tone: "cool" },
+  { name: "Alpine Snow", code: "L00", hex: "#FAFAF7", finish: "Creme", family: "nude", seasons: ["summer","winter"], occasions: ["vacation","wedding","party"], moods: ["bold","edgy","playful"], tone: "all" },
+  { name: "Put It in Neutral", code: "T65", hex: "#EBC7BC", finish: "Sheer", family: "nude", seasons: ["spring","summer","fall","winter"], occasions: ["work","interview","everyday"], moods: ["calm"], tone: "warm" },
+  { name: "Samoan Sand", code: "P61", hex: "#E5C7B4", finish: "Sheer", family: "nude", seasons: ["spring","fall"], occasions: ["work","interview","wedding"], moods: ["calm","elegant"], tone: "warm" },
+  { name: "Love Is in the Bare", code: "T69", hex: "#EFD3C8", finish: "Sheer", family: "nude", seasons: ["spring","summer"], occasions: ["wedding","everyday"], moods: ["romantic","calm"], tone: "all" },
+  { name: "Sweet Heart", code: "S96", hex: "#F5D6D8", finish: "Sheer", family: "nude", seasons: ["spring"], occasions: ["wedding","date","everyday"], moods: ["romantic","calm"], tone: "cool" },
+  { name: "Mimosas for Mr. & Mrs.", code: "R41", hex: "#E4B9A8", finish: "Creme", family: "nude", seasons: ["spring","summer","fall"], occasions: ["wedding","work"], moods: ["elegant","calm"], tone: "warm" },
+  { name: "Tiramisu for Two", code: "V28", hex: "#D9B9A2", finish: "Creme", family: "nude", seasons: ["fall","winter"], occasions: ["work","interview","everyday"], moods: ["calm","elegant"], tone: "warm" },
+  { name: "Kyoto Pearl", code: "L03", hex: "#F1E6DF", finish: "Pearl", family: "nude", seasons: ["winter","spring"], occasions: ["wedding","party"], moods: ["elegant","romantic"], tone: "cool" },
+  { name: "Chicago Champagne Toast", code: "S63", hex: "#E4BFB1", finish: "Shimmer", family: "nude", seasons: ["winter","fall"], occasions: ["wedding","party"], moods: ["elegant","romantic"], tone: "warm" },
+  { name: "Princesses Rule!", code: "R44", hex: "#F0D7DA", finish: "Sheer shimmer", family: "nude", seasons: ["spring","winter"], occasions: ["wedding"], moods: ["romantic","calm"], tone: "cool" },
+  { name: "Barefoot in Barcelona", code: "E41", hex: "#E3C2BA", finish: "Creme", family: "nude", seasons: ["spring","fall"], occasions: ["work","everyday","interview"], moods: ["calm","elegant"], tone: "all" },
+  // Pinks & corals
+  { name: "Passion", code: "H19", hex: "#E2A3A5", finish: "Creme", family: "pink", seasons: ["spring","summer"], occasions: ["date","everyday"], moods: ["romantic"], tone: "cool" },
+  { name: "Mod About You", code: "B56", hex: "#F1C3CF", finish: "Creme", family: "pink", seasons: ["spring","summer"], occasions: ["everyday","date"], moods: ["playful","romantic"], tone: "cool" },
+  { name: "Don't Bossa Nova Me Around", code: "A60", hex: "#CF9C9B", finish: "Creme", family: "pink", seasons: ["fall","spring"], occasions: ["work","everyday","date"], moods: ["romantic","calm","elegant"], tone: "all" },
+  { name: "Strawberry Margarita", code: "M23", hex: "#E5476C", finish: "Creme", family: "pink", seasons: ["summer","spring"], occasions: ["vacation","party","date"], moods: ["playful","bold"], tone: "all" },
+  { name: "Hotter Than You Pink", code: "N36", hex: "#EE5A91", finish: "Creme", family: "pink", seasons: ["summer"], occasions: ["vacation","party"], moods: ["playful","bold"], tone: "cool" },
+  { name: "Pink Flamenco", code: "E44", hex: "#DC3C7E", finish: "Creme", family: "pink", seasons: ["summer","spring"], occasions: ["party","date","vacation"], moods: ["bold","playful","romantic"], tone: "cool" },
+  { name: "Shorts Story", code: "B86", hex: "#E86D78", finish: "Creme", family: "pink", seasons: ["summer","spring"], occasions: ["vacation","everyday"], moods: ["playful"], tone: "warm" },
+  // Reds
+  { name: "Big Apple Red", code: "N25", hex: "#B5122B", finish: "Creme", family: "red", seasons: ["winter","fall","summer"], occasions: ["date","party","everyday"], moods: ["bold","elegant"], tone: "cool" },
+  { name: "OPI Red", code: "L72", hex: "#C0142B", finish: "Creme", family: "red", seasons: ["spring","summer","fall","winter"], occasions: ["date","party","vacation"], moods: ["bold","elegant"], tone: "all" },
+  { name: "I'm Not Really a Waitress", code: "H08", hex: "#A3172C", finish: "Shimmer", family: "red", seasons: ["winter","fall"], occasions: ["date","party"], moods: ["bold","romantic"], tone: "all" },
+  { name: "Got the Blues for Red", code: "W52", hex: "#8E1527", finish: "Creme", family: "red", seasons: ["winter","fall"], occasions: ["party","date","interview"], moods: ["elegant","bold"], tone: "cool" },
+  { name: "Red Hot Rio", code: "A70", hex: "#C8213A", finish: "Creme", family: "red", seasons: ["summer"], occasions: ["vacation","party","date"], moods: ["bold","playful"], tone: "warm" },
+  { name: "Cajun Shrimp", code: "L64", hex: "#D44B3E", finish: "Creme", family: "orange", seasons: ["summer","spring"], occasions: ["vacation","everyday","party"], moods: ["playful","bold"], tone: "warm" },
+  // Berries & wines
+  { name: "Malaga Wine", code: "L87", hex: "#6E1A2D", finish: "Creme", family: "berry", seasons: ["fall","winter"], occasions: ["date","party","work"], moods: ["elegant","romantic"], tone: "all" },
+  { name: "Chick Flick Cherry", code: "H02", hex: "#8C2141", finish: "Creme", family: "berry", seasons: ["fall","winter"], occasions: ["date"], moods: ["romantic","bold"], tone: "cool" },
+  { name: "Bogota Blackberry", code: "F52", hex: "#4F1B33", finish: "Creme", family: "berry", seasons: ["fall","winter"], occasions: ["date","party"], moods: ["elegant","romantic"], tone: "cool" },
+  { name: "Miami Beet", code: "B78", hex: "#8B2148", finish: "Creme", family: "berry", seasons: ["fall","summer"], occasions: ["date","party"], moods: ["bold","romantic"], tone: "cool" },
+  // Oranges & yellows
+  { name: "A Good Man-darin Is Hard to Find", code: "H47", hex: "#E9622D", finish: "Creme", family: "orange", seasons: ["summer"], occasions: ["vacation","party"], moods: ["playful","bold"], tone: "warm" },
+  { name: "Bee Unapologetic", code: "B010", hex: "#EDBE2E", finish: "Shimmer", family: "orange", seasons: ["summer","spring"], occasions: ["vacation"], moods: ["playful","bold"], tone: "warm" },
+  // Purples
+  { name: "Do You Lilac It?", code: "B29", hex: "#C6AEDA", finish: "Creme", family: "purple", seasons: ["spring"], occasions: ["everyday","date","vacation"], moods: ["playful","calm","romantic"], tone: "cool" },
+  { name: "Turn On the Northern Lights!", code: "I57", hex: "#3E2557", finish: "Shimmer", family: "purple", seasons: ["winter"], occasions: ["party","date"], moods: ["edgy","bold"], tone: "cool" },
+  { name: "Lincoln Park After Dark", code: "W42", hex: "#2E1A24", finish: "Creme", family: "dark", seasons: ["fall","winter"], occasions: ["party","date","everyday"], moods: ["edgy","elegant"], tone: "all" },
+  // Blues & greens
+  { name: "It's a Boy!", code: "T75", hex: "#C7DAEB", finish: "Creme", family: "blue", seasons: ["spring","summer"], occasions: ["everyday","vacation"], moods: ["playful","calm"], tone: "cool" },
+  { name: "You're Such a Budapest", code: "E74", hex: "#B8C6DF", finish: "Creme", family: "blue", seasons: ["winter","spring"], occasions: ["everyday","wedding"], moods: ["calm","elegant"], tone: "cool" },
+  { name: "Yoga-ta Get This Blue!", code: "I47", hex: "#3E5FA6", finish: "Creme", family: "blue", seasons: ["summer","winter"], occasions: ["vacation","party"], moods: ["bold","playful"], tone: "cool" },
+  { name: "Russian Navy", code: "R54", hex: "#1E2342", finish: "Shimmer", family: "blue", seasons: ["winter","fall"], occasions: ["work","party","date"], moods: ["edgy","elegant"], tone: "cool" },
+  { name: "My Dogsled Is a Hybrid", code: "N45", hex: "#6FB7A6", finish: "Creme", family: "blue", seasons: ["spring","summer"], occasions: ["vacation","everyday"], moods: ["playful","calm"], tone: "all" },
+  { name: "Teal the Cows Come Home", code: "B54", hex: "#1E6B73", finish: "Creme", family: "blue", seasons: ["fall","summer"], occasions: ["party","vacation"], moods: ["bold","edgy"], tone: "all" },
+  // Neutrals & darks
+  { name: "Berlin There Done That", code: "G13", hex: "#8C7F7B", finish: "Creme", family: "dark", seasons: ["fall","winter"], occasions: ["work","interview"], moods: ["edgy","calm","elegant"], tone: "all" },
+  { name: "You Don't Know Jacques!", code: "F15", hex: "#6E5F55", finish: "Creme", family: "dark", seasons: ["fall","winter"], occasions: ["work","everyday"], moods: ["elegant","edgy"], tone: "warm" },
+  { name: "Chocolate Moose", code: "C89", hex: "#4A2E28", finish: "Creme", family: "dark", seasons: ["fall"], occasions: ["everyday","party"], moods: ["elegant","edgy"], tone: "warm" },
+  { name: "Black Onyx", code: "T02", hex: "#141214", finish: "Creme", family: "dark", seasons: ["fall","winter"], occasions: ["party","date"], moods: ["edgy","bold"], tone: "all" },
+];
+
+const GROUPS = {
+  season: [["spring","Spring"],["summer","Summer"],["fall","Fall"],["winter","Winter"]],
+  occasion: [["everyday","Everyday"],["work","Work"],["interview","Interview"],["date","Date night"],["wedding","Wedding"],["party","Holiday party"],["vacation","Vacation"]],
+  mood: [["elegant","Elegant"],["romantic","Romantic"],["calm","Calm"],["playful","Playful"],["bold","Bold"],["edgy","Edgy"]],
+  tone: [["any","Any"],["cool","Cool"],["warm","Warm"],["neutral","Neutral"]],
+};
+const LABEL = Object.fromEntries(Object.values(GROUPS).flat());
+
+const FAMILIES = [["all","All"],["nude","Nudes & sheers"],["pink","Pinks"],["red","Reds"],["berry","Berries & wines"],["orange","Corals & sunny"],["purple","Purples"],["blue","Blues & greens"],["dark","Neutrals & darks"]];
+
+// Nail plate outlines, viewBox 0 0 60 100. Cuticle sits at the bottom.
+const SHAPES = {
+  round:    { label: "Round",    path: "M10 92 V40 Q10 18 30 18 Q50 18 50 40 V92 Q30 100 10 92 Z", note: "Softest edge, hardest to break. Best for short nails." },
+  oval:     { label: "Oval",     path: "M10 92 V44 C10 18 20 8 30 8 C40 8 50 18 50 44 V92 Q30 100 10 92 Z", note: "Lengthens fingers. Classic and easy to wear." },
+  squoval:  { label: "Squoval",  path: "M10 92 V20 Q10 11 20 11 H40 Q50 11 50 20 V92 Q30 100 10 92 Z", note: "Square with soft corners. The office favorite." },
+  square:   { label: "Square",   path: "M10 92 V12 H50 V92 Q30 100 10 92 Z", note: "Crisp straight tip. Great for French and minimal art." },
+  almond:   { label: "Almond",   path: "M10 92 V50 C10 28 24 8 30 3 C36 8 50 28 50 50 V92 Q30 100 10 92 Z", note: "Tapered and graceful. Ideal for date nights and weddings." },
+  coffin:   { label: "Coffin",   path: "M10 92 V46 L21 5 H39 L50 46 V92 Q30 100 10 92 Z", note: "Also called ballerina. Tapered with a flat tip. Needs medium to long." },
+  stiletto: { label: "Stiletto", path: "M10 92 V62 Q14 38 30 0 Q46 38 50 62 V92 Q30 100 10 92 Z", note: "Sharp point. Maximum drama, usually on extensions." },
+};
+
+// Occasion sets the baseline; strong moods can push shape and length.
+const OCCASION_LOOK = {
+  everyday: ["squoval","Short"], work: ["squoval","Short"], interview: ["round","Short"],
+  date: ["almond","Medium"], wedding: ["almond","Medium"], party: ["coffin","Medium"], vacation: ["oval","Short"],
+};
+const MOOD_LOOK = { bold: ["coffin", 1], edgy: ["stiletto", 1], romantic: ["almond", 0], calm: ["oval", 0], playful: ["square", 0], elegant: ["oval", 0] };
+const LENGTHS = ["Short","Medium","Long"];
+
+const MONTHS = [
+  ["January", "Russian Navy", "A crisp fresh start"],
+  ["February", "Chick Flick Cherry", "Valentine's red-pink"],
+  ["March", "My Dogsled Is a Hybrid", "First green of spring"],
+  ["April", "Do You Lilac It?", "Spring florals"],
+  ["May", "Mod About You", "Showers and graduations"],
+  ["June", "Cajun Shrimp", "Wedding-season coral"],
+  ["July", "Red Hot Rio", "Fireworks and pool days"],
+  ["August", "Bee Unapologetic", "Last of the sun"],
+  ["September", "Tiramisu for Two", "Back-to-routine nude"],
+  ["October", "Malaga Wine", "Deep fall wine"],
+  ["November", "Chocolate Moose", "Cozy and rich"],
+  ["December", "I'm Not Really a Waitress", "Holiday party shimmer"],
+];
+
+// ---------- Helpers ----------
+const $ = (s, el = document) => el.querySelector(s);
+const byName = Object.fromEntries(SHADES.map(s => [s.name, s]));
+const fullCode = s => `NL ${s.code}`;
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+function lum(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
+  return .2126 * r + .7152 * g + .0722 * b;
+}
+const textOn = hex => lum(hex) > .36 ? "#2B1822" : "#FFFFFF";
+const esc = s => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function nailSvg(shapeKey, fill, cls = "nail") {
+  const sh = SHAPES[shapeKey];
+  return `<svg class="${cls}" viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}" fill="${fill}" stroke="rgba(0,0,0,.12)" stroke-width="1"/><path d="M17 30 Q17 22 22 20 L22 70 Q17 68 17 60 Z" fill="rgba(255,255,255,.45)"/></svg>`;
+}
+
+let toastTimer;
+function toast(msg) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 1900);
+}
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); toast(`Copied ${text}`); }
+  catch {
+    const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch {}
+    ta.remove(); toast(ok ? `Copied ${text}` : `Code: ${text}`);
+  }
+}
+
+// ---------- State ----------
+const now = new Date();
+const monthIdx = now.getMonth();
+const seasonFor = m => [11, 0, 1].includes(m) ? "winter" : m <= 4 ? "spring" : m <= 7 ? "summer" : "fall";
+const state = Object.assign({ season: seasonFor(monthIdx), occasion: "everyday", mood: "elegant", tone: "any" }, store.get("mm-picks", {}));
+let favs = store.get("mm-favs", []);
+let currentLook = { shape: "squoval", length: "Short" };
+
+// ---------- Matching ----------
+function lookFor(occasion, mood) {
+  let [shape, length] = OCCASION_LOOK[occasion];
+  const [mShape, bump] = MOOD_LOOK[mood];
+  const conservative = occasion === "work" || occasion === "interview";
+  if (!conservative && (bump || mood === "romantic" || mood === "playful")) shape = mShape;
+  if (!conservative && bump) length = LENGTHS[Math.min(2, LENGTHS.indexOf(length) + bump)];
+  if (shape === "coffin" || shape === "stiletto") length = length === "Short" ? "Medium" : length;
+  return { shape, length };
+}
+
+function score(s) {
+  let v = 0;
+  if (s.seasons.includes(state.season)) v += 3;
+  if (s.occasions.includes(state.occasion)) v += 3;
+  if (s.moods.includes(state.mood)) v += 2.5;
+  if (state.tone !== "any") {
+    if (s.tone === state.tone) v += 1.2;
+    else if (s.tone === "all") v += .8;
+    else if (state.tone === "neutral") v += .4;
+  }
+  return v;
+}
+
+function matches(n = 6) {
+  const pool = SHADES.map((s, i) => ({ s, v: score(s) - i * 0.001 }));
+  const picked = [];
+  const famCount = {};
+  while (picked.length < n && pool.length) {
+    // Penalize repeat families so the results stay varied.
+    pool.forEach(p => p.adj = p.v - (famCount[p.s.family] || 0) * 1.6);
+    pool.sort((a, b) => b.adj - a.adj);
+    const best = pool.shift();
+    picked.push(best.s);
+    famCount[best.s.family] = (famCount[best.s.family] || 0) + 1;
+  }
+  return picked;
+}
+
+// ---------- Rendering ----------
+function renderPickers() {
+  document.querySelectorAll("[data-group]").forEach(box => {
+    const g = box.dataset.group;
+    box.innerHTML = GROUPS[g].map(([v, l]) =>
+      `<label class="chip"><input type="radio" name="${g}" id="${g}-${v}" value="${v}" ${state[g] === v ? "checked" : ""}><span>${l}</span></label>`).join("");
+  });
+  $("#pickers").addEventListener("change", e => {
+    state[e.target.name] = e.target.value;
+    store.set("mm-picks", state);
+    renderResults();
+  });
+}
+
+function renderResults() {
+  currentLook = lookFor(state.occasion, state.mood);
+  const list = matches();
+  $("#resultsTitle").textContent = `${LABEL[state.season]} · ${LABEL[state.occasion]} · ${LABEL[state.mood]}`;
+  $("#resultsSub").innerHTML = `Pair with <b>${SHAPES[currentLook.shape].label}</b> shape, <b>${currentLook.length.toLowerCase()}</b> length`;
+  $("#results").innerHTML = list.map((s, i) => {
+    const hits = [
+      s.seasons.includes(state.season) && LABEL[state.season],
+      s.occasions.includes(state.occasion) && LABEL[state.occasion],
+      s.moods.includes(state.mood) && LABEL[state.mood],
+    ].filter(Boolean);
+    const extra = s.moods.filter(m => m !== state.mood).slice(0, 2).map(m => LABEL[m]);
+    const shimmer = /shimmer|pearl/i.test(s.finish);
+    return `<article class="card ${shimmer ? "shimmer" : ""}" style="--i:${i}">
+      <div class="swatch" style="--c:${s.hex}">
+        <span class="rank">#${i + 1} match</span>
+        ${nailSvg(currentLook.shape, s.hex)}
+      </div>
+      <div class="card-body">
+        <div class="card-title">
+          <div><h4>${esc(s.name)}</h4><small>OPI · Nail Lacquer · ${s.finish}</small></div>
+          <button class="heart" type="button" data-fav="${esc(s.name)}" aria-pressed="${favs.includes(s.name)}" aria-label="Save ${esc(s.name)} to shortlist">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>
+          </button>
+        </div>
+        <div class="code-row">
+          <div><div class="label">Salon code</div><div class="code">${fullCode(s)}</div></div>
+          <button class="copy" type="button" data-copy="OPI ${fullCode(s)} ${esc(s.name)}">Copy</button>
+        </div>
+        <dl class="meta">
+          <dt>Shape</dt><dd>${nailSvg(currentLook.shape, "currentColor", "")}${SHAPES[currentLook.shape].label}</dd>
+          <dt>Length</dt><dd>${currentLook.length}</dd>
+        </dl>
+        <div class="why">${hits.map(h => `<span class="hit">${h}</span>`).join("")}${extra.map(h => `<span>${h}</span>`).join("")}</div>
+      </div>
+      <div class="card-actions"><button class="btn small" type="button" data-open="${esc(s.name)}">Open salon card</button></div>
+    </article>`;
+  }).join("");
+  paintTheme(list);
+}
+
+function paintTheme(list) {
+  // The hero fan, brand mark and shape guide take on the current top matches.
+  const top = list[0];
+  const fanShades = [...list, ...matches(9).slice(6)].slice(0, 9);
+  const fan = $("#fan");
+  if (!fan.children.length) {
+    fan.innerHTML = fanShades.map((s, i) => `<div class="stick" style="--i:${i};--a:${-52 + i * 13}deg;--c:${s.hex}"><div class="tip"></div><div class="rod"></div></div>`).join("");
+  } else {
+    [...fan.children].forEach((el, i) => el.style.setProperty("--c", (fanShades[i] || top).hex));
+  }
+  $("#fanLabel").innerHTML = `<span class="mono">${fullCode(top)}</span><b>${esc(top.name)}</b>Top match right now`;
+  $("#brandDot").style.background = top.hex;
+  document.querySelectorAll(".shape svg path:not(.finger)").forEach(p => p.style.fill = top.hex);
+  $("#heroEyebrow").textContent = `${LABEL[state.season]} consultation · ${now.toLocaleString("en-US", { month: "long" })}`;
+}
+
+function renderShortlist() {
+  const box = $("#shortlist");
+  box.innerHTML = favs.length
+    ? favs.filter(n => byName[n]).map(n => { const s = byName[n]; return `<button class="mini" type="button" data-open="${esc(n)}"><i style="--c:${s.hex}"></i>${esc(n)} <span class="mono">${fullCode(s)}</span></button>`; }).join("")
+    : `<p class="empty">Tap the heart on any shade to save it here. Your shortlist stays on this device.</p>`;
+}
+
+function toggleFav(name) {
+  favs = favs.includes(name) ? favs.filter(n => n !== name) : [...favs, name];
+  store.set("mm-favs", favs);
+  document.querySelectorAll(`[data-fav="${CSS.escape(name)}"]`).forEach(b => b.setAttribute("aria-pressed", favs.includes(name)));
+  renderShortlist();
+  toast(favs.includes(name) ? "Saved to shortlist" : "Removed from shortlist");
+  return favs.includes(name);
+}
+
+function renderMonths() {
+  $("#monthGrid").innerHTML = MONTHS.map(([m, shade, why], i) => {
+    const s = byName[shade];
+    return `<button class="month ${i === monthIdx ? "now" : ""}" type="button" data-open="${esc(shade)}">
+      <span class="chip-color" style="--c:${s.hex}"></span>
+      <span class="m-body"><span class="m-name">${m}${i === monthIdx ? " · now" : ""}</span><span class="m-shade">${esc(shade)}</span><span class="m-why">${why} · <span class="mono">${fullCode(s)}</span></span></span>
+    </button>`;
+  }).join("");
+}
+
+function renderShapes() {
+  $("#shapeGrid").innerHTML = Object.values(SHAPES).map(sh =>
+    `<div class="shape"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}"/></svg><b>${sh.label}</b><p>${sh.note}</p></div>`).join("");
+}
+
+let family = "all";
+function renderLibrary() {
+  $("#filters").innerHTML = FAMILIES.map(([v, l]) =>
+    `<label class="chip"><input type="radio" name="family" id="family-${v}" value="${v}" ${family === v ? "checked" : ""}><span>${l}</span></label>`).join("");
+  drawLibrary();
+  $("#filters").addEventListener("change", e => { family = e.target.value; drawLibrary(); });
+}
+function drawLibrary() {
+  const list = SHADES.filter(s => family === "all" || s.family === family);
+  $("#libraryGrid").innerHTML = list.map(s =>
+    `<button class="lib" type="button" data-open="${esc(s.name)}"><i style="--c:${s.hex}"></i><div><b>${esc(s.name)}</b><span class="mono">${fullCode(s)}</span></div></button>`).join("");
+}
+
+// ---------- Salon card ----------
+let openShade = null;
+function openCard(name) {
+  const s = byName[name]; if (!s) return;
+  openShade = s;
+  const dlg = $("#salonCard");
+  dlg.style.setProperty("--c", s.hex);
+  dlg.style.setProperty("--t", textOn(s.hex));
+  $("#scCode").textContent = fullCode(s);
+  $("#scName").textContent = s.name;
+  $("#scFinish").textContent = s.finish;
+  $("#scShape").textContent = SHAPES[currentLook.shape].label;
+  $("#scLength").textContent = currentLook.length;
+  $("#scNote").textContent = `Want gel? Ask for "${s.name}" in gel. Shape and length are suggested for ${LABEL[state.occasion].toLowerCase()} with ${/^[aeiou]/i.test(state.mood) ? "an" : "a"} ${LABEL[state.mood].toLowerCase()} mood.`;
+  $("#scSave").textContent = favs.includes(s.name) ? "Saved ✓" : "Save to shortlist";
+  if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
+}
+$("#scClose").addEventListener("click", () => $("#salonCard").close());
+$("#salonCard").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$("#scCopy").addEventListener("click", () => openShade && copyText(`OPI ${fullCode(openShade)} ${openShade.name}`));
+$("#scSave").addEventListener("click", () => {
+  if (!openShade) return;
+  $("#scSave").textContent = toggleFav(openShade.name) ? "Saved ✓" : "Save to shortlist";
+});
+
+document.addEventListener("click", e => {
+  const t = e.target.closest("[data-open],[data-copy],[data-fav]");
+  if (!t) return;
+  if (t.dataset.open) openCard(t.dataset.open);
+  else if (t.dataset.copy) copyText(t.dataset.copy);
+  else if (t.dataset.fav) toggleFav(t.dataset.fav);
+});
+
+// ---------- Boot ----------
+$("#statShades").textContent = SHADES.length;
+renderShapes();
+renderPickers();
+renderResults();
+renderShortlist();
+renderMonths();
+renderLibrary();
+</script>
+</body>
+</html>
