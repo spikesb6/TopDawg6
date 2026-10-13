@@ -19,6 +19,7 @@ import { modesByKey } from '@/data/modes';
 import { useMiles } from '@/hooks/use-miles';
 import { usePlaces } from '@/hooks/use-places';
 import { useSpin } from '@/hooks/use-spin';
+import { track } from '@/lib/analytics';
 import { pickRandom } from '@/lib/picker';
 import { directionsUrl, filterPlaces, placeMeta, type PlacesMode } from '@/lib/places';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -63,7 +64,10 @@ export default function PlaceScreen() {
   const spinAgain = () => {
     const next = pickRandom(filterPlaces(places, filters), place.id);
     setOnlyOne(next == null);
-    if (next) spin.spinTo(next.id);
+    if (next) {
+      track({ name: 'spin_again', mode });
+      spin.spinTo(next.id);
+    }
   };
 
   return (
@@ -100,13 +104,17 @@ export default function PlaceScreen() {
         onSpin={spinAgain}
         onLockIn={() => {
           store.lockInPlace(ref);
+          track({ name: 'locked_in', mode, kind: 'place' });
           setLockedId(place.id);
         }}>
         <ActionButton
           label="Get directions"
           color={palette.sunny}
           disabled={spin.spinning}
-          onPress={() => Linking.openURL(directionsUrl(place, Platform.OS))}
+          onPress={() => {
+            track({ name: 'directions_opened', mode });
+            Linking.openURL(directionsUrl(place, Platform.OS)).catch(() => {});
+          }}
         />
       </ResultActions>
     </Screen>

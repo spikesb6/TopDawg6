@@ -17,6 +17,7 @@ import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
 import type { Cost, Mood } from '@/data/ideas';
 import { useSpin } from '@/hooks/use-spin';
+import { track } from '@/lib/analytics';
 import { costLabel, filterIdeas, pickRandom, surprisePool } from '@/lib/picker';
 import type { ResultSource } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -61,7 +62,10 @@ export default function ResultScreen() {
       source.from === 'surprise' ? surprisePool(ideas, store.picks) : filterIdeas(ideas, source);
     const next = pickRandom(pool, idea.id);
     setOnlyOne(next == null);
-    if (next) spin.spinTo(next.id);
+    if (next) {
+      track({ name: 'spin_again', mode: idea.mode });
+      spin.spinTo(next.id);
+    }
   };
 
   return (
@@ -93,6 +97,7 @@ export default function ResultScreen() {
         onSpin={spinAgain}
         onLockIn={() => {
           store.lockIn(idea.id);
+          track({ name: 'locked_in', mode: idea.mode, kind: 'idea' });
           setLockedId(idea.id);
         }}>
         {!spin.spinning && idea.mode === 'cook' && idea.ingredients?.length ? (
@@ -100,7 +105,10 @@ export default function ResultScreen() {
             label="See the recipe"
             color={palette.coral}
             disabled={spin.spinning}
-            onPress={() => router.push({ pathname: '/recipe', params: { id: String(idea.id) } })}
+            onPress={() => {
+              track({ name: 'recipe_opened', idea_id: idea.id });
+              router.push({ pathname: '/recipe', params: { id: String(idea.id) } });
+            }}
           />
         ) : null}
         {!spin.spinning && idea.mode === 'deliv' ? (

@@ -130,3 +130,9 @@ export async function importGuestData(
     if (error) throw error;
   }
 }
+
+/** Deletes the signed-in account through the `delete-account` Edge Function. */
+export async function deleteAccount() {
+  const { error } = await client().functions.invoke('delete-account', { method: 'POST' });
+  if (error) throw error;
+}

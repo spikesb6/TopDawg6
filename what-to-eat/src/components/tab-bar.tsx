@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     flex: 1,
+    minHeight: 48,
     alignItems: 'center',
     gap: 4,
   },

@@ -133,5 +133,21 @@ do $$ begin
   end;
 end $$;
 
+-- Deleting an account (what the delete-account function does) removes everything it saved.
+reset role;
+delete from auth.users where id = '00000000-0000-0000-0000-00000000000a';
+
+do $$ begin
+  assert (select count(*) from public.favorites
+          where user_id = '00000000-0000-0000-0000-00000000000a') = 0, 'favorites deleted';
+  assert (select count(*) from public.place_favorites
+          where user_id = '00000000-0000-0000-0000-00000000000a') = 0, 'place favorites deleted';
+  assert (select count(*) from public.picks
+          where user_id = '00000000-0000-0000-0000-00000000000a') = 0, 'picks deleted';
+  assert (select count(*) from public.profiles
+          where user_id = '00000000-0000-0000-0000-00000000000a') = 0, 'profile deleted';
+  assert (select count(*) from public.ideas) = 28, 'shared ideas stay';
+end $$;
+
 select 'rls tests passed' as result;
 rollback;

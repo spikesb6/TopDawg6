@@ -6,9 +6,10 @@ import { Icon } from '@/components/icons';
 import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { groupByRecipe, listToText } from '@/lib/grocery';
 import { useGrocery } from '@/store/grocery-store';
-import { borderWidth, fonts, palette, radius } from '@/theme/theme';
+import { borderWidth, fonts, linkHitSlop, palette, radius } from '@/theme/theme';
 
 export default function GroceryScreen() {
   const theme = useTheme();
@@ -42,7 +43,7 @@ export default function GroceryScreen() {
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={`Remove ${group.recipeName} from the list`}
-                  hitSlop={8}
+                  hitSlop={linkHitSlop}
                   onPress={() => grocery.removeRecipe(group.recipeId)}>
                   <Text style={[styles.link, { color: theme.muted }]}>Remove</Text>
                 </Pressable>
@@ -83,7 +84,10 @@ export default function GroceryScreen() {
             accessibilityRole="button"
             accessibilityLabel="Share list"
             tilt={-1}
-            onPress={() => Share.share({ message: listToText(grocery.items) }).catch(() => {})}
+            onPress={() => {
+              track({ name: 'grocery_shared' });
+              Share.share({ message: listToText(grocery.items) }).catch(() => {});
+            }}
             style={[styles.button, { borderColor: theme.border }]}>
             <Text style={styles.buttonLabel}>Share list</Text>
           </BouncyPressable>
@@ -132,6 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+    minHeight: 44,
     paddingVertical: 8,
   },
   box: {

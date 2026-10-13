@@ -9,11 +9,12 @@ import type { Cost, Mood } from '@/data/ideas';
 import { useMiles } from '@/hooks/use-miles';
 import { usePlaces } from '@/hooks/use-places';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { pickRandom } from '@/lib/picker';
 import { filterPlaces, placeMeta, type PlacesMode } from '@/lib/places';
 import { placeHref } from '@/lib/routes';
 import { useLocationStore } from '@/store/location-store';
-import { borderWidth, fonts, palette, radius } from '@/theme/theme';
+import { borderWidth, fonts, linkHitSlop, palette, radius } from '@/theme/theme';
 
 type Props = { mode: PlacesMode; mood: Mood | null; cost: Cost | null };
 
@@ -40,6 +41,7 @@ export function NearbyPlaces({ mode, mood, cost }: Props) {
         disabled={matches.length === 0}
         onPress={() => {
           const place = pickRandom(matches);
+          track({ name: 'pick_one', mode });
           if (place) router.push(placeHref(place, mode, { mood, cost }, true));
         }}
       />
@@ -51,7 +53,7 @@ export function NearbyPlaces({ mode, mood, cost }: Props) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Change location"
-          hitSlop={8}
+          hitSlop={linkHitSlop}
           onPress={location.change}>
           <Text style={[styles.link, { color: theme.text }]}>Change</Text>
         </Pressable>

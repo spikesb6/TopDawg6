@@ -7,6 +7,7 @@ import { moodLabel } from '@/components/idea-row';
 import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { hasRecipe } from '@/lib/grocery';
 import { costLabel } from '@/lib/picker';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -66,7 +67,10 @@ export default function RecipeScreen() {
         accessibilityLabel={onList ? 'See grocery list' : 'Add to grocery list'}
         tilt={-1}
         onPress={() => {
-          if (!onList) grocery.addRecipe(idea);
+          if (!onList) {
+            grocery.addRecipe(idea);
+            track({ name: 'grocery_added', idea_id: idea.id });
+          }
           router.push('/grocery');
         }}
         style={[styles.button, { borderColor: theme.border }]}>

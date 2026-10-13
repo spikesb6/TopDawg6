@@ -34,6 +34,10 @@ export function Chip({ label, accessibilityLabel, selected, selectedColor, onPre
 
 const styles = StyleSheet.create({
   chip: {
+    minHeight: 44,
+    minWidth: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,

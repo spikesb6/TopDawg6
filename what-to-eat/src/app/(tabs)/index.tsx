@@ -1,5 +1,6 @@
 import { router } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { BouncyPressable } from '@/components/bouncy-pressable';
 import { Icon } from '@/components/icons';
@@ -7,6 +8,7 @@ import { Screen } from '@/components/screen';
 import { Wordmark } from '@/components/wordmark';
 import { modes } from '@/data/modes';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { pickRandom, surprisePool } from '@/lib/picker';
 import { resultHref } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -23,6 +25,7 @@ export default function HomeScreen() {
   const toBuy = grocery.items.filter((i) => !i.checked).length;
 
   const surprise = () => {
+    track({ name: 'surprise_me' });
     const idea = pickRandom(surprisePool(ideas, picks));
     if (idea) router.push(resultHref(idea.id, { from: 'surprise' }, true));
   };
@@ -66,17 +69,26 @@ export default function HomeScreen() {
 
       <View style={styles.grid}>
         {modes.map((mode, i) => (
-          <BouncyPressable
+          <Animated.View
             key={mode.key}
-            accessibilityRole="button"
-            accessibilityLabel={`${mode.title}. ${mode.blurb}`}
-            tilt={tileTilts[i]}
-            onPress={() => router.push({ pathname: '/mode/[mode]', params: { mode: mode.key } })}
-            style={[styles.tile, { backgroundColor: modeColors[mode.key] }]}>
-            <Icon name={mode.icon} color={palette.ink} size={26} />
-            <Text style={styles.tileTitle}>{mode.title}</Text>
-            <Text style={styles.tileBlurb}>{mode.blurb}</Text>
-          </BouncyPressable>
+            entering={FadeInUp.delay(80 + i * 60)
+              .springify()
+              .damping(16)}
+            style={styles.tileWrap}>
+            <BouncyPressable
+              accessibilityRole="button"
+              accessibilityLabel={`${mode.title}. ${mode.blurb}`}
+              tilt={tileTilts[i]}
+              onPress={() => {
+                track({ name: 'mode_opened', mode: mode.key });
+                router.push({ pathname: '/mode/[mode]', params: { mode: mode.key } });
+              }}
+              style={[styles.tile, { backgroundColor: modeColors[mode.key] }]}>
+              <Icon name={mode.icon} color={palette.ink} size={26} />
+              <Text style={styles.tileTitle}>{mode.title}</Text>
+              <Text style={styles.tileBlurb}>{mode.blurb}</Text>
+            </BouncyPressable>
+          </Animated.View>
         ))}
       </View>
     </Screen>
@@ -144,8 +156,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.gap,
   },
-  tile: {
+  tileWrap: {
     flexBasis: '45%',
+    flexGrow: 1,
+  },
+  tile: {
     flexGrow: 1,
     minHeight: 104,
     padding: 14,

@@ -72,6 +72,9 @@ export const radius = {
 
 export const borderWidth = 3;
 
+/** Grows small text links to a 44 pt touch target. */
+export const linkHitSlop = { top: 13, bottom: 13, left: 10, right: 10 };
+
 export const spacing = {
   screen: 20,
   gap: 12,

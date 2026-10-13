@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { type AnimatedStyle } from 'react-native-reanimated';
+import Animated, { FadeInDown, type AnimatedStyle } from 'react-native-reanimated';
 
 import { BouncyPressable } from '@/components/bouncy-pressable';
 import { Icon } from '@/components/icons';
@@ -29,26 +29,29 @@ export function ResultCard({
 }: CardProps) {
   const mode = modesByKey[modeKey];
   return (
-    <Animated.View
-      accessibilityLiveRegion="polite"
-      style={[styles.card, { backgroundColor: modeColors[modeKey] }, cardStyle]}>
-      <View style={styles.cardTop}>
-        <View style={styles.modeTag}>
-          <Icon name={mode.icon} color={palette.ink} size={18} />
-          <Text style={styles.modeTagText}>{mode.title}</Text>
+    // Springs in when the card first appears (skipped with reduce motion), then wobbles on spin.
+    <Animated.View entering={FadeInDown.springify().damping(14)}>
+      <Animated.View
+        accessibilityLiveRegion="polite"
+        style={[styles.card, { backgroundColor: modeColors[modeKey] }, cardStyle]}>
+        <View style={styles.cardTop}>
+          <View style={styles.modeTag}>
+            <Icon name={mode.icon} color={palette.ink} size={18} />
+            <Text style={styles.modeTagText}>{mode.title}</Text>
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={fave ? 'Remove from faves' : 'Add to faves'}
+            accessibilityState={{ selected: fave, disabled: spinning }}
+            disabled={spinning}
+            hitSlop={10}
+            onPress={onToggleFave}
+            style={({ pressed }) => [styles.heart, pressed && { opacity: 0.6 }]}>
+            <Icon name="heart" color={fave ? palette.tomato : palette.ink} filled={fave} />
+          </Pressable>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={fave ? 'Remove from faves' : 'Add to faves'}
-          accessibilityState={{ selected: fave, disabled: spinning }}
-          disabled={spinning}
-          hitSlop={10}
-          onPress={onToggleFave}
-          style={({ pressed }) => [styles.heart, pressed && { opacity: 0.6 }]}>
-          <Icon name="heart" color={fave ? palette.tomato : palette.ink} filled={fave} />
-        </Pressable>
-      </View>
-      {children}
+        {children}
+      </Animated.View>
     </Animated.View>
   );
 }

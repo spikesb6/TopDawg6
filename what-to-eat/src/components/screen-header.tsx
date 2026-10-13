@@ -34,9 +34,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   back: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',

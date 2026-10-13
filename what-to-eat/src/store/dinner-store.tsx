@@ -4,7 +4,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 
 import { seedIdeas, type Idea } from '@/data/ideas';
+import { identify, track } from '@/lib/analytics';
 import * as auth from '@/lib/auth';
+import { setMonitoringUser } from '@/lib/monitoring';
 import {
   addPick,
   addPlacePick,
@@ -58,6 +60,8 @@ type DinnerStore = {
   closeSignIn: () => void;
   signIn: (provider: Provider) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Deletes the account and everything saved to it, then signs out. */
+  deleteAccount: () => Promise<void>;
 };
 
 const StoreContext = createContext<DinnerStore | null>(null);
@@ -103,6 +107,12 @@ export function DinnerStoreProvider({ children }: { children: ReactNode }) {
   };
 
   const userId = session?.user.id ?? null;
+
+  // Analytics and crash reports know the account by its random id only.
+  useEffect(() => {
+    identify(userId);
+    setMonitoringUser(userId);
+  }, [userId]);
   const signedIn = userId != null;
 
   const ideasQuery = useQuery({
@@ -191,6 +201,12 @@ export function DinnerStoreProvider({ children }: { children: ReactNode }) {
 
   const toggleFaveAction = (ideaId: number) => {
     const removing = isFave(ideaId);
+    track({
+      name: 'fave_toggled',
+      kind: 'idea',
+      mode: ideasById.get(ideaId)?.mode ?? 'cook',
+      on: !removing,
+    });
     if (!signedIn) {
       const offered = offerSignIn(!removing);
       updateLocal((prev) => ({
@@ -209,6 +225,7 @@ export function DinnerStoreProvider({ children }: { children: ReactNode }) {
 
   const togglePlaceFaveAction = (place: PlaceRef) => {
     const removing = isPlaceFave(place.id);
+    track({ name: 'fave_toggled', kind: 'place', mode: place.mode, on: !removing });
     if (!signedIn) {
       const offered = offerSignIn(!removing);
       updateLocal((prev) => ({
@@ -249,6 +266,12 @@ export function DinnerStoreProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const clearAccountCache = () => {
+    for (const key of ['favorites', 'place-favorites', 'picks']) {
+      queryClient.removeQueries({ queryKey: [key] });
+    }
+  };
+
   const meta = session?.user.user_metadata ?? {};
   const name = (meta.full_name ?? meta.name ?? session?.user.email ?? 'you') as string;
 
@@ -272,14 +295,24 @@ export function DinnerStoreProvider({ children }: { children: ReactNode }) {
     openSignIn: () => setSignInVisible(true),
     closeSignIn: () => setSignInVisible(false),
     signIn: async (provider) => {
-      const ok = await (provider === 'apple' ? auth.signInWithApple() : auth.signInWithGoogle());
+      let ok = false;
+      try {
+        ok = await (provider === 'apple' ? auth.signInWithApple() : auth.signInWithGoogle());
+      } finally {
+        track({ name: 'sign_in', provider, ok });
+      }
       if (ok) setSignInVisible(false);
     },
     signOut: async () => {
       await auth.signOut();
-      for (const key of ['favorites', 'place-favorites', 'picks']) {
-        queryClient.removeQueries({ queryKey: [key] });
-      }
+      clearAccountCache();
+    },
+    deleteAccount: async () => {
+      await remote.deleteAccount();
+      track({ name: 'account_deleted' });
+      // The session is already gone on the server; drop it here too.
+      await auth.signOut().catch(() => {});
+      clearAccountCache();
     },
   };
 

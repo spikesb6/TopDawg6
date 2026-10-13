@@ -2,6 +2,7 @@ import { Linking, StyleSheet, Text, View } from 'react-native';
 
 import { BouncyPressable } from '@/components/bouncy-pressable';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { deliveryLinks } from '@/lib/delivery';
 import { borderWidth, fonts, palette, radius } from '@/theme/theme';
 
@@ -22,7 +23,10 @@ export function DeliveryButtons({ dish, disabled }: { dish: string; disabled?: b
             accessibilityState={{ disabled }}
             disabled={disabled}
             tilt={tilts[i]}
-            onPress={() => Linking.openURL(app.url).catch(() => {})}
+            onPress={() => {
+              track({ name: 'delivery_opened', app: app.key });
+              Linking.openURL(app.url).catch(() => {});
+            }}
             style={[styles.button, { borderColor: theme.border, opacity: disabled ? 0.5 : 1 }]}>
             <Text style={styles.buttonLabel} numberOfLines={1} adjustsFontSizeToFit>
               {app.label}

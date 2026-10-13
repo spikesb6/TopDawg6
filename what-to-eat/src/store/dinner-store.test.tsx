@@ -113,6 +113,11 @@ jest.mock('@/lib/remote', () => {
         { id: `server-${nextId++}`, ideaId, pickedAt: Date.now() },
       ]);
     },
+    deleteAccount: async () => {
+      mockServer.favorites.delete(mockUser());
+      mockServer.picks.delete(mockUser());
+      mockServer.placeFaves.delete(mockUser());
+    },
     importGuestData: jest.fn(async (guest: never, known: Set<number>) => {
       const rows = guestRows(guest, known);
       for (const f of rows.favorites) {
@@ -261,6 +266,24 @@ describe('faves and past picks follow the user to a second phone', () => {
     expect(phone.result.current.syncing).toBe(false);
     const saved = JSON.parse((await AsyncStorage.getItem('what-to-eat/v1'))!);
     expect(saved.favorites.map((f: { ideaId: number }) => f.ideaId)).toEqual([4]);
+    await phone.unmount();
+  });
+
+  it('deletes the account and everything saved to it', async () => {
+    const phone = await launchApp();
+    await waitFor(() => expect(phone.result.current.loaded).toBe(true));
+    await act(async () => phone.result.current.signIn('google'));
+    await waitFor(() => expect(phone.result.current.user).not.toBeNull());
+    await act(async () => phone.result.current.toggleFave(2));
+    await act(async () => phone.result.current.lockInPlace(tacos));
+    await waitFor(() => expect(mockServer.favorites.get('user-1')?.length).toBe(1));
+
+    await act(async () => phone.result.current.deleteAccount());
+    await waitFor(() => expect(phone.result.current.user).toBeNull());
+    expect(mockServer.favorites.has('user-1')).toBe(false);
+    expect(mockServer.picks.has('user-1')).toBe(false);
+    expect(phone.result.current.favorites).toEqual([]);
+    expect(phone.result.current.picks).toEqual([]);
     await phone.unmount();
   });
 });

@@ -27,6 +27,15 @@ Without setup the app runs in guest mode and saves everything on the phone. To t
 sign-in, sync across phones, and real nearby places for Fast food and Dine out, follow
 [`supabase/README.md`](supabase/README.md).
 
+## Release
+
+Building for TestFlight and Google Play internal testing is step by step in
+[`RELEASE.md`](RELEASE.md). Tester sessions are in [`TESTING.md`](TESTING.md); store copy and a
+draft privacy policy are in [`STORE.md`](STORE.md) and [`PRIVACY.md`](PRIVACY.md).
+
+Analytics (PostHog) and crash reports (Sentry) switch on when their keys are in `.env`; see
+`.env.example`.
+
 ## Checks
 
 ```bash

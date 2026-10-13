@@ -13,6 +13,7 @@ import { costs, moods, type Cost, type Mood } from '@/data/ideas';
 import { modesByKey } from '@/data/modes';
 import { showsPlaces } from '@/hooks/use-places';
 import { useTheme } from '@/hooks/use-theme';
+import { track } from '@/lib/analytics';
 import { costLabel, filterIdeas, pickRandom } from '@/lib/picker';
 import { resultHref, type ResultSource } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -33,6 +34,7 @@ export default function ModeListScreen() {
   const matches = filterIdeas(ideas, source);
 
   const pickOne = () => {
+    track({ name: 'pick_one', mode: mode.key });
     const idea = pickRandom(matches);
     if (idea) router.push(resultHref(idea.id, source, true));
   };

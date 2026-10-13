@@ -8,9 +8,13 @@
     "scheme": "whattoeat",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
+      "icon": "./assets/images/icon.png",
       "bundleIdentifier": "com.whattoeat.app",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "supportsTablet": false
     },
     "android": {
       "adaptiveIcon": {
@@ -33,7 +37,7 @@
         {
           "backgroundColor": "#FFF4DC",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76,
+          "imageWidth": 200,
           "dark": {
             "backgroundColor": "#1D1230"
           }

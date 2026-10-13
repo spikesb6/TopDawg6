@@ -1,3 +1,4 @@
+import { corsHeaders, json } from '../_shared/http.ts';
 import {
   CACHE_TTL_MS,
   FIELD_MASK,
@@ -21,19 +22,6 @@ type Deps = {
   now: () => number;
   log?: (message: string) => void;
 };
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-  });
-}
 
 /**
  * POST { mode: 'fast' | 'dine', lat, lng } or { mode, city } and get back

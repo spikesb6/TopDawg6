@@ -51,6 +51,19 @@ In Supabase open **Authentication > URL Configuration** and add these **Redirect
 - `whattoeat://**` for the real app
 - `exp://**` while testing in Expo Go
 
+## 5b. Let people delete their account
+
+Apple requires apps with sign-in to offer account deletion. The app has it under
+Faves > Delete account; it calls a small Edge Function that you deploy once:
+
+```bash
+supabase link --project-ref <your-project-ref>
+supabase functions deploy delete-account
+```
+
+It only ever deletes the signed-in person who called it. Their faves, picks and profile go
+with the account.
+
 ## 6. Try it on two phones
 
 1. Phone 1: heart an idea and lock one in. A sheet offers sign-in after the first heart.

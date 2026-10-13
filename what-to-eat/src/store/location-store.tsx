@@ -2,6 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
+import { track } from '@/lib/analytics';
 import type { PlacesWhere } from '@/lib/remote';
 
 const CITY_KEY = 'what-to-eat/city';
@@ -72,6 +73,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     where,
     askForLocation: async () => {
       const perm = await Location.requestForegroundPermissionsAsync().catch(() => null);
+      track({ name: 'location_choice', choice: perm?.granted ? 'granted' : 'denied' });
       if (perm?.granted) {
         await AsyncStorage.removeItem(CITY_KEY).catch(() => {});
         locate();
@@ -82,6 +84,7 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     setCity: (city) => {
       const clean = city.trim().replace(/\s+/g, ' ');
       if (!clean) return;
+      track({ name: 'location_choice', choice: 'city' });
       AsyncStorage.setItem(CITY_KEY, clean).catch(() => {});
       setWhere({ city: clean });
       setStatus('ready');
