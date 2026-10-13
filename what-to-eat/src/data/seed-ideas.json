@@ -1,0 +1,564 @@
+[
+  {
+    "id": 1,
+    "mode": "cook",
+    "name": "Creamy tomato pasta",
+    "blurb": "Pantry pasta that tastes like a hug",
+    "mood": "comfy",
+    "cost": 1,
+    "minutes": 20,
+    "details": "Penne, canned tomatoes, garlic, a splash of cream and lots of parmesan.",
+    "ingredients": [
+      {
+        "qty": "12 oz",
+        "name": "penne"
+      },
+      {
+        "qty": "1 can (14 oz)",
+        "name": "crushed tomatoes"
+      },
+      {
+        "qty": "3 cloves",
+        "name": "garlic"
+      },
+      {
+        "qty": "1/2 cup",
+        "name": "heavy cream"
+      },
+      {
+        "qty": "1/2 cup",
+        "name": "grated parmesan"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "olive oil"
+      },
+      {
+        "qty": "1 pinch",
+        "name": "red pepper flakes"
+      }
+    ],
+    "steps": [
+      "Boil the penne in well-salted water until just tender. Save a cup of the pasta water.",
+      "While it cooks, warm the olive oil and garlic in a big pan for 1 minute.",
+      "Add the tomatoes and pepper flakes and simmer for 8 minutes.",
+      "Stir in the cream and parmesan.",
+      "Toss in the pasta with a splash of pasta water until glossy. Season and serve."
+    ]
+  },
+  {
+    "id": 2,
+    "mode": "cook",
+    "name": "Sheet-pan fajitas",
+    "blurb": "One pan, zero fuss, big sizzle",
+    "mood": "spicy",
+    "cost": 1,
+    "minutes": 25,
+    "details": "Chicken, peppers and onions roasted hot with chili and cumin. Wrap in warm tortillas.",
+    "ingredients": [
+      {
+        "qty": "1 lb",
+        "name": "chicken breast"
+      },
+      {
+        "qty": "2",
+        "name": "bell peppers"
+      },
+      {
+        "qty": "1",
+        "name": "onion"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "olive oil"
+      },
+      {
+        "qty": "2 tsp",
+        "name": "chili powder"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "ground cumin"
+      },
+      {
+        "qty": "8 small",
+        "name": "flour tortillas"
+      },
+      {
+        "qty": "1",
+        "name": "lime"
+      },
+      {
+        "qty": "",
+        "name": "sour cream, to serve"
+      }
+    ],
+    "steps": [
+      "Heat the oven to 425°F (220°C).",
+      "Slice the chicken, peppers and onion into strips.",
+      "Toss everything on a sheet pan with the oil, chili powder, cumin and a big pinch of salt.",
+      "Roast for 18 to 20 minutes, until the chicken is cooked and the edges char.",
+      "Warm the tortillas, squeeze lime over the pan, and wrap it up with sour cream."
+    ]
+  },
+  {
+    "id": 3,
+    "mode": "cook",
+    "name": "Teriyaki salmon bowls",
+    "blurb": "Glossy salmon over rice",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 25,
+    "details": "Pan-seared salmon, quick teriyaki glaze, rice, cucumber and sesame.",
+    "ingredients": [
+      {
+        "qty": "2",
+        "name": "salmon fillets"
+      },
+      {
+        "qty": "1 cup",
+        "name": "white rice"
+      },
+      {
+        "qty": "3 tbsp",
+        "name": "soy sauce"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "honey"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "grated ginger"
+      },
+      {
+        "qty": "1",
+        "name": "cucumber"
+      },
+      {
+        "qty": "1 tbsp",
+        "name": "sesame seeds"
+      },
+      {
+        "qty": "2",
+        "name": "scallions"
+      }
+    ],
+    "steps": [
+      "Cook the rice.",
+      "Stir together the soy sauce, honey and ginger.",
+      "Sear the salmon skin-side down for 4 minutes, flip, and cook 3 more.",
+      "Pour in the sauce and let it bubble for 1 minute, spooning it over the fish.",
+      "Slice the cucumber and scallions. Build bowls of rice, salmon and cucumber, then top with sesame and scallions."
+    ]
+  },
+  {
+    "id": 4,
+    "mode": "cook",
+    "name": "Grilled cheese and tomato soup",
+    "blurb": "The classic rainy-night combo",
+    "mood": "comfy",
+    "cost": 1,
+    "minutes": 15,
+    "details": "Crispy buttered sourdough with cheddar, dunked in a quick tomato soup.",
+    "ingredients": [
+      {
+        "qty": "4 slices",
+        "name": "sourdough bread"
+      },
+      {
+        "qty": "4 oz",
+        "name": "cheddar"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "butter"
+      },
+      {
+        "qty": "1 can (28 oz)",
+        "name": "crushed tomatoes"
+      },
+      {
+        "qty": "1 cup",
+        "name": "vegetable broth"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "sugar"
+      }
+    ],
+    "steps": [
+      "Simmer the tomatoes, broth and sugar for 10 minutes. Season with salt and pepper.",
+      "Butter the outsides of the bread and fill with cheddar.",
+      "Cook the sandwiches in a pan over medium heat, about 3 minutes per side, until golden and melty.",
+      "Blend the soup if you like it smooth.",
+      "Cut the sandwiches into strips and dunk."
+    ]
+  },
+  {
+    "id": 5,
+    "mode": "cook",
+    "name": "Shrimp tacos with slaw",
+    "blurb": "Crunchy, zesty, done fast",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 20,
+    "details": "Garlicky shrimp, lime cabbage slaw and a spoon of chipotle mayo.",
+    "ingredients": [
+      {
+        "qty": "1 lb",
+        "name": "shrimp, peeled"
+      },
+      {
+        "qty": "2 cups",
+        "name": "shredded cabbage"
+      },
+      {
+        "qty": "2",
+        "name": "limes"
+      },
+      {
+        "qty": "3 tbsp",
+        "name": "mayonnaise"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "chipotle in adobo"
+      },
+      {
+        "qty": "2 cloves",
+        "name": "garlic"
+      },
+      {
+        "qty": "8 small",
+        "name": "corn tortillas"
+      },
+      {
+        "qty": "1 handful",
+        "name": "cilantro"
+      }
+    ],
+    "steps": [
+      "Toss the cabbage with the juice of 1 lime and a pinch of salt.",
+      "Stir the chipotle into the mayo.",
+      "Sauté the garlic and shrimp in a hot pan for 2 to 3 minutes, until pink.",
+      "Warm the tortillas.",
+      "Fill with slaw and shrimp, add a spoon of chipotle mayo, cilantro and a lime wedge."
+    ]
+  },
+  {
+    "id": 6,
+    "mode": "cook",
+    "name": "Spicy peanut noodles",
+    "blurb": "Slurpy, nutty, a little fiery",
+    "mood": "spicy",
+    "cost": 1,
+    "minutes": 15,
+    "details": "Noodles tossed in peanut butter, soy, lime and chili crisp. Top with scallions.",
+    "ingredients": [
+      {
+        "qty": "8 oz",
+        "name": "noodles (spaghetti works)"
+      },
+      {
+        "qty": "1/3 cup",
+        "name": "peanut butter"
+      },
+      {
+        "qty": "3 tbsp",
+        "name": "soy sauce"
+      },
+      {
+        "qty": "1",
+        "name": "lime"
+      },
+      {
+        "qty": "1 tbsp",
+        "name": "chili crisp"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "honey"
+      },
+      {
+        "qty": "3",
+        "name": "scallions"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "roasted peanuts"
+      }
+    ],
+    "steps": [
+      "Cook the noodles. Save a little of the cooking water.",
+      "Whisk the peanut butter, soy sauce, lime juice, chili crisp and honey with a few spoons of hot water until smooth.",
+      "Toss the noodles in the sauce.",
+      "Top with sliced scallions and chopped peanuts."
+    ]
+  },
+  {
+    "id": 7,
+    "mode": "cook",
+    "name": "Greek chicken salad",
+    "blurb": "Bright, crunchy and filling",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 25,
+    "details": "Lemon-oregano chicken, cucumber, tomato, olives, feta and warm pita.",
+    "ingredients": [
+      {
+        "qty": "1 lb",
+        "name": "chicken thighs"
+      },
+      {
+        "qty": "1",
+        "name": "lemon"
+      },
+      {
+        "qty": "1 tsp",
+        "name": "dried oregano"
+      },
+      {
+        "qty": "2 tbsp",
+        "name": "olive oil"
+      },
+      {
+        "qty": "1",
+        "name": "cucumber"
+      },
+      {
+        "qty": "1 pint",
+        "name": "cherry tomatoes"
+      },
+      {
+        "qty": "1/2 cup",
+        "name": "kalamata olives"
+      },
+      {
+        "qty": "4 oz",
+        "name": "feta"
+      },
+      {
+        "qty": "4",
+        "name": "pita breads"
+      }
+    ],
+    "steps": [
+      "Toss the chicken with lemon juice, oregano, olive oil and salt. Let it sit for 5 minutes.",
+      "Cook in a hot pan for 5 to 6 minutes per side.",
+      "Chop the cucumber and halve the tomatoes.",
+      "Slice the chicken over the vegetables with olives and crumbled feta.",
+      "Warm the pita and serve on the side."
+    ]
+  },
+  {
+    "id": 8,
+    "mode": "fast",
+    "name": "Cheeseburger and fries",
+    "blurb": "You already know",
+    "mood": "comfy",
+    "cost": 1,
+    "minutes": 10,
+    "details": "A double with pickles, a large fry and something cold to sip."
+  },
+  {
+    "id": 9,
+    "mode": "fast",
+    "name": "Spicy chicken sandwich",
+    "blurb": "Crispy with a kick",
+    "mood": "spicy",
+    "cost": 1,
+    "minutes": 10,
+    "details": "Spicy fried chicken, pickles and mayo on a soft bun."
+  },
+  {
+    "id": 10,
+    "mode": "fast",
+    "name": "Burrito bowl",
+    "blurb": "Build it your way",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 10,
+    "details": "Rice, beans, grilled chicken, salsa, corn and a scoop of guac."
+  },
+  {
+    "id": 11,
+    "mode": "fast",
+    "name": "Fried chicken bucket",
+    "blurb": "Share it, or don’t",
+    "mood": "comfy",
+    "cost": 2,
+    "minutes": 15,
+    "details": "Mixed pieces, biscuits, mashed potatoes and gravy."
+  },
+  {
+    "id": 12,
+    "mode": "fast",
+    "name": "Turkey sub",
+    "blurb": "Fresh and stacked",
+    "mood": "fresh",
+    "cost": 1,
+    "minutes": 10,
+    "details": "Turkey, lettuce, tomato, peppers and oil and vinegar on a toasted roll."
+  },
+  {
+    "id": 13,
+    "mode": "fast",
+    "name": "Hot chicken tenders",
+    "blurb": "Bring napkins",
+    "mood": "spicy",
+    "cost": 1,
+    "minutes": 10,
+    "details": "Cayenne-glazed tenders, white bread, pickles and slaw."
+  },
+  {
+    "id": 14,
+    "mode": "fast",
+    "name": "Tacos and nachos",
+    "blurb": "Late-night energy",
+    "mood": "spicy",
+    "cost": 1,
+    "minutes": 10,
+    "details": "A few crunchy tacos and a tray of cheesy nachos to split."
+  },
+  {
+    "id": 15,
+    "mode": "dine",
+    "name": "Neighborhood pizza place",
+    "blurb": "Booths, red pepper flakes, good times",
+    "mood": "comfy",
+    "cost": 2,
+    "minutes": 60,
+    "details": "Split a big pie and a salad. Garlic knots are not optional."
+  },
+  {
+    "id": 16,
+    "mode": "dine",
+    "name": "Sushi night",
+    "blurb": "Treat yourself",
+    "mood": "fresh",
+    "cost": 3,
+    "minutes": 75,
+    "details": "Sit at the bar, order a few rolls and some sashimi to share."
+  },
+  {
+    "id": 17,
+    "mode": "dine",
+    "name": "Thai curry spot",
+    "blurb": "Pick your heat level",
+    "mood": "spicy",
+    "cost": 2,
+    "minutes": 60,
+    "details": "Green or red curry, sticky rice and a Thai iced tea."
+  },
+  {
+    "id": 18,
+    "mode": "dine",
+    "name": "Steakhouse",
+    "blurb": "Big night energy",
+    "mood": "comfy",
+    "cost": 3,
+    "minutes": 90,
+    "details": "A good steak, creamed spinach and a baked potato with everything."
+  },
+  {
+    "id": 19,
+    "mode": "dine",
+    "name": "Mediterranean grill",
+    "blurb": "Bright plates to share",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 60,
+    "details": "Kebabs, hummus, tabbouleh and warm pita for the table."
+  },
+  {
+    "id": 20,
+    "mode": "dine",
+    "name": "Sichuan restaurant",
+    "blurb": "Tingly, numbing, so good",
+    "mood": "spicy",
+    "cost": 2,
+    "minutes": 60,
+    "details": "Mapo tofu, dan dan noodles and dry-fried green beans."
+  },
+  {
+    "id": 21,
+    "mode": "dine",
+    "name": "Breakfast-for-dinner diner",
+    "blurb": "Pancakes at 8pm, why not",
+    "mood": "comfy",
+    "cost": 1,
+    "minutes": 45,
+    "details": "Short stack, eggs your way, hash browns and bottomless coffee."
+  },
+  {
+    "id": 22,
+    "mode": "deliv",
+    "name": "Pad thai",
+    "blurb": "Sweet, salty, a little heat",
+    "mood": "spicy",
+    "cost": 2,
+    "minutes": 35,
+    "details": "Add spring rolls and an extra lime."
+  },
+  {
+    "id": 23,
+    "mode": "deliv",
+    "name": "Poke bowl",
+    "blurb": "Fresh fish, zero dishes",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 30,
+    "details": "Tuna or salmon, rice, avocado, edamame and spicy mayo on the side."
+  },
+  {
+    "id": 24,
+    "mode": "deliv",
+    "name": "Pepperoni pizza",
+    "blurb": "Couch, blanket, pizza",
+    "mood": "comfy",
+    "cost": 2,
+    "minutes": 40,
+    "details": "Large pepperoni, a side of ranch, maybe some wings."
+  },
+  {
+    "id": 25,
+    "mode": "deliv",
+    "name": "Chicken tikka masala",
+    "blurb": "Rich, creamy curry",
+    "mood": "spicy",
+    "cost": 2,
+    "minutes": 45,
+    "details": "With garlic naan, basmati rice and a mango lassi."
+  },
+  {
+    "id": 26,
+    "mode": "deliv",
+    "name": "Tonkotsu ramen",
+    "blurb": "A big bowl of cozy",
+    "mood": "comfy",
+    "cost": 2,
+    "minutes": 40,
+    "details": "Rich pork broth, chashu, soft egg and a side of gyoza."
+  },
+  {
+    "id": 27,
+    "mode": "deliv",
+    "name": "Gyro platter",
+    "blurb": "Fresh, filling, saucy",
+    "mood": "fresh",
+    "cost": 2,
+    "minutes": 35,
+    "details": "Gyro meat, rice, Greek salad and plenty of tzatziki."
+  },
+  {
+    "id": 28,
+    "mode": "deliv",
+    "name": "Mac and cheese",
+    "blurb": "Pure comfort, delivered",
+    "mood": "comfy",
+    "cost": 1,
+    "minutes": 35,
+    "details": "Baked mac with a crunchy top. Add a side of BBQ chicken."
+  }
+]
