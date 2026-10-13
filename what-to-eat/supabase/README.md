@@ -6,7 +6,8 @@ the sign-in options are hidden.
 ## 1. Create the project and tables
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. Open **SQL Editor**, paste all of `migrations/20261013000000_init.sql`, and run it.
+2. Open **SQL Editor** and run each file in `migrations/`, oldest first:
+   `20261013000000_init.sql`, then `20261014000000_places.sql`.
 3. Paste all of `seed.sql` and run it. This adds the 28 ideas with the same ids the app uses.
 4. Optional check: paste `tests/rls.test.sql` and run it. The last result should say
    `rls tests passed`. It runs inside a transaction and leaves nothing behind.
@@ -55,3 +56,29 @@ In Supabase open **Authentication > URL Configuration** and add these **Redirect
 2. Sign in. Your guest faves and picks are copied to your account.
 3. Phone 2: open the app, go to Faves, tap **Sign in** with the same account. The same faves
    and past picks show up.
+
+## 7. Real places for Fast food and Dine out
+
+Without this, Fast food and Dine out ask for your location and then say "Couldn't load places".
+
+1. In [Google Cloud Console](https://console.cloud.google.com) pick a project with billing on, open
+   **APIs & Services > Library**, and enable **Places API (New)**.
+2. Under **APIs & Services > Credentials** create an **API key**. Under **API restrictions**
+   choose **Restrict key** and tick only **Places API (New)**. Leave application restrictions
+   off: the key is only ever used from Supabase's servers.
+3. Install the [Supabase CLI](https://supabase.com/docs/guides/cli), then from the
+   `what-to-eat` folder:
+
+   ```bash
+   supabase link --project-ref <your-project-ref>
+   supabase secrets set GOOGLE_PLACES_API_KEY=<the key from step 2>
+   supabase functions deploy places
+   ```
+
+4. Open Fast food on your phone, tap **Use my location**, and allow it. You should see places
+   near you that are open right now. Tap **Type a city instead** to try another city.
+
+The key lives only in Supabase secrets, never in the app or the repo. Results are cached for
+15 minutes per area (about 100 m) or city in the `places_cache` table, which the app itself
+can't read, so repeat visits don't cost another Google call.
+

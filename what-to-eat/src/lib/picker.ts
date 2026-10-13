@@ -1,8 +1,11 @@
 import type { Cost, Idea, Mood } from '@/data/ideas';
+import type { PlaceRef } from '@/lib/places';
 import type { ModeKey } from '@/theme/theme';
 
-export type PastPick = { id: string; ideaId: number; pickedAt: number };
+/** A locked-in dinner: either a seed idea (ideaId) or a real place (place). */
+export type PastPick = { id: string; ideaId?: number; place?: PlaceRef; pickedAt: number };
 export type Fave = { ideaId: number; createdAt: number };
+export type PlaceFave = { place: PlaceRef; createdAt: number };
 
 export type Filters = {
   mode?: ModeKey | null;
@@ -26,7 +29,7 @@ export function filterIdeas(list: Idea[], { mode, mood, cost }: Filters): Idea[]
 /** Ideas locked in with "Let's eat this" during the last `days` days. */
 export function recentIdeaIds(picks: PastPick[], now: number, days = NO_REPEAT_DAYS): Set<number> {
   const since = now - days * DAY_MS;
-  return new Set(picks.filter((p) => p.pickedAt > since).map((p) => p.ideaId));
+  return new Set(picks.flatMap((p) => (p.pickedAt > since && p.ideaId != null ? [p.ideaId] : [])));
 }
 
 /**
@@ -40,12 +43,12 @@ export function surprisePool(list: Idea[], picks: PastPick[], now = Date.now()):
 }
 
 /** A random idea from the pool that is never `excludeId` (so Spin again never repeats). */
-export function pickRandom(
-  pool: Idea[],
-  excludeId: number | null = null,
+export function pickRandom<T extends { id: number | string }>(
+  pool: T[],
+  excludeId: T['id'] | null = null,
   random: () => number = Math.random
-): Idea | null {
-  const options = excludeId == null ? pool : pool.filter((idea) => idea.id !== excludeId);
+): T | null {
+  const options = excludeId == null ? pool : pool.filter((item) => item.id !== excludeId);
   if (options.length === 0) return null;
   return options[Math.min(Math.floor(random() * options.length), options.length - 1)];
 }
@@ -70,6 +73,16 @@ export function toggleFave(faves: Fave[], ideaId: number, now: number): Fave[] {
 
 export function addPick(picks: PastPick[], ideaId: number, now: number): PastPick[] {
   return [{ id: `${now}-${ideaId}`, ideaId, pickedAt: now }, ...picks];
+}
+
+export function togglePlaceFave(faves: PlaceFave[], place: PlaceRef, now: number): PlaceFave[] {
+  return faves.some((f) => f.place.id === place.id)
+    ? faves.filter((f) => f.place.id !== place.id)
+    : [{ place, createdAt: now }, ...faves];
+}
+
+export function addPlacePick(picks: PastPick[], place: PlaceRef, now: number): PastPick[] {
+  return [{ id: `${now}-${place.id}`, place, pickedAt: now }, ...picks];
 }
 
 export function costLabel(cost: Cost): string {

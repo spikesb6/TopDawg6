@@ -1,6 +1,15 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { faveFromRow, guestRows, ideaFromRow, mergeFaves, mergePicks, pickFromRow } from './sync';
+import {
+  faveFromRow,
+  guestRows,
+  ideaFromRow,
+  mergeFaves,
+  mergePicks,
+  mergePlaceFaves,
+  pickFromRow,
+  placeFaveFromRow,
+} from './sync';
 
 describe('row mapping', () => {
   it('turns an ideas row into an Idea, filling empty columns', () => {
@@ -69,6 +78,7 @@ describe('guestRows', () => {
   it('returns nothing for an empty guest', () => {
     expect(guestRows({ favorites: [], picks: [] }, new Set([1]))).toEqual({
       favorites: [],
+      placeFavorites: [],
       picks: [],
     });
   });
@@ -101,5 +111,67 @@ describe('merging guest data while it uploads', () => {
         [{ id: 'a', ideaId: 1, pickedAt: 20 }]
       ).map((p) => p.id)
     ).toEqual(['a', 'server-1']);
+  });
+});
+
+describe('places', () => {
+  const tacos = { id: 'gp-1', name: 'Near Tacos', mode: 'fast' as const };
+
+  it('maps place picks and place favorites from rows', () => {
+    expect(
+      pickFromRow({
+        id: 3,
+        idea_id: null,
+        place_id: 'gp-1',
+        place_name: 'Near Tacos',
+        place_mode: 'fast',
+        picked_at: '2026-10-12T19:30:00.000Z',
+      })
+    ).toEqual({ id: 'server-3', place: tacos, pickedAt: Date.parse('2026-10-12T19:30:00.000Z') });
+    expect(
+      placeFaveFromRow({
+        place_id: 'gp-1',
+        name: 'Near Tacos',
+        mode: 'fast',
+        created_at: '2026-10-12T19:30:00.000Z',
+      })
+    ).toEqual({ place: tacos, createdAt: Date.parse('2026-10-12T19:30:00.000Z') });
+  });
+
+  it('uploads guest place faves and place picks', () => {
+    const t = Date.parse('2026-10-10T19:00:00.000Z');
+    const rows = guestRows(
+      {
+        favorites: [],
+        placeFaves: [
+          { place: tacos, createdAt: t },
+          { place: tacos, createdAt: t + 1 },
+        ],
+        picks: [{ id: 'a', place: tacos, pickedAt: t }],
+      },
+      new Set()
+    );
+    expect(rows.placeFavorites).toEqual([
+      {
+        place_id: 'gp-1',
+        name: 'Near Tacos',
+        mode: 'fast',
+        created_at: '2026-10-10T19:00:00.000Z',
+      },
+    ]);
+    expect(rows.picks).toEqual([
+      {
+        place_id: 'gp-1',
+        place_name: 'Near Tacos',
+        place_mode: 'fast',
+        picked_at: '2026-10-10T19:00:00.000Z',
+      },
+    ]);
+  });
+
+  it('merges place faves while uploading', () => {
+    expect(
+      mergePlaceFaves([{ place: tacos, createdAt: 5 }], [{ place: tacos, createdAt: 1 }])
+    ).toEqual([{ place: tacos, createdAt: 5 }]);
   });
 });

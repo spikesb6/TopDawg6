@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { SignInSheet } from '@/components/sign-in-sheet';
 import { useScheme, useTheme } from '@/hooks/use-theme';
 import { DinnerStoreProvider } from '@/store/dinner-store';
+import { LocationProvider } from '@/store/location-store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,17 +35,20 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <DinnerStoreProvider>
-        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: theme.background },
-          }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="mode/[mode]" />
-          <Stack.Screen name="result" />
-        </Stack>
-        <SignInSheet />
+        <LocationProvider>
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: theme.background },
+            }}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="mode/[mode]" />
+            <Stack.Screen name="result" />
+            <Stack.Screen name="place" />
+          </Stack>
+          <SignInSheet />
+        </LocationProvider>
       </DinnerStoreProvider>
     </QueryClientProvider>
   );

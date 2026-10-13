@@ -2,19 +2,21 @@ import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { BouncyPressable } from '@/components/bouncy-pressable';
 import { Chip } from '@/components/chip';
 import { Icon } from '@/components/icons';
 import { IdeaRow } from '@/components/idea-row';
+import { NearbyPlaces } from '@/components/nearby-places';
+import { PickButton } from '@/components/pick-button';
 import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
 import { costs, moods, type Cost, type Mood } from '@/data/ideas';
 import { modesByKey } from '@/data/modes';
+import { showsPlaces } from '@/hooks/use-places';
 import { useTheme } from '@/hooks/use-theme';
 import { costLabel, filterIdeas, pickRandom } from '@/lib/picker';
 import { resultHref, type ResultSource } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
-import { borderWidth, fonts, modeColors, palette, radius, type ModeKey } from '@/theme/theme';
+import { fonts, modeColors, palette, radius, type ModeKey } from '@/theme/theme';
 
 export default function ModeListScreen() {
   const theme = useTheme();
@@ -79,38 +81,31 @@ export default function ModeListScreen() {
         ))}
       </View>
 
-      <BouncyPressable
-        accessibilityRole="button"
-        accessibilityLabel="Pick one for me"
-        accessibilityState={{ disabled: matches.length === 0 }}
-        disabled={matches.length === 0}
-        tilt={1}
-        onPress={pickOne}
-        style={[
-          styles.pick,
-          { borderColor: theme.border, opacity: matches.length === 0 ? 0.5 : 1 },
-        ]}>
-        <Icon name="dice" color={palette.cream} size={24} />
-        <Text style={styles.pickLabel}>Pick one for me</Text>
-      </BouncyPressable>
-
-      {matches.length === 0 ? (
-        <View style={styles.empty}>
-          <Text style={[styles.emptyTitle, { color: theme.text }]}>Nothing matches</Text>
-          <Text style={[styles.emptyBody, { color: theme.muted }]}>
-            Try loosening your filters.
-          </Text>
-        </View>
+      {showsPlaces(mode.key) ? (
+        // Fast food and Dine out: real places near you once Supabase is set up.
+        <NearbyPlaces mode={mode.key} mood={mood} cost={cost} />
       ) : (
-        <View style={styles.list}>
-          {matches.map((idea) => (
-            <IdeaRow
-              key={idea.id}
-              idea={idea}
-              onPress={() => router.push(resultHref(idea.id, source))}
-            />
-          ))}
-        </View>
+        <>
+          <PickButton disabled={matches.length === 0} onPress={pickOne} />
+          {matches.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={[styles.emptyTitle, { color: theme.text }]}>Nothing matches</Text>
+              <Text style={[styles.emptyBody, { color: theme.muted }]}>
+                Try loosening your filters.
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.list}>
+              {matches.map((idea) => (
+                <IdeaRow
+                  key={idea.id}
+                  idea={idea}
+                  onPress={() => router.push(resultHref(idea.id, source))}
+                />
+              ))}
+            </View>
+          )}
+        </>
       )}
     </Screen>
   );
@@ -152,22 +147,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
     marginTop: 10,
-  },
-  pick: {
-    marginTop: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    minHeight: 60,
-    borderWidth,
-    borderRadius: radius.button,
-    backgroundColor: palette.grape,
-  },
-  pickLabel: {
-    fontFamily: fonts.heading,
-    fontSize: 19,
-    color: palette.cream,
   },
   list: {
     marginTop: 20,

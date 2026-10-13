@@ -3,6 +3,7 @@ import { describe, expect, it } from '@jest/globals';
 import { seedIdeas as ideas } from '../data/ideas';
 import {
   addPick,
+  addPlacePick,
   costLabel,
   filterIdeas,
   pickRandom,
@@ -10,6 +11,7 @@ import {
   relativeDay,
   surprisePool,
   toggleFave,
+  togglePlaceFave,
   type PastPick,
 } from './picker';
 
@@ -115,5 +117,26 @@ describe('faves and picks', () => {
   it('formats budget', () => {
     expect(costLabel(1)).toBe('$');
     expect(costLabel(3)).toBe('$$$');
+  });
+});
+
+describe('places in faves and picks', () => {
+  const tacos = { id: 'gp-1', name: 'Near Tacos', mode: 'fast' as const };
+
+  it('toggles a place fave', () => {
+    const on = togglePlaceFave([], tacos, now);
+    expect(on).toEqual([{ place: tacos, createdAt: now }]);
+    expect(togglePlaceFave(on, tacos, now)).toEqual([]);
+  });
+
+  it('records a place pick that the 7-day rule ignores', () => {
+    const picks = addPlacePick(addPick([], 1, now), tacos, now);
+    expect(picks[0]).toEqual({ id: `${now}-gp-1`, place: tacos, pickedAt: now });
+    expect([...recentIdeaIds(picks, now)]).toEqual([1]);
+  });
+
+  it('picks places too, never repeating the current one', () => {
+    const pool = [{ id: 'a' }, { id: 'b' }];
+    expect(pickRandom(pool, 'a', () => 0)?.id).toBe('b');
   });
 });

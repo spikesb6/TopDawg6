@@ -22,10 +22,23 @@ const mockAuth = {
 };
 const mockServer = {
   favorites: new Map<string, { ideaId: number; createdAt: number }[]>(),
-  picks: new Map<string, { id: string; ideaId: number; pickedAt: number }[]>(),
+  picks: new Map<
+    string,
+    {
+      id: string;
+      ideaId?: number;
+      place?: { id: string; name: string; mode: 'fast' | 'dine' };
+      pickedAt: number;
+    }[]
+  >(),
+  placeFaves: new Map<
+    string,
+    { place: { id: string; name: string; mode: 'fast' | 'dine' }; createdAt: number }[]
+  >(),
   reset() {
     this.favorites.clear();
     this.picks.clear();
+    this.placeFaves.clear();
   },
 };
 const mockUser = () => mockAuth.session!.user.id;
@@ -61,11 +74,29 @@ jest.mock('@/lib/remote', () => {
   const { guestRows } = require('@/lib/sync');
   const faves = () => mockServer.favorites.get(mockUser()) ?? [];
   const picks = () => mockServer.picks.get(mockUser()) ?? [];
+  const placeFaves = () => mockServer.placeFaves.get(mockUser()) ?? [];
   let nextId = 1;
   return {
     fetchIdeas: async () => seedIdeas,
     fetchFavorites: async () => [...faves()].sort((a, b) => b.createdAt - a.createdAt),
     fetchPicks: async () => [...picks()].sort((a, b) => b.pickedAt - a.pickedAt),
+    fetchPlaceFavorites: async () => [...placeFaves()].sort((a, b) => b.createdAt - a.createdAt),
+    addPlaceFavorite: async (place: { id: string; name: string; mode: 'fast' | 'dine' }) => {
+      if (!placeFaves().some((f) => f.place.id === place.id))
+        mockServer.placeFaves.set(mockUser(), [...placeFaves(), { place, createdAt: Date.now() }]);
+    },
+    removePlaceFavorite: async (placeId: string) => {
+      mockServer.placeFaves.set(
+        mockUser(),
+        placeFaves().filter((f) => f.place.id !== placeId)
+      );
+    },
+    addPlacePick: async (place: { id: string; name: string; mode: 'fast' | 'dine' }) => {
+      mockServer.picks.set(mockUser(), [
+        ...picks(),
+        { id: `server-${nextId++}`, place, pickedAt: Date.now() },
+      ]);
+    },
     addFavorite: async (ideaId: number) => {
       if (!faves().some((f) => f.ideaId === ideaId))
         mockServer.favorites.set(mockUser(), [...faves(), { ideaId, createdAt: Date.now() }]);
@@ -91,10 +122,23 @@ jest.mock('@/lib/remote', () => {
             { ideaId: f.idea_id, createdAt: Date.parse(f.created_at) },
           ]);
       }
+      for (const f of rows.placeFavorites) {
+        mockServer.placeFaves.set(mockUser(), [
+          ...placeFaves(),
+          {
+            place: { id: f.place_id, name: f.name, mode: f.mode },
+            createdAt: Date.parse(f.created_at),
+          },
+        ]);
+      }
       for (const p of rows.picks) {
+        const place =
+          'place_id' in p ? { id: p.place_id, name: p.place_name, mode: p.place_mode } : undefined;
         mockServer.picks.set(mockUser(), [
           ...picks(),
-          { id: `server-${nextId++}`, ideaId: p.idea_id, pickedAt: Date.parse(p.picked_at) },
+          place
+            ? { id: `server-${nextId++}`, place, pickedAt: Date.parse(p.picked_at) }
+            : { id: `server-${nextId++}`, ideaId: p.idea_id, pickedAt: Date.parse(p.picked_at) },
         ]);
       }
     }),
@@ -114,7 +158,11 @@ async function launchApp() {
   return renderHook(() => useDinnerStore(), { wrapper });
 }
 
-const ids = (list: { ideaId: number }[]) => list.map((x) => x.ideaId).sort((a, b) => a - b);
+const ids = (list: { ideaId?: number }[]) =>
+  list.flatMap((x) => (x.ideaId != null ? [x.ideaId] : [])).sort((a, b) => a - b);
+const placeIds = (list: { place?: { id: string } }[]) =>
+  list.flatMap((x) => (x.place ? [x.place.id] : [])).sort();
+const tacos = { id: 'gp-1', name: 'Near Tacos', mode: 'fast' as const };
 
 describe('faves and past picks follow the user to a second phone', () => {
   beforeEach(async () => {
@@ -140,9 +188,13 @@ describe('faves and past picks follow the user to a second phone', () => {
     expect(ids(phone1.result.current.picks)).toEqual([2]);
     expect(mockServer.favorites.size).toBe(0);
 
-    // A second fave does not ask again.
+    // A second fave does not ask again, including a place.
     await act(async () => phone1.result.current.toggleFave(3));
+    await act(async () => phone1.result.current.togglePlaceFave(tacos));
+    await act(async () => phone1.result.current.lockInPlace(tacos));
     expect(phone1.result.current.signInVisible).toBe(false);
+    expect(phone1.result.current.isPlaceFave('gp-1')).toBe(true);
+    expect(placeIds(phone1.result.current.picks)).toEqual(['gp-1']);
 
     // Sign in: guest data is copied up and cleared from the phone.
     await act(async () => phone1.result.current.signIn('google'));
@@ -150,10 +202,13 @@ describe('faves and past picks follow the user to a second phone', () => {
     expect(phone1.result.current.user?.name).toBe('sam@example.com');
     expect(ids(mockServer.favorites.get('user-1')!)).toEqual([1, 3]);
     expect(ids(mockServer.picks.get('user-1')!)).toEqual([2]);
+    expect(placeIds(mockServer.picks.get('user-1')!)).toEqual(['gp-1']);
+    expect(mockServer.placeFaves.get('user-1')!.map((f) => f.place)).toEqual([tacos]);
     await waitFor(() => expect(ids(phone1.result.current.favorites)).toEqual([1, 3]));
     const saved = JSON.parse((await AsyncStorage.getItem('what-to-eat/v1'))!);
     expect(saved.favorites).toEqual([]);
     expect(saved.picks).toEqual([]);
+    expect(saved.placeFaves).toEqual([]);
 
     // Signed in: hearts and picks go straight to the server.
     await act(async () => phone1.result.current.toggleFave(5));
@@ -170,12 +225,27 @@ describe('faves and past picks follow the user to a second phone', () => {
     await waitFor(() => expect(ids(phone2.result.current.favorites)).toEqual([3, 5]));
     await waitFor(() => expect(ids(phone2.result.current.picks)).toEqual([2, 7]));
     expect(phone2.result.current.isFave(5)).toBe(true);
+    await waitFor(() => expect(phone2.result.current.isPlaceFave('gp-1')).toBe(true));
+    expect(placeIds(phone2.result.current.picks)).toEqual(['gp-1']);
+
+    // Un-hearting the place on phone 2 removes it from the account.
+    await act(async () => phone2.result.current.togglePlaceFave(tacos));
+    await waitFor(() => expect(mockServer.placeFaves.get('user-1')).toEqual([]));
 
     // Signing out goes back to an empty guest.
     await act(async () => phone2.result.current.signOut());
     await waitFor(() => expect(phone2.result.current.user).toBeNull());
     expect(phone2.result.current.favorites).toEqual([]);
     expect(phone2.result.current.picks).toEqual([]);
+    expect(phone2.result.current.placeFaves).toEqual([]);
+  });
+
+  it('offers sign-in when the first heart is a place', async () => {
+    const phone = await launchApp();
+    await waitFor(() => expect(phone.result.current.loaded).toBe(true));
+    await act(async () => phone.result.current.togglePlaceFave(tacos));
+    expect(phone.result.current.signInVisible).toBe(true);
+    await phone.unmount();
   });
 
   it('keeps guest data on the phone if the upload fails, and still shows the account', async () => {

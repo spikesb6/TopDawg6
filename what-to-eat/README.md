@@ -24,7 +24,8 @@ Switch your phone to dark mode to see the dark theme.
 ## Accounts and sync
 
 Without setup the app runs in guest mode and saves everything on the phone. To turn on
-sign-in and sync across phones, follow [`supabase/README.md`](supabase/README.md).
+sign-in, sync across phones, and real nearby places for Fast food and Dine out, follow
+[`supabase/README.md`](supabase/README.md).
 
 ## Checks
 
@@ -32,4 +33,5 @@ sign-in and sync across phones, follow [`supabase/README.md`](supabase/README.md
 npx tsc --noEmit
 npx expo lint
 npm test
+npm run test:functions   # Edge Function tests (Deno)
 ```

@@ -47,6 +47,37 @@ do $$ begin
   end;
 end $$;
 
+-- Places: A can heart a place and lock one in; a pick is an idea or a place, never both.
+insert into public.place_favorites (place_id, name, mode) values ('gp-1', 'Near Tacos', 'fast');
+insert into public.picks (place_id, place_name, place_mode) values ('gp-1', 'Near Tacos', 'fast');
+
+do $$ begin
+  assert (select count(*) from public.place_favorites) = 1, 'A sees their place favorite';
+  assert (select count(*) from public.picks) = 3, 'A sees idea and place picks';
+  begin
+    insert into public.picks (idea_id, place_id, place_name, place_mode)
+    values (1, 'gp-2', 'x', 'fast');
+    raise exception 'a pick had both an idea and a place';
+  exception when check_violation then null;
+  end;
+  begin
+    insert into public.picks (place_id) values ('gp-3');
+    raise exception 'a place pick had no name';
+  exception when check_violation then null;
+  end;
+  begin
+    insert into public.place_favorites (user_id, place_id, name, mode)
+    values ('00000000-0000-0000-0000-00000000000b', 'gp-4', 'x', 'dine');
+    raise exception 'A wrote a place favorite for B';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform 1 from public.places_cache;
+    raise exception 'a signed-in user read the places cache';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+
 -- Signed in as B on another phone: sees none of A's data and cannot delete it.
 select set_config('request.jwt.claims',
   '{"sub": "00000000-0000-0000-0000-00000000000b", "role": "authenticated"}', true);
@@ -56,6 +87,7 @@ delete from public.favorites where idea_id = 1;
 do $$ begin
   assert (select count(*) from public.favorites) = 0, 'B sees no favorites from A';
   assert (select count(*) from public.picks) = 0, 'B sees no picks from A';
+  assert (select count(*) from public.place_favorites) = 0, 'B sees no place favorites from A';
 end $$;
 
 -- Back to A: still has both favorites, and can remove one.
@@ -87,6 +119,16 @@ do $$ begin
   begin
     perform 1 from public.picks;
     raise exception 'guest read picks';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform 1 from public.place_favorites;
+    raise exception 'guest read place favorites';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    perform 1 from public.places_cache;
+    raise exception 'guest read the places cache';
   exception when insufficient_privilege then null;
   end;
 end $$;
