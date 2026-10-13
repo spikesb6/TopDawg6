@@ -47,13 +47,21 @@ screens.
 
 ## Code map
 - `src/theme/theme.ts`: color tokens, light and dark palettes, fonts, radii.
-- `src/data/ideas.ts`: the 28 seed ideas (placeholder set until prototype.html is added; same
-  shape as the `ideas` table). `src/data/modes.ts`: the four modes.
+- `src/data/seed-ideas.json`: the 28 seed ideas (placeholder set until prototype.html is added).
+  `supabase/seed.sql` is generated from it with `npm run gen:seed`; a test checks they match.
+  `src/data/ideas.ts`: idea types, moods, budgets. `src/data/modes.ts`: the four modes.
 - `src/lib/picker.ts`: filters, Surprise me pool (7-day rule), spin picking, relative days.
-  Tested in `src/lib/picker.test.ts` (`npm test`).
-- `src/store/dinner-store.tsx`: faves and past picks, saved on the device with AsyncStorage.
+- `src/lib/sync.ts`: Supabase row mapping and guest-to-account upload rows (pure, tested).
+- `src/lib/supabase.ts`: client; `backendConfigured` is false until `.env` has the keys, and the
+  app then stays in guest mode. `src/lib/auth.ts`: Apple and Google sign-in.
+  `src/lib/remote.ts`: queries. `src/lib/secure-storage.ts`: session storage in SecureStore.
+- `src/store/dinner-store.tsx`: ideas, faves and picks. Guests keep them in AsyncStorage; after
+  sign-in they're uploaded once, then read from Supabase with TanStack Query. Tested as two
+  phones in `dinner-store.test.tsx`.
 - `src/app/(tabs)/`: Home (`index`), `faves`, `past`. `src/app/mode/[mode].tsx`: mode list.
   `src/app/result.tsx`: result card with spin, heart, Let's eat this and Spin again.
-- `src/components/`: wordmark, tab bar, header, chips, idea rows, bouncy buttons, icons.
+- `src/components/`: wordmark, tab bar, header, chips, idea rows, bouncy buttons, icons,
+  sign-in sheet (offered after the first fave), account card on Faves.
+- `supabase/`: migration (tables + RLS), seed, `tests/rls.test.sql`, setup steps in README.
 - See AGENTS.md for Expo commands. Run `npx tsc --noEmit`, `npx expo lint` and `npm test`
   before finishing.

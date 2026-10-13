@@ -21,6 +21,11 @@ See `CLAUDE.md` for the look, rules and build phases, and `reference/` for the b
 
 Switch your phone to dark mode to see the dark theme.
 
+## Accounts and sync
+
+Without setup the app runs in guest mode and saves everything on the phone. To turn on
+sign-in and sync across phones, follow [`supabase/README.md`](supabase/README.md).
+
 ## Checks
 
 ```bash

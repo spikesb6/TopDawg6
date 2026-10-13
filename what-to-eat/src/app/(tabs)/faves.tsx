@@ -1,11 +1,11 @@
 import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { AccountCard } from '@/components/account-card';
 import { EmptyState } from '@/components/empty-state';
 import { IdeaRow } from '@/components/idea-row';
 import { Screen } from '@/components/screen';
 import { Wordmark } from '@/components/wordmark';
-import { ideasById } from '@/data/ideas';
 import { useTheme } from '@/hooks/use-theme';
 import { resultHref } from '@/lib/routes';
 import { useDinnerStore } from '@/store/dinner-store';
@@ -13,7 +13,7 @@ import { fonts } from '@/theme/theme';
 
 export default function FavesScreen() {
   const theme = useTheme();
-  const { favorites } = useDinnerStore();
+  const { favorites, ideasById } = useDinnerStore();
   const faveIdeas = favorites.flatMap((f) => ideasById.get(f.ideaId) ?? []);
 
   return (
@@ -22,6 +22,7 @@ export default function FavesScreen() {
       <Text accessibilityRole="header" style={[styles.title, { color: theme.text }]}>
         Faves
       </Text>
+      <AccountCard />
       {faveIdeas.length === 0 ? (
         <EmptyState
           icon="heart"

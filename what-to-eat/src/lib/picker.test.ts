@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 
-import { ideas } from '../data/ideas';
+import { seedIdeas as ideas } from '../data/ideas';
 import {
   addPick,
   costLabel,

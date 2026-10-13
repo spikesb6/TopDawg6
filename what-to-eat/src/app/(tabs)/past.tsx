@@ -5,7 +5,6 @@ import { EmptyState } from '@/components/empty-state';
 import { IdeaRow } from '@/components/idea-row';
 import { Screen } from '@/components/screen';
 import { Wordmark } from '@/components/wordmark';
-import { ideasById } from '@/data/ideas';
 import { useTheme } from '@/hooks/use-theme';
 import { relativeDay } from '@/lib/picker';
 import { resultHref } from '@/lib/routes';
@@ -14,7 +13,7 @@ import { fonts } from '@/theme/theme';
 
 export default function PastPicksScreen() {
   const theme = useTheme();
-  const { picks } = useDinnerStore();
+  const { picks, ideasById } = useDinnerStore();
   const rows = picks.flatMap((pick) => {
     const idea = ideasById.get(pick.ideaId);
     return idea ? [{ pick, idea }] : [];

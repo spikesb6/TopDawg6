@@ -8,16 +8,18 @@ import { Icon } from '@/components/icons';
 import { IdeaRow } from '@/components/idea-row';
 import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
-import { costs, ideas, moods, type Cost, type Mood } from '@/data/ideas';
+import { costs, moods, type Cost, type Mood } from '@/data/ideas';
 import { modesByKey } from '@/data/modes';
 import { useTheme } from '@/hooks/use-theme';
 import { costLabel, filterIdeas, pickRandom } from '@/lib/picker';
 import { resultHref, type ResultSource } from '@/lib/routes';
+import { useDinnerStore } from '@/store/dinner-store';
 import { borderWidth, fonts, modeColors, palette, radius, type ModeKey } from '@/theme/theme';
 
 export default function ModeListScreen() {
   const theme = useTheme();
   const { mode: modeParam } = useLocalSearchParams<{ mode: string }>();
+  const { ideas } = useDinnerStore();
   const [mood, setMood] = useState<Mood | null>(null);
   const [cost, setCost] = useState<Cost | null>(null);
 

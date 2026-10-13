@@ -5,7 +5,6 @@ import { BouncyPressable } from '@/components/bouncy-pressable';
 import { Icon } from '@/components/icons';
 import { Screen } from '@/components/screen';
 import { Wordmark } from '@/components/wordmark';
-import { ideas } from '@/data/ideas';
 import { modes } from '@/data/modes';
 import { useTheme } from '@/hooks/use-theme';
 import { pickRandom, surprisePool } from '@/lib/picker';
@@ -18,7 +17,7 @@ const tileTilts = [-1, 1.5, 1, -1.5];
 
 export default function HomeScreen() {
   const theme = useTheme();
-  const { picks } = useDinnerStore();
+  const { picks, ideas } = useDinnerStore();
 
   const surprise = () => {
     const idea = pickRandom(surprisePool(ideas, picks));

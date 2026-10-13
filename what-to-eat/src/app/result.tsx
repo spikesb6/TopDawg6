@@ -15,7 +15,7 @@ import { Icon } from '@/components/icons';
 import { moodLabel } from '@/components/idea-row';
 import { Screen } from '@/components/screen';
 import { ScreenHeader } from '@/components/screen-header';
-import { ideas, ideasById, type Cost, type Idea, type Mood } from '@/data/ideas';
+import type { Cost, Idea, Mood } from '@/data/ideas';
 import { modesByKey } from '@/data/modes';
 import { useTheme } from '@/hooks/use-theme';
 import { costLabel, filterIdeas, pickRandom, surprisePool } from '@/lib/picker';
@@ -50,6 +50,7 @@ export default function ResultScreen() {
   const theme = useTheme();
   const params = useLocalSearchParams<Params>();
   const store = useDinnerStore();
+  const { ideas, ideasById } = store;
   const reduceMotion = useReducedMotion();
 
   const startId = Number(params.id);
@@ -95,7 +96,7 @@ export default function ResultScreen() {
       clearInterval(flash);
       clearTimeout(land);
     };
-  }, [spinTarget, wobble]);
+  }, [spinTarget, wobble, ideas]);
 
   const idea = ideasById.get(ideaId);
   if (!idea) return <Redirect href="/" />;
