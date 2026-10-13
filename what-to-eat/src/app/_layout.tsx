@@ -1,13 +1,13 @@
 import { Fredoka_600SemiBold, Fredoka_700Bold } from '@expo-google-fonts/fredoka';
 import { Nunito_700Bold } from '@expo-google-fonts/nunito';
 import { useFonts } from 'expo-font';
-import { Tabs } from 'expo-router/js-tabs';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
-import { TabBar } from '@/components/tab-bar';
 import { useScheme, useTheme } from '@/hooks/use-theme';
+import { DinnerStoreProvider } from '@/store/dinner-store';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,18 +28,17 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <>
+    <DinnerStoreProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-      <Tabs
-        tabBar={(props) => <TabBar {...props} />}
+      <Stack
         screenOptions={{
           headerShown: false,
-          sceneStyle: { backgroundColor: theme.background },
+          contentStyle: { backgroundColor: theme.background },
         }}>
-        <Tabs.Screen name="index" options={{ title: 'Home' }} />
-        <Tabs.Screen name="faves" options={{ title: 'Faves' }} />
-        <Tabs.Screen name="past" options={{ title: 'Past picks' }} />
-      </Tabs>
-    </>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="mode/[mode]" />
+        <Stack.Screen name="result" />
+      </Stack>
+    </DinnerStoreProvider>
   );
 }

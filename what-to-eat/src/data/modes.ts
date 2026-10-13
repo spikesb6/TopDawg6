@@ -15,3 +15,5 @@ export const modes: Mode[] = [
   { key: 'dine', title: 'Dine out', blurb: 'Sit down somewhere good', icon: 'forkKnife' },
   { key: 'deliv', title: 'Delivery', blurb: 'Couch mode', icon: 'bag' },
 ];
+
+export const modesByKey = Object.fromEntries(modes.map((m) => [m.key, m])) as Record<ModeKey, Mode>;

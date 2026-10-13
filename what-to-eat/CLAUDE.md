@@ -47,7 +47,13 @@ screens.
 
 ## Code map
 - `src/theme/theme.ts`: color tokens, light and dark palettes, fonts, radii.
-- `src/components/wordmark.tsx`: the crooked wordmark (`scale` prop for smaller uses).
-- `src/components/tab-bar.tsx`: custom bottom tabs (Home, Faves, Past picks).
-- `src/app/`: routes. `index` is Home, `faves` and `past` are the other tabs.
-- See AGENTS.md for Expo commands. Run `npx tsc --noEmit` and `npx expo lint` before finishing.
+- `src/data/ideas.ts`: the 28 seed ideas (placeholder set until prototype.html is added; same
+  shape as the `ideas` table). `src/data/modes.ts`: the four modes.
+- `src/lib/picker.ts`: filters, Surprise me pool (7-day rule), spin picking, relative days.
+  Tested in `src/lib/picker.test.ts` (`npm test`).
+- `src/store/dinner-store.tsx`: faves and past picks, saved on the device with AsyncStorage.
+- `src/app/(tabs)/`: Home (`index`), `faves`, `past`. `src/app/mode/[mode].tsx`: mode list.
+  `src/app/result.tsx`: result card with spin, heart, Let's eat this and Spin again.
+- `src/components/`: wordmark, tab bar, header, chips, idea rows, bouncy buttons, icons.
+- See AGENTS.md for Expo commands. Run `npx tsc --noEmit`, `npx expo lint` and `npm test`
+  before finishing.

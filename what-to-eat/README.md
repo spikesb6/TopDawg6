@@ -26,4 +26,5 @@ Switch your phone to dark mode to see the dark theme.
 ```bash
 npx tsc --noEmit
 npx expo lint
+npm test
 ```

@@ -9,13 +9,16 @@ export type IconName =
   | 'burger'
   | 'forkKnife'
   | 'bag'
-  | 'dice';
+  | 'dice'
+  | 'chevronLeft';
 
 type IconProps = {
   name: IconName;
   color: string;
   size?: number;
   strokeWidth?: number;
+  /** Fills the shape with `color` (used for a hearted heart). */
+  filled?: boolean;
 };
 
 const paths: Record<Exclude<IconName, 'dice' | 'clock'>, string[]> = {
@@ -24,6 +27,7 @@ const paths: Record<Exclude<IconName, 'dice' | 'clock'>, string[]> = {
     'M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7',
     'M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6',
   ],
+  chevronLeft: ['M15 6l-6 6 6 6'],
   heart: ['M19.5 12.572 12 20l-7.5-7.428A5 5 0 1 1 12 6.006a5 5 0 1 1 7.5 6.572'],
   chefHat: [
     'M12 3c1.918 0 3.52 1.35 3.91 3.151a4 4 0 0 1 2.09 7.723V21H6v-7.126a4 4 0 1 1 2.092-7.723A4 4 0 0 1 12 3z',
@@ -45,13 +49,13 @@ const paths: Record<Exclude<IconName, 'dice' | 'clock'>, string[]> = {
   ],
 };
 
-export function Icon({ name, color, size = 24, strokeWidth = 2 }: IconProps) {
+export function Icon({ name, color, size = 24, strokeWidth = 2, filled = false }: IconProps) {
   const stroke = {
     stroke: color,
     strokeWidth,
     strokeLinecap: 'round' as const,
     strokeLinejoin: 'round' as const,
-    fill: 'none',
+    fill: filled ? color : 'none',
   };
 
   return (

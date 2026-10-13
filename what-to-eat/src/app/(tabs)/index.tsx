@@ -1,11 +1,16 @@
+import { router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { BouncyPressable } from '@/components/bouncy-pressable';
 import { Icon } from '@/components/icons';
 import { Screen } from '@/components/screen';
 import { Wordmark } from '@/components/wordmark';
+import { ideas } from '@/data/ideas';
 import { modes } from '@/data/modes';
 import { useTheme } from '@/hooks/use-theme';
+import { pickRandom, surprisePool } from '@/lib/picker';
+import { resultHref } from '@/lib/routes';
+import { useDinnerStore } from '@/store/dinner-store';
 import { borderWidth, fonts, modeColors, palette, radius, spacing } from '@/theme/theme';
 
 // Tiles lean 1 to 1.5 degrees, alternating direction.
@@ -13,6 +18,12 @@ const tileTilts = [-1, 1.5, 1, -1.5];
 
 export default function HomeScreen() {
   const theme = useTheme();
+  const { picks } = useDinnerStore();
+
+  const surprise = () => {
+    const idea = pickRandom(surprisePool(ideas, picks));
+    if (idea) router.push(resultHref(idea.id, { from: 'surprise' }, true));
+  };
 
   return (
     <Screen>
@@ -25,6 +36,7 @@ export default function HomeScreen() {
         accessibilityLabel="Surprise me"
         accessibilityHint="Picks one dinner idea from every mode"
         tilt={-1.5}
+        onPress={surprise}
         style={[styles.surprise, { borderColor: theme.border }]}>
         <Icon name="dice" color={palette.ink} size={26} />
         <Text style={styles.surpriseLabel}>Surprise me</Text>
@@ -39,6 +51,7 @@ export default function HomeScreen() {
             accessibilityRole="button"
             accessibilityLabel={`${mode.title}. ${mode.blurb}`}
             tilt={tileTilts[i]}
+            onPress={() => router.push({ pathname: '/mode/[mode]', params: { mode: mode.key } })}
             style={[styles.tile, { backgroundColor: modeColors[mode.key] }]}>
             <Icon name={mode.icon} color={palette.ink} size={26} />
             <Text style={styles.tileTitle}>{mode.title}</Text>
