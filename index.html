@@ -288,8 +288,9 @@ legend { font-weight: 700; font-size: .78rem; letter-spacing: .1em; text-transfo
 .empty { color: var(--muted); font-size: .92rem; padding: 18px; border: 1px dashed var(--line); border-radius: var(--r); width: 100%; }
 
 /* ---------- Brands ---------- */
-.brands { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 860px) { .brands { grid-template-columns: 1fr; } }
+.brands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1080px) { .brands { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .brands { grid-template-columns: 1fr; } }
 .brand-card {
   border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 22px; display: grid; gap: 14px; align-content: start;
   position: relative; overflow: hidden; transition: transform .25s var(--ease), box-shadow .25s;
@@ -411,6 +412,48 @@ dialog.flood .salon > *:nth-child(n+5) { animation-delay: .3s; }
 .salon .acts button:active { transform: scale(.95); }
 .salon .acts button.solid { background: var(--t); color: var(--c); border-color: var(--t); }
 
+/* ---------- Selects, search, brand table ---------- */
+.select { position: relative; display: inline-flex; max-width: 100%; }
+.select select {
+  appearance: none; -webkit-appearance: none; font: 500 .92rem/1.2 var(--f-body); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 999px; padding: 10px 40px 10px 16px; cursor: pointer; max-width: 100%;
+  transition: border-color .2s, box-shadow .2s;
+}
+.select select:hover { border-color: var(--muted); }
+.select select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.select::after {
+  content: ""; position: absolute; right: 16px; top: 50%; width: 7px; height: 7px; margin-top: -6px; pointer-events: none;
+  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg);
+}
+.lib-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+.search { flex: 1 1 260px; min-width: 0; }
+.search input {
+  width: 100%; font: 500 .95rem/1.2 var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
+  border-radius: 999px; padding: 11px 18px; transition: border-color .2s, box-shadow .2s;
+}
+.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.more-row { display: flex; justify-content: center; margin-top: 18px; }
+.lib .lib-brand { font-size: .72rem; color: var(--muted); }
+.lib .by-name { font-size: .74rem; color: var(--muted); font-style: italic; }
+.code-row .code.byname { font-family: var(--f-body); font-weight: 600; font-size: .98rem; letter-spacing: 0; overflow-wrap: anywhere; }
+.gel-hint { font-size: .78rem; color: var(--muted); margin-top: -4px; }
+.salon .big.byname { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1.05; letter-spacing: 0; }
+.table-wrap { overflow-x: auto; margin-top: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.brand-table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 760px; }
+.brand-table th { text-align: left; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 14px 16px; border-bottom: 1px solid var(--line); }
+.brand-table td { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.brand-table tr:last-child td { border-bottom: 0; }
+.brand-table tbody tr { transition: background .2s; }
+.brand-table tbody tr:hover { background: var(--bg); }
+.brand-table .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+.brand-link { border: 0; background: none; padding: 0; cursor: pointer; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.brand-link:hover { color: var(--accent); }
+.brand-link .dots { display: inline-flex; }
+.brand-link .dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); border: 2px solid var(--surface); margin-left: -5px; transition: margin .25s var(--ease); }
+.brand-link .dots i:first-child { margin-left: 0; }
+.brand-link:hover .dots i { margin-left: -1px; }
+
 /* ---------- Footer / toast ---------- */
 footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .84rem; display: grid; gap: 8px; }
 .toast {
@@ -448,14 +491,14 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
         <span class="line">Walk in knowing your</span>
         <span class="line"><span class="rotator" id="rotator" aria-hidden="true"></span></span>
       </h1>
-      <p class="lede">Pick the season, the event and your mood. Mani Match suggests the color, shape and length that fit, with the salon code for OPI, DND or Aprés and the right Gel-X tip if you want extensions.</p>
+      <p class="lede">Pick the season, the event and your mood. Mani Match suggests the color, shape and length that fit, with the salon code or exact shade name from 22 brands, and the right Gel-X tip if you want extensions.</p>
       <div class="hero-cta">
         <a class="btn primary" href="#finder">Find my shade</a>
         <a class="btn" href="#months">See this month's pick</a>
       </div>
       <div class="hero-stats">
         <div><b data-count="0" id="statShades">0</b><span>salon shades</span></div>
-        <div><b data-count="3">3</b><span>brands</span></div>
+        <div><b data-count="0" id="statBrands">0</b><span>brands</span></div>
         <div><b data-count="7">7</b><span>nail shapes</span></div>
         <div><b data-count="12">12</b><span>monthly picks</span></div>
       </div>
@@ -492,8 +535,8 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
         </fieldset>
         <fieldset>
           <legend>Brand</legend>
-          <div class="chips" data-group="brand"></div>
-          <p class="hint">Ask your salon which brands they carry. Aprés colors are gel only.</p>
+          <span class="select"><select id="brandSelect" name="brand" aria-label="Brand"></select></span>
+          <p class="hint">Not every salon carries every brand, so ask which ones they stock. Aprés colors are gel only.</p>
         </fieldset>
       </form>
 
@@ -516,10 +559,14 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
   <section id="brands">
     <div class="section-head reveal">
       <p class="eyebrow">Know your brands</p>
-      <h2>How to ask for each code</h2>
-      <p class="lede">Every brand prints its shade number a little differently. Here's what to say at the front desk.</p>
+      <h2>How to ask for each shade</h2>
+      <p class="lede">Some brands print a shade number and some go by name only. Here's what to say at the front desk.</p>
     </div>
     <div class="brands reveal" id="brandGrid"></div>
+
+    <div class="table-wrap reveal">
+      <table class="brand-table" id="brandTable"></table>
+    </div>
 
     <div class="gelx reveal">
       <div class="gelx-top">
@@ -565,15 +612,19 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
       <h2>Browse every shade</h2>
       <p class="lede">Filter by brand and color family. Tap any shade to open its salon card.</p>
     </div>
-    <div class="filters chips" id="brandFilters"></div>
+    <div class="lib-controls">
+      <label class="search"><span class="visually-hidden">Search shades</span><input type="search" id="libSearch" placeholder="Search by shade name or code" autocomplete="off"></label>
+      <span class="select"><select id="libBrand" aria-label="Brand"></select></span>
+    </div>
     <div class="filters chips" id="filters"></div>
     <p class="lib-count" id="libCount"></p>
     <div class="library" id="libraryGrid"></div>
+    <div class="more-row"><button class="btn" type="button" id="libMore" hidden>Show more</button></div>
   </section>
 
   <footer>
-    <p><b>About the codes.</b> OPI codes are Nail Lacquer numbers (for example NL S86). DND codes are the number on the cap, and DND duos come as a matching gel and regular polish. Aprés codes are gel shade numbers. Codes were checked against retailer listings.</p>
-    <p>Screen colors are approximate. Check the bottle or the salon's swatch ring before your tech starts, since shades can be discontinued or out of stock. Mani Match is an independent guide and is not affiliated with OPI, DND or Aprés.</p>
+    <p><b>About the codes.</b> OPI codes are Nail Lacquer numbers (for example NL S86). DND codes are the number on the cap, and DND duos come as a matching gel and regular polish. Aprés codes are gel shade numbers. CHANEL, Dior, Hermès and Gucci print a number on the bottle. Other brands are asked for by shade name. Codes were checked against retailer listings, and the wider catalog comes from the "All Nail Colors By Brand" guide (October 2026).</p>
+    <p>Screen colors are approximate. Check the bottle or the salon's swatch ring before your tech starts, since shades can be discontinued or out of stock. Mani Match is an independent guide and is not affiliated with any brand listed.</p>
   </footer>
 </div>
 
@@ -608,7 +659,8 @@ footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var
 // ---------- Data ----------
 // Tag strings are space-separated. tone: cool | warm | all.
 function mk(brand, code, name, hex, finish, family, seasons, occasions, moods, tone) {
-  return { id: `${brand}-${code.replace(/\s/g, "")}`, brand, code, name, hex, finish, family,
+  const key = code ? code.replace(/\s/g, "") : name.toLowerCase().replace(/[^a-z0-9]+/g, "");
+  return { id: `${brand}-${key}`, brand, code, name, hex, finish, family,
     seasons: seasons.split(" "), occasions: occasions.split(" "), moods: moods.split(" "), tone };
 }
 const ALL4 = "spring summer fall winter";
@@ -710,18 +762,521 @@ const SHADES = [
   A("603", "Cold Coffee", "#9E7C68", "Sheer gel", "dark", "fall winter", "work everyday interview", "calm edgy", "all"),
 ];
 
+// Shades from the "All Nail Colors By Brand" catalog. Columns: brand, code ("" = ask by name), name, hex, finish, catalog family.
+// Season, occasion, mood and undertone tags for these are worked out from the color itself (see deriveTags).
+const PDF_ROWS = [
+  ["opi", "A16", "The Thrill of Brazil", "#A6192E", "Crème", "Red"],
+  ["opi", "L60", "Dutch Tulips", "#C13A54", "Crème", "Pink"],
+  ["opi", "I43", "Black Cherry Chutney", "#3B1F2E", "Shimmer", "Purple"],
+  ["opi", "", "Tickle My France-y", "#C8A598", "Crème", "Nude"],
+  ["opi", "A15", "Dulce De Leche", "#C9A189", "Crème", "Nude"],
+  ["opi", "A61", "Taupe-less Beach", "#B8A99A", "Crème", "Taupe"],
+  ["opi", "B59", "My Private Jet", "#2B2B30", "Holo Shimmer", "Black"],
+  ["opi", "C09", "Pompeii Purple", "#7A4A7E", "Shimmer", "Purple"],
+  ["opi", "", "Do You Sea What I Sea?", "#2E7FA8", "Shimmer", "Blue"],
+  ["opi", "M92", "Mi Casa Es Blue Casa", "#2B4C9A", "Crème", "Blue"],
+  ["opi", "", "Rated Pea-G", "#7BA05B", "Crème", "Green"],
+  ["opi", "", "Cargo All Out", "#3D4A3A", "Crème Forest", "Green"],
+  ["opi", "F009", "Midnight Mantra", "#1E2A4A", "Crème Navy", "Blue"],
+  ["opi", "", "Cliffside Karaoke", "#6B3F2A", "Crème", "Brown"],
+  ["opi", "", "Espresso Your Inner Self", "#4B2E2B", "Crème", "Brown"],
+  ["opi", "", "Brown To Earth", "#7A5A44", "Crème", "Brown"],
+  ["opi", "", "It's a Girl!", "#F9E2E6", "Sheer", "Pink"],
+  ["opi", "", "Let's Be Friends!", "#F9C9D4", "Crème", "Pink"],
+  ["opi", "", "Exotic Birds Do Not Tweet", "#F2C94C", "Crème", "Yellow"],
+  ["opi", "I59", "Less Is Norse", "#5A6B7D", "Crème Dusty", "Blue"],
+  ["opi", "", "Icelanded a Bottle of OPI", "#8E7A9A", "Shimmer", "Purple"],
+  ["essie", "", "Ballet Slippers", "#F6DFE0", "Sheer", "Pink"],
+  ["essie", "", "Mademoiselle", "#F2D5D5", "Sheer", "Pink"],
+  ["essie", "", "Allure", "#F8EFEA", "Sheer", "White"],
+  ["essie", "", "Marshmallow", "#F7F3EE", "Crème", "White"],
+  ["essie", "", "Blanc", "#FFFFFF", "Crème", "White"],
+  ["essie", "", "Fiji", "#FADDE1", "Crème", "Pink"],
+  ["essie", "", "Muchi Muchi", "#F7C1CC", "Crème", "Pink"],
+  ["essie", "", "Lovie Dovie", "#F78FB0", "Crème", "Pink"],
+  ["essie", "", "Watermelon", "#E94E64", "Crème Melon", "Pink"],
+  ["essie", "", "Really Red", "#C1272D", "Crème", "Red"],
+  ["essie", "", "Forever Yummy", "#B11E24", "Crème", "Red"],
+  ["essie", "", "A List", "#9E1B32", "Crème", "Red"],
+  ["essie", "", "Wicked", "#4A1A24", "Crème Black-Cherry", "Red"],
+  ["essie", "", "Berry Naughty", "#6E142E", "Crème", "Berry"],
+  ["essie", "", "Bahama Mama", "#732640", "Crème", "Berry"],
+  ["essie", "", "Angora Cardi", "#8A4B56", "Crème", "Mauve"],
+  ["essie", "", "Chinchilly", "#9A9189", "Crème", "Grey"],
+  ["essie", "", "Sand Tropez", "#D6C2A8", "Crème", "Nude"],
+  ["essie", "", "Topless & Barefoot", "#E3CFC0", "Crème", "Nude"],
+  ["essie", "", "Sugar Daddy", "#F3DAD8", "Sheer Nude", "Pink"],
+  ["essie", "", "Mint Candy Apple", "#A9D6C5", "Crème", "Mint"],
+  ["essie", "", "Turquoise & Caicos", "#5FB4A5", "Crème", "Turquoise"],
+  ["essie", "", "Bikini So Teeny", "#A9C6E8", "Crème Periwinkle", "Blue"],
+  ["essie", "", "Salt Water Happy", "#7FB0D6", "Crème", "Blue"],
+  ["essie", "", "Butler Please", "#2B4FD8", "Crème Cobalt", "Blue"],
+  ["essie", "", "Mesmerized", "#2F4A8A", "Crème", "Blue"],
+  ["essie", "", "Licorice", "#111111", "Crème", "Black"],
+  ["essie", "", "Smokin' Hot", "#5A4A5A", "Crème Grey-Purple", "Purple"],
+  ["essie", "", "Sexy Divide", "#5B2A6E", "Shimmer", "Purple"],
+  ["essie", "", "Lilacism", "#C5A9D6", "Crème", "Purple"],
+  ["essie", "", "Play Date", "#D8BFE8", "Crème Lavender", "Purple"],
+  ["essie", "", "Geranium", "#E85A4F", "Crème", "Coral"],
+  ["essie", "", "Cute As A Button", "#FF7A6B", "Crème", "Coral"],
+  ["essie", "", "Tart Deco", "#F28C6B", "Crème", "Coral"],
+  ["essie", "", "Meet Me At Sunset", "#E85D2A", "Crème", "Orange"],
+  ["essie", "", "Willow in the Wind", "#7AA95C", "Crème", "Green"],
+  ["essie", "", "Off Tropic", "#2E5E4E", "Crème", "Green"],
+  ["essie", "", "Penny Talk", "#B76E5A", "Rose Gold Metallic", "Metallic"],
+  ["essie", "", "No Place Like Chrome", "#C0C0C8", "Silver Chrome", "Metallic"],
+  ["essie", "", "Set In Stones", "#D9D9DE", "Silver Glitter", "Glitter"],
+  ["sally", "", "Miracle Gel - Red Eye", "#B71C2E", "Gel-Crème", "Red"],
+  ["sally", "", "Miracle Gel - Dig Fig", "#6B2737", "Gel-Crème", "Berry"],
+  ["sally", "", "Miracle Gel - Wine Stock", "#722F37", "Gel-Crème", "Berry"],
+  ["sally", "", "Miracle Gel - Pink Cadillaquer", "#F27AA5", "Gel-Crème", "Pink"],
+  ["sally", "", "Miracle Gel - Malibu Peach", "#FFB997", "Gel-Crème", "Peach"],
+  ["sally", "", "Miracle Gel - Sugar Top Coat - Birthday Suit", "#E8CFC0", "Gel-Crème", "Nude"],
+  ["sally", "", "Miracle Gel - Get Mod", "#F8F8F8", "Gel-Crème", "White"],
+  ["sally", "", "Miracle Gel - Once Upon a Pearl", "#EFE9E0", "Pearl", "White"],
+  ["sally", "", "Miracle Gel - Onyx-pected", "#151515", "Gel-Crème", "Black"],
+  ["sally", "", "Miracle Gel - Midnight Mod", "#1B2A4E", "Gel-Crème Navy", "Blue"],
+  ["sally", "", "Miracle Gel - Sugar Plum", "#7A4A6E", "Gel-Crème", "Purple"],
+  ["sally", "", "Miracle Gel - Lacey Lilac", "#C8A2C8", "Gel-Crème", "Purple"],
+  ["sally", "", "Miracle Gel - Street Flair", "#6A5ACD", "Gel-Crème", "Purple"],
+  ["sally", "", "Miracle Gel - Leaf Me Alone", "#4A6741", "Gel-Crème", "Green"],
+  ["sally", "", "Miracle Gel - Jealous Boyfriend", "#2F5233", "Gel-Crème", "Green"],
+  ["sally", "", "Insta-Dri - White On Time", "#FFFFFF", "Crème", "White"],
+  ["sally", "", "Insta-Dri - Sonic Bloom", "#FF6B5A", "Crème", "Coral"],
+  ["sally", "", "Insta-Dri - Cherry Fast", "#C1272D", "Crème", "Red"],
+  ["sally", "", "Insta-Dri - Rapid Red", "#D32F2F", "Crème", "Red"],
+  ["sally", "", "Insta-Dri - Pink Blink", "#FFB6C9", "Crème", "Pink"],
+  ["sally", "", "Insta-Dri - Mauve It", "#B7848A", "Crème", "Mauve"],
+  ["sally", "", "Insta-Dri - Petal Pusher", "#D8B4A6", "Crème", "Nude"],
+  ["sally", "", "Insta-Dri - Buff and Tumble", "#E6D2C3", "Crème", "Nude"],
+  ["sally", "", "Insta-Dri - Night Fright", "#111111", "Crème", "Black"],
+  ["sally", "", "Good Kind Pure - White Tea", "#F9F6F0", "Crème", "White"],
+  ["sally", "", "Good Kind Pure - Mother Earth", "#8B6F4E", "Crème", "Brown"],
+  ["sally", "", "Good Kind Pure - Elderflower Power", "#F4C2C2", "Crème", "Pink"],
+  ["sally", "", "Good Kind Pure - Cherry Amore", "#A6192E", "Crème", "Red"],
+  ["sally", "", "Good Kind Pure - Laven-Dear", "#B19CD9", "Crème", "Purple"],
+  ["zoya", "", "Snow White", "#FFFFFF", "Crème", "White"],
+  ["zoya", "", "Purity", "#F8F8F8", "Crème", "White"],
+  ["zoya", "", "Abby", "#D6CDEA", "Crème", "Lavender"],
+  ["zoya", "", "Marley", "#CFC4DB", "Shimmer", "Lavender"],
+  ["zoya", "", "Blu", "#A9C6DE", "Crème Baby Blue", "Blue"],
+  ["zoya", "", "Walker", "#4A7FBF", "Crème", "Blue"],
+  ["zoya", "", "Dory", "#2E6DA4", "Crème", "Blue"],
+  ["zoya", "", "Charla", "#1F7A6D", "Metallic", "Teal"],
+  ["zoya", "", "Zuza", "#3AA99A", "Metallic", "Teal"],
+  ["zoya", "", "Wednesday", "#5FB0A5", "Crème", "Turquoise"],
+  ["zoya", "", "Robyn", "#2A9DF4", "Crème Bright", "Blue"],
+  ["zoya", "", "Elisa", "#A6192E", "Metallic", "Red"],
+  ["zoya", "", "Sooki", "#D32F2F", "Crème", "Red"],
+  ["zoya", "", "America", "#C1272D", "Crème", "Red"],
+  ["zoya", "", "Pepper", "#8E2F32", "Crème Brick", "Red"],
+  ["zoya", "", "Channing", "#B87333", "Metallic", "Copper"],
+  ["zoya", "", "Payton", "#5E2129", "Holo", "Berry"],
+  ["zoya", "", "Aurora", "#7D3C98", "Holo", "Purple"],
+  ["zoya", "", "Dream", "#1A3A5E", "Holo", "Blue"],
+  ["zoya", "", "Storm", "#222228", "Holo", "Black"],
+  ["zoya", "", "Willa", "#111111", "Crème", "Black"],
+  ["zoya", "", "Raven", "#1C1C22", "Shimmer", "Black"],
+  ["zoya", "", "Kelly", "#6B6B73", "Crème", "Grey"],
+  ["zoya", "", "Dove", "#D3D3D3", "Crème", "Grey"],
+  ["zoya", "", "Rue", "#E8D0C8", "Crème Blush", "Nude"],
+  ["zoya", "", "Avery", "#EAD9C2", "Crème", "Nude"],
+  ["zoya", "", "Chantal", "#E8DCC8", "Crème", "Nude"],
+  ["zoya", "", "Spencer", "#C8A882", "Crème Camel", "Nude"],
+  ["zoya", "", "Godiva", "#D6B98A", "PixieDust Glitter", "Nude"],
+  ["zoya", "", "Nyssa", "#6B4A2F", "Crème", "Brown"],
+  ["chanel", "101", "Insomniaque", "#F5EFE6", "Crème", "White"],
+  ["chanel", "111", "Ballerina", "#F7E3E3", "Sheer", "Pink"],
+  ["chanel", "113", "Faun / Fée", "#C8AFA0", "Crème", "Nude"],
+  ["chanel", "127", "Fugueuse", "#5A3D2E", "Crème", "Brown"],
+  ["chanel", "131", "Cavalier Seul", "#6B6B4E", "Crème", "Khaki"],
+  ["chanel", "133", "Dueliste", "#4A2C4A", "Crème", "Purple"],
+  ["chanel", "135", "Immortelle", "#B8A9C9", "Metallic", "Lilac"],
+  ["chanel", "141", "Lune de Miel", "#D4AF6A", "Metallic", "Gold"],
+  ["chanel", "143", "Diva", "#E75480", "Crème Fuchsia", "Pink"],
+  ["chanel", "147", "Incendiaire", "#E85A2A", "Crème", "Orange"],
+  ["chanel", "151", "Pirate", "#A6192E", "Crème", "Red"],
+  ["chanel", "153", "Pompier", "#7A1F2B", "Crème", "Red"],
+  ["chanel", "155", "Rouge Noir / Vamp", "#3D0E1E", "Crème Black-Cherry", "Berry"],
+  ["chanel", "157", "Phénomène", "#3A5F4A", "Metallic", "Green"],
+  ["chanel", "159", "Fire / Flamme", "#C1272D", "Crème", "Red"],
+  ["chanel", "161", "Le Diable en Chanel", "#111111", "Crème", "Black"],
+  ["chanel", "163", "Songe d'Été", "#E8DCC8", "Shimmer", "Beige"],
+  ["chanel", "165", "Bois des Îles", "#8B5E3C", "Crème", "Brown"],
+  ["chanel", "167", "Séducteur", "#9A6B7A", "Crème", "Mauve"],
+  ["chanel", "169", "Tentation", "#8E2A4A", "Crème", "Berry"],
+  ["chanel", "171", "Gauloise", "#A67B5B", "Metallic Copper", "Metallic"],
+  ["chanel", "173", "Sirène", "#F2C9D3", "Iridescent", "Pink"],
+  ["chanel", "175", "Équinoxe", "#A99A8A", "Crème", "Taupe"],
+  ["chanel", "177", "Rêveuse", "#F9DDE0", "Sheer", "Pink"],
+  ["chanel", "179", "Miroir", "#C9C9D1", "Silver", "Metallic"],
+  ["dior", "001", "Blanche", "#FFFFFF", "Crème", "White"],
+  ["dior", "047", "Early Bird", "#F7C8D3", "Crème", "Pink"],
+  ["dior", "108", "Muguet", "#F9E2E6", "Sheer", "Pink"],
+  ["dior", "155", "Tutu", "#F2C4CE", "Crème", "Pink"],
+  ["dior", "196", "Delice", "#FF8A75", "Shimmer", "Coral"],
+  ["dior", "268", "Ruban", "#E75480", "Crème", "Pink"],
+  ["dior", "277", "Osée", "#C5A9D6", "Crème", "Lilac"],
+  ["dior", "314", "Farniente", "#D8BFA8", "Crème", "Nude"],
+  ["dior", "323", "Dune", "#C9B096", "Crème", "Nude"],
+  ["dior", "403", "Palais Royal", "#A99A8F", "Crème", "Taupe"],
+  ["dior", "413", "Grège", "#B8AEA6", "Crème", "Greige"],
+  ["dior", "494", "Junon", "#7A8BA0", "Crème Grey-Blue", "Blue"],
+  ["dior", "545", "Lady", "#E8DDD0", "Pearl", "Beige"],
+  ["dior", "558", "Grace", "#D98A94", "Crème", "Pink"],
+  ["dior", "575", "Wonderland", "#FF5A8A", "Crème Bright", "Pink"],
+  ["dior", "612", "Palais", "#C9A86A", "Metallic", "Gold"],
+  ["dior", "659", "Lucky", "#E75480", "Crème", "Pink"],
+  ["dior", "688", "Silhouette", "#A67A85", "Crème", "Mauve"],
+  ["dior", "754", "Pandore", "#C1272D", "Crème", "Red"],
+  ["dior", "769", "Rouge / Exuberant", "#B01030", "Crème", "Red"],
+  ["dior", "853", "Massaï", "#8E232E", "Crème", "Red"],
+  ["dior", "970", "Nuit 1947", "#4A1F2E", "Crème", "Berry"],
+  ["dior", "999", "Rouge 999", "#CE1126", "Crème Iconic", "Red"],
+  ["dior", "997", "Dark Blue / Blue Poison", "#1E2A4A", "Crème Navy", "Blue"],
+  ["oliveJune", "", "HD", "#FFFFFF", "Crème", "White"],
+  ["oliveJune", "", "MM", "#F7F3EE", "Milky White", "White"],
+  ["oliveJune", "", "GH", "#FBEAEA", "Sheer Pink", "Pink"],
+  ["oliveJune", "", "BP", "#F9A8C0", "Bubblegum", "Pink"],
+  ["oliveJune", "", "JM", "#F27AA5", "Crème", "Pink"],
+  ["oliveJune", "", "CV", "#722F37", "Crème Cabernet", "Berry"],
+  ["oliveJune", "", "LD", "#C1272D", "Crème", "Red"],
+  ["oliveJune", "", "CV / Cabernet (alt)", "#5E2129", "Crème", "Berry"],
+  ["oliveJune", "", "OBG", "#FF7A6B", "Crème", "Coral"],
+  ["oliveJune", "", "WKF", "#E85D2A", "Crème", "Orange"],
+  ["oliveJune", "", "JLR - Butter Yellow", "#F9E076", "Crème Butter", "Yellow"],
+  ["oliveJune", "", "KMC", "#F2D16B", "Crème", "Yellow"],
+  ["oliveJune", "", "HDW", "#7AA95C", "Crème", "Green"],
+  ["oliveJune", "", "Willa / Into The Trees", "#2F5233", "Crème Forest", "Green"],
+  ["oliveJune", "", "JJ", "#3AA99A", "Crème Jade", "Green"],
+  ["oliveJune", "", "OMG", "#A9C6E8", "Crème", "Blue"],
+  ["oliveJune", "", "IB - Faded Jeans", "#6B8ABF", "Crème Denim", "Blue"],
+  ["oliveJune", "", "RP - Deep Teal", "#1F4E4A", "Crème", "Teal"],
+  ["oliveJune", "", "E+M", "#E8D5CC", "Crème", "Nude"],
+  ["oliveJune", "", "CCT", "#D8B4A6", "Crème", "Nude"],
+  ["oliveJune", "", "EC", "#C9A189", "Crème", "Nude"],
+  ["oliveJune", "", "CHM", "#5C3D2E", "Crème Chocolate", "Brown"],
+  ["oliveJune", "", "CN", "#8B6F4E", "Crème", "Brown"],
+  ["oliveJune", "", "SC", "#B8A99A", "Crème", "Taupe"],
+  ["oliveJune", "", "Z", "#222222", "Sheer Black", "Black"],
+  ["oliveJune", "", "Universe - Glitter", "#E8E0F0", "Holo Glitter", "Glitter"],
+  ["oliveJune", "", "Golden Hour", "#D4AF6A", "Gold Shimmer", "Metallic"],
+  ["oliveJune", "", "Obvi - Lilac", "#C5A9D6", "Crème", "Purple"],
+  ["oliveJune", "", "HD - Pink Goldfish", "#FF9AA2", "Crème", "Pink"],
+  ["oliveJune", "", "Fresh Paint", "#A9D6C5", "Crème", "Mint"],
+  ["chinaGlaze", "", "White On White", "#FFFFFF", "Crème", "White"],
+  ["chinaGlaze", "", "Snow Globe", "#EFEFEF", "Iridescent Glitter", "Glitter"],
+  ["chinaGlaze", "", "Fairy Dust", "#E8E8F0", "Holo Topper", "Glitter"],
+  ["chinaGlaze", "", "Shocking Pink Neon", "#FF2A7A", "Neon Crème", "Pink"],
+  ["chinaGlaze", "", "Pool Party", "#FF5A8A", "Neon", "Pink"],
+  ["chinaGlaze", "", "Flip Flop Fantasy", "#FF7A6B", "Neon", "Coral"],
+  ["chinaGlaze", "", "Surreal Appeal", "#FF8A75", "Crème", "Coral"],
+  ["chinaGlaze", "", "Peachy Keen", "#FFB997", "Crème", "Peach"],
+  ["chinaGlaze", "", "Sunset Sail", "#E8CFC0", "Shimmer", "Nude"],
+  ["chinaGlaze", "", "Innocence", "#F9E2E6", "Sheer", "Pink"],
+  ["chinaGlaze", "", "For Audrey", "#7AC5B5", "Crème", "Tiffany Blue"],
+  ["chinaGlaze", "", "Aquadelic", "#5FB4A5", "Crème", "Aqua"],
+  ["chinaGlaze", "", "Re-Fresh Mint", "#A9D6C5", "Crème", "Mint"],
+  ["chinaGlaze", "", "Four Leaf Clover", "#2E9E6B", "Crème", "Green"],
+  ["chinaGlaze", "", "Emerald Fitzgerald", "#1F5C4A", "Shimmer", "Green"],
+  ["chinaGlaze", "", "Blue Bells Ring", "#4A7FBF", "Shimmer", "Blue"],
+  ["chinaGlaze", "", "Bahamian Escape", "#7FB0D6", "Crème", "Blue"],
+  ["chinaGlaze", "", "Secret Peri-Wink-Le", "#8A9BD8", "Crème Periwinkle", "Blue"],
+  ["chinaGlaze", "", "Luxe and Lush", "#E8DCC8", "Flakie", "Glitter"],
+  ["chinaGlaze", "", "Ruby Pumps", "#A6192E", "Glitter", "Red"],
+  ["chinaGlaze", "", "Long Kiss", "#8E232E", "Shimmer", "Red"],
+  ["chinaGlaze", "", "Phat Santa", "#C1272D", "Crème", "Red"],
+  ["chinaGlaze", "", "Grape Juice", "#7D3C98", "Shimmer", "Purple"],
+  ["chinaGlaze", "", "That's Shore Bright", "#B19CD9", "Neon", "Purple"],
+  ["chinaGlaze", "", "Liquid Leather", "#111111", "Crème", "Black"],
+  ["orly", "", "White Tips", "#FFFFFF", "Crème", "White"],
+  ["orly", "", "Crystal Healing", "#F0EDE8", "Shimmer", "White"],
+  ["orly", "", "Bare Rose - Breathable", "#F2D5D5", "Sheer", "Pink"],
+  ["orly", "", "Kiss Me I'm Kind - Breathable", "#F7C1CC", "Crème", "Pink"],
+  ["orly", "", "Rehab - Breathable", "#E8D5CC", "Treatment Crème", "Nude"],
+  ["orly", "", "Nourishing Nude - Breathable", "#D8B4A6", "Crème", "Nude"],
+  ["orly", "", "Pamper Me", "#F27AA5", "Crème", "Pink"],
+  ["orly", "", "Risky Behavior", "#E75480", "Crème Fuchsia", "Pink"],
+  ["orly", "", "Scenic Route", "#8A7AC5", "Crème", "Purple"],
+  ["orly", "", "Provence", "#C5A9D6", "Crème Lavender", "Purple"],
+  ["orly", "", "Prelude To A Kiss", "#FADDE1", "Crème Pastel", "Pink"],
+  ["orly", "", "Lift The Veil", "#F9E2E6", "Sheer", "Pink"],
+  ["orly", "", "Mirror Mirror", "#9A9189", "Crème", "Grey"],
+  ["orly", "", "Naughty", "#5E2129", "Crème", "Berry"],
+  ["orly", "", "Bus Stop Vampire", "#722F37", "Crème", "Red"],
+  ["orly", "", "Haute Red", "#C1272D", "Crème", "Red"],
+  ["orly", "", "Monroe's Red", "#A6192E", "Crème", "Red"],
+  ["orly", "", "Star Spangled", "#B01030", "Glitter", "Red"],
+  ["orly", "", "Torrid", "#8E232E", "Shimmer", "Red"],
+  ["orly", "", "Green With Envy", "#2F5233", "Crème", "Green"],
+  ["orly", "", "Wandering Vine", "#4A6741", "Crème", "Green"],
+  ["orly", "", "Fresh", "#7AA95C", "Crème Bright", "Green"],
+  ["orly", "", "Skyline", "#7FB0D6", "Crème", "Blue"],
+  ["orly", "", "Skinny Dip", "#4A90D9", "Neon", "Blue"],
+  ["orly", "", "Black Vinyl", "#111111", "Crème", "Black"],
+  ["cnd", "", "Cream Puff", "#FFFFFF", "Crème", "White"],
+  ["cnd", "", "Negligee", "#F9E8E8", "Sheer", "Pink"],
+  ["cnd", "", "Beau", "#F2D5D5", "Sheer Nude", "Pink"],
+  ["cnd", "", "Romantique", "#F7C1CC", "Crème", "Pink"],
+  ["cnd", "", "Cake Pop", "#F9A8C0", "Crème", "Pink"],
+  ["cnd", "", "Strawberry Smoothie", "#F27AA5", "Crème", "Pink"],
+  ["cnd", "", "Hot Pop Pink", "#FF5A8A", "Crème", "Pink"],
+  ["cnd", "", "Tropix", "#FF7A6B", "Crème", "Coral"],
+  ["cnd", "", "Lobster Roll", "#E85D4A", "Crème", "Red"],
+  ["cnd", "", "Wildfire", "#C1272D", "Crème", "Red"],
+  ["cnd", "", "Decadence", "#8E232E", "Crème", "Red"],
+  ["cnd", "", "Masquerade", "#722F37", "Shimmer", "Berry"],
+  ["cnd", "", "Dark Lava", "#4A1F2E", "Shimmer", "Berry"],
+  ["cnd", "", "Fedora", "#5C3D2E", "Crème", "Brown"],
+  ["cnd", "", "Midnight Swim", "#1E2A4A", "Shimmer Navy", "Blue"],
+  ["cnd", "", "Asphalt", "#5A5A5A", "Crème", "Grey"],
+  ["cnd", "", "Cityscape", "#C9C9C9", "Crème", "Grey"],
+  ["cnd", "", "Field Fox", "#C8AFA0", "Crème", "Nude"],
+  ["cnd", "", "Naked Naiveté", "#E8D5CC", "Crème", "Nude"],
+  ["cnd", "", "Powder My Nose", "#EAD9C2", "Crème", "Nude"],
+  ["cnd", "", "Black Pool", "#111111", "Crème", "Black"],
+  ["cnd", "", "Overtly Onyx", "#222228", "Shimmer", "Black"],
+  ["cnd", "", "Emerald Lights", "#2F5233", "Glitter", "Green"],
+  ["cnd", "", "Hollywood", "#A6192E", "Shimmer", "Red"],
+  ["cnd", "", "Tutti Frutti", "#E75480", "Shimmer", "Pink"],
+  ["lippmann", "", "Tiny Dancer", "#F9E2E6", "Sheer", "Pink"],
+  ["lippmann", "", "P.Y.T.", "#F27AA5", "Crème", "Pink"],
+  ["lippmann", "", "My Old Flame", "#A6192E", "Crème", "Red"],
+  ["lippmann", "", "Lady Is A Tramp", "#C1272D", "Crème", "Red"],
+  ["lippmann", "", "Single Ladies", "#8E232E", "Glitter", "Red"],
+  ["lippmann", "", "Happy Birthday", "#E8B4D8", "Multi Glitter", "Glitter"],
+  ["lippmann", "", "Today Was A Fairytale", "#D9D9DE", "Silver Glitter", "Glitter"],
+  ["lippmann", "", "Across The Universe", "#1F4E79", "Blue-Green Glitter", "Glitter"],
+  ["lippmann", "", "Mermaid's Dream", "#5FB4A5", "Metallic Glitter", "Teal"],
+  ["lippmann", "", "Do Ya Think I'm Sexy", "#B01030", "Glitter", "Red"],
+  ["lippmann", "", "Ruby Red Slippers", "#722F37", "Glitter", "Red"],
+  ["lippmann", "", "Prelude To A Kiss", "#FADDE1", "Sheer", "Pink"],
+  ["lippmann", "", "Naked", "#E8D5CC", "Crème", "Nude"],
+  ["lippmann", "", "Fashion", "#B8A99A", "Crème Taupe", "Nude"],
+  ["lippmann", "", "Waking Up In Vegas", "#A99A8F", "Crème Greige", "Grey"],
+  ["lippmann", "", "Stormy Weather", "#6B6B73", "Crème", "Grey"],
+  ["lippmann", "", "Dark Side Of The Moon", "#3B2A4A", "Crème Eggplant", "Purple"],
+  ["lippmann", "", "Bitches Brew", "#4A1F2E", "Shimmer", "Berry"],
+  ["lippmann", "", "Good Girl Gone Bad", "#722F37", "Shimmer", "Berry"],
+  ["lippmann", "", "Call Me Irresponsible", "#7D3C98", "Crème", "Purple"],
+  ["butter", "", "Cotton Buds", "#F8F8F8", "Crème", "White"],
+  ["butter", "", "Jasper", "#F9E076", "Crème", "Yellow"],
+  ["butter", "", "Cheeky Chops", "#F2C94C", "Crème", "Yellow"],
+  ["butter", "", "Trout Pout", "#FF8A75", "Crème", "Coral"],
+  ["butter", "", "Macbeth", "#E85D4A", "Crème", "Coral"],
+  ["butter", "", "Primrose Hill Picnic", "#F27AA5", "Crème", "Pink"],
+  ["butter", "", "Snog", "#E75480", "Crème", "Pink"],
+  ["butter", "", "Teddy Girl", "#FADDE1", "Crème Pastel", "Pink"],
+  ["butter", "", "Kerfuffle", "#FFB997", "Crème", "Peach"],
+  ["butter", "", "Queen Vic", "#722640", "Crème", "Berry"],
+  ["butter", "", "Tramp Stamp", "#5C3D2E", "Crème", "Brown"],
+  ["butter", "", "Yummy Mummy", "#C8AFA0", "Shimmer", "Nude"],
+  ["butter", "", "All Hail The Queen", "#A99A8F", "Holo Shimmer", "Taupe"],
+  ["butter", "", "The Full Monty", "#D4AF6A", "Metallic", "Gold"],
+  ["butter", "", "West End Wonderland", "#E8C87A", "Glitter", "Gold"],
+  ["butter", "", "Chancer", "#A6192E", "Glitter", "Red"],
+  ["butter", "", "Come To Bed Red", "#8E232E", "Crème", "Red"],
+  ["butter", "", "Blowing Raspberries", "#A6194A", "Crème", "Berry"],
+  ["butter", "", "British Racing Green", "#1F4633", "Crème", "Green"],
+  ["butter", "", "Union Jack Black", "#111111", "Crème", "Black"],
+  ["ilnp", "", "Fame", "#D4AF6A", "Holo", "Gold"],
+  ["ilnp", "", "MEGA", "#C0C0C8", "Holo Linear", "Silver"],
+  ["ilnp", "", "MEGA X", "#D9D9DE", "Holo Flakie", "Silver"],
+  ["ilnp", "", "Harbour Island", "#7AC5B5", "Holo", "Aqua"],
+  ["ilnp", "", "Good Vibes Only", "#3AA99A", "Holo", "Teal"],
+  ["ilnp", "", "Interstellar", "#2B4C9A", "Holo", "Blue"],
+  ["ilnp", "", "Bikini Bottoms", "#4A90D9", "Jelly Holo", "Blue"],
+  ["ilnp", "", "My Little Glacier", "#A9C6DE", "Shimmer Ice", "Blue"],
+  ["ilnp", "", "Paper Route", "#F7F3EE", "Crème Speckle", "White"],
+  ["ilnp", "", "Juliette", "#B76E79", "Metallic Holo", "Rose Gold"],
+  ["ilnp", "", "Ava", "#F27AA5", "Holo", "Pink"],
+  ["ilnp", "", "Birthday Girl", "#F9A8C0", "Holo Glitter", "Pink"],
+  ["ilnp", "", "Cherry Luxe", "#A6192E", "Holo", "Red"],
+  ["ilnp", "", "Diablo", "#8E232E", "Multichrome", "Red"],
+  ["ilnp", "", "Eclipse", "#2B2135", "Multichrome", "Black"],
+  ["ilnp", "", "Masquerade", "#3A5F4A", "Multichrome", "Green/Purple"],
+  ["ilnp", "", "Hush", "#5B2A6E", "Multichrome", "Purple"],
+  ["ilnp", "", "Cygnus Loop", "#4A2C6A", "Multichrome", "Purple"],
+  ["ilnp", "", "Poison", "#2F5233", "Multichrome", "Green"],
+  ["ilnp", "", "Black Magic", "#1C1C22", "Holo", "Black"],
+  ["cirque", "", "Clean Slate", "#F8F8F8", "Crème", "White"],
+  ["cirque", "", "Linen", "#F7F3EE", "Crème", "White"],
+  ["cirque", "", "Violetta", "#C5A9D6", "Crème", "Lilac"],
+  ["cirque", "", "Ondine", "#7D3C98", "Jelly", "Purple"],
+  ["cirque", "", "Plum Jelly", "#722640", "Jelly", "Berry"],
+  ["cirque", "", "Ruby Slipper", "#A6192E", "Jelly Glitter", "Red"],
+  ["cirque", "", "Rothko Red", "#8E232E", "Crème", "Red"],
+  ["cirque", "", "Valley Of The Dolls", "#F9A8C0", "Crème", "Pink"],
+  ["cirque", "", "Don't Forget The Cannoli", "#E8D5CC", "Crème", "Nude"],
+  ["cirque", "", "Bisque", "#EAD9C2", "Crème", "Nude"],
+  ["cirque", "", "Emerald City", "#2F9E6B", "Jelly", "Green"],
+  ["cirque", "", "Central Park After Dark", "#1F4633", "Crème", "Green"],
+  ["cirque", "", "Navy Jelly", "#1E2A4A", "Jelly", "Blue"],
+  ["cirque", "", "Indigo Jelly", "#2B4C9A", "Jelly", "Blue"],
+  ["cirque", "", "Peach Jelly", "#FFB997", "Jelly", "Peach"],
+  ["cirque", "", "Rosewater Jelly", "#F7C1CC", "Jelly", "Pink"],
+  ["cirque", "", "Citrus Jelly", "#FF8A3D", "Jelly", "Orange"],
+  ["cirque", "", "Sunny Side Up", "#F9E076", "Crème", "Yellow"],
+  ["cirque", "", "Clink Clink", "#C9C9D1", "Silver Foil", "Metallic"],
+  ["cirque", "", "Halcyon", "#B76E79", "Metallic", "Rose Gold"],
+  ["ellaMila", "", "Pure Love", "#FFFFFF", "Crème", "White"],
+  ["ellaMila", "", "So In Love", "#F9E2E6", "Sheer", "Pink"],
+  ["ellaMila", "", "Sugar Fairy", "#FADDE1", "Glitter", "Pink"],
+  ["ellaMila", "", "Kiss Kiss", "#F27AA5", "Crème", "Pink"],
+  ["ellaMila", "", "Lakeside View", "#7FB0D6", "Crème", "Blue"],
+  ["ellaMila", "", "Summer Love", "#FF7A6B", "Crème", "Coral"],
+  ["ellaMila", "", "Mediterranean Mist", "#5FB4A5", "Crème", "Teal"],
+  ["ellaMila", "", "Desert Suede", "#D8B4A6", "Crème", "Nude"],
+  ["ellaMila", "", "Earth Angel", "#B8A99A", "Crème", "Taupe"],
+  ["ellaMila", "", "In Line For Wine", "#722F37", "Crème", "Berry"],
+  ["ellaMila", "", "Naughty Not Nice", "#C1272D", "Crème", "Red"],
+  ["ellaMila", "", "Berry Much In Love", "#8E2A4A", "Crème", "Berry"],
+  ["ellaMila", "", "Light To Night", "#222222", "Crème", "Black"],
+  ["ellaMila", "", "Golden Hour", "#D4AF6A", "Shimmer", "Gold"],
+  ["ellaMila", "", "Dream", "#D6CDEA", "Crème", "Lavender"],
+  ["ellaMila", "", "Mint To Be", "#A9D6C5", "Crème", "Mint"],
+  ["ellaMila", "", "Bon Voyage", "#1E2A4A", "Crème", "Navy"],
+  ["ellaMila", "", "Unicorn Burst", "#E8E0F0", "Iridescent", "Glitter"],
+  ["ellaMila", "", "On Thin Ice", "#D3D3D3", "Crème", "Grey"],
+  ["ellaMila", "", "Heart Of Gold", "#E8C87A", "Glitter", "Gold"],
+  ["jinsoon", "", "Absolute White", "#FFFFFF", "Crème", "White"],
+  ["jinsoon", "", "Absolute Black", "#111111", "Crème", "Black"],
+  ["jinsoon", "", "Auspicious", "#A99A8F", "Crème Greige", "Grey"],
+  ["jinsoon", "", "Nostalgia", "#D8B4A6", "Crème", "Nude"],
+  ["jinsoon", "", "Doux", "#F2D5D5", "Sheer", "Pink"],
+  ["jinsoon", "", "Prim", "#F7C1CC", "Crème", "Pink"],
+  ["jinsoon", "", "Dolly Pink", "#F27AA5", "Crème", "Pink"],
+  ["jinsoon", "", "Love", "#C1272D", "Crème", "Red"],
+  ["jinsoon", "", "Coquette", "#A6192E", "Crème", "Red"],
+  ["jinsoon", "", "Risqué", "#4A1F2E", "Crème Black-Cherry", "Berry"],
+  ["jinsoon", "", "Baroque", "#722F37", "Metallic", "Berry"],
+  ["jinsoon", "", "Spiffy", "#B87333", "Metallic", "Copper"],
+  ["jinsoon", "", "Charme", "#FF8A75", "Crème", "Coral"],
+  ["jinsoon", "", "Coral Peony", "#FF7A6B", "Crème", "Coral"],
+  ["jinsoon", "", "Sea Breeze", "#A9D6C5", "Crème", "Mint"],
+  ["jinsoon", "", "Peace", "#A9C6DE", "Crème", "Blue"],
+  ["jinsoon", "", "Aero", "#4A7FBF", "Crème", "Blue"],
+  ["jinsoon", "", "Heirloom", "#1F7A6D", "Metallic", "Teal"],
+  ["hermes", "01", "Blanc Orage", "#F7F3EE", "Crème", "White"],
+  ["hermes", "03", "Rose Singulier", "#F27AA5", "Crème", "Pink"],
+  ["hermes", "06", "Rouge H", "#8E232E", "Crème Iconic", "Red"],
+  ["hermes", "13", "Rose Ikebana", "#FADDE1", "Sheer", "Pink"],
+  ["hermes", "21", "Rose Tamisé", "#E8A0B0", "Crème", "Pink"],
+  ["hermes", "23", "Rose Blush", "#F7C1CC", "Crème", "Pink"],
+  ["hermes", "30", "Rose Horizon", "#D98A94", "Crème", "Rose"],
+  ["hermes", "33", "Orange Boîte", "#E85D04", "Crème Hermes Orange", "Orange"],
+  ["hermes", "39", "Jaune Impérial", "#F2C94C", "Crème", "Yellow"],
+  ["hermes", "43", "Rose Incarnat", "#E75480", "Crème", "Pink"],
+  ["hermes", "49", "Rouge Casaque", "#C1272D", "Crème", "Red"],
+  ["hermes", "56", "Rouge Exotique", "#A6192E", "Crème", "Red"],
+  ["hermes", "62", "Rouge Feu", "#B01030", "Crème", "Red"],
+  ["hermes", "64", "Rouge Casaque (Alt)", "#9E1B32", "Crème", "Red"],
+  ["hermes", "66", "Rouge Piment", "#CE1126", "Crème Spicy", "Red"],
+  ["hermes", "70", "Rose Indien", "#A6194A", "Crème", "Berry"],
+  ["hermes", "75", "Rouge Amazone", "#722640", "Crème", "Berry"],
+  ["hermes", "85", "Rouge H Foncé", "#5E2129", "Crème Dark", "Berry"],
+  ["gucci", "010", "Sara Blonde - Gold", "#D4AF6A", "Metallic", "Gold"],
+  ["gucci", "025", "Goldie Red", "#C1272D", "Crème", "Red"],
+  ["gucci", "212", "Annabel Rose", "#F7C1CC", "Crème", "Pink"],
+  ["gucci", "215", "Lucy Baby Blue", "#A9C6DE", "Crème Pastel", "Blue"],
+  ["gucci", "304", "Annabel Rose Dark", "#D98A94", "Crème", "Rose"],
+  ["gucci", "402", "Vantine Fuchsia", "#E75480", "Crème Fuchsia", "Pink"],
+  ["gucci", "411", "Lucy Baby Blue Dark", "#4A7FBF", "Crème", "Blue"],
+  ["gucci", "413", "Lucy Light Blue", "#C9DFF2", "Sheer", "Blue"],
+  ["gucci", "414", "Peggy Taupe", "#B8A99A", "Crème", "Taupe"],
+  ["gucci", "505", "Janet Ruth", "#6B3F2A", "Crème", "Brown"],
+  ["gucci", "700", "Crystal Black", "#111111", "Crème", "Black"],
+  ["gucci", "701", "Lucy White", "#FFFFFF", "Crème", "White"],
+  ["gucci", "712", "Melinda Green", "#2F9E6B", "Crème", "Green"],
+  ["gucci", "713", "Dorothy Turquoise", "#3AA99A", "Crème", "Turquoise"],
+  ["gucci", "714", "Miriam Mint", "#A9D6C5", "Crème", "Mint"],
+  ["gucci", "715", "Lucy Lavender", "#C5A9D6", "Crème", "Lavender"],
+  ["gucci", "716", "Lucy Orange", "#E85D2A", "Crème", "Orange"],
+  ["gucci", "717", "Lucy Yellow", "#F9E076", "Crème", "Yellow"],
+  ["londontown", "", "Cheerio", "#F9E8E8", "Sheer", "White"],
+  ["londontown", "", "Princess Awaits", "#FADDE1", "Sheer", "Pink"],
+  ["londontown", "", "Jane Austen", "#F7C1CC", "Crème", "Pink"],
+  ["londontown", "", "Peach Pop", "#FFB997", "Crème", "Peach"],
+  ["londontown", "", "Summer Fling", "#FF7A6B", "Crème", "Coral"],
+  ["londontown", "", "Poppy Meadows", "#C1272D", "Crème", "Red"],
+  ["londontown", "", "Lady Luck", "#A6192E", "Crème", "Red"],
+  ["londontown", "", "Vendetta", "#722F37", "Crème", "Berry"],
+  ["londontown", "", "Save The Queen", "#5E2129", "Crème", "Berry"],
+  ["londontown", "", "Chivvy", "#E8D5CC", "Crème", "Nude"],
+  ["londontown", "", "Mum's The Word", "#A99A8F", "Crème", "Taupe"],
+  ["londontown", "", "Pence In A Pinch", "#D8B4A6", "Crème", "Nude"],
+  ["londontown", "", "Skyline Reflect", "#9A9189", "Metallic", "Grey"],
+  ["londontown", "", "Star Moss", "#2F5233", "Shimmer", "Green"],
+  ["londontown", "", "Agave", "#5FB4A5", "Crème", "Teal"],
+  ["londontown", "", "Iconic", "#1E2A4A", "Crème", "Navy"],
+  ["londontown", "", "Chim Cher-ee", "#222222", "Crème", "Black"],
+  ["londontown", "", "Black Thorn", "#3B2A4A", "Crème", "Purple"],
+  ["londontown", "", "Goldie", "#D4AF6A", "Metallic", "Gold"],
+  ["londontown", "", "Ring Me", "#B76E79", "Metallic", "Rose Gold"],
+  ["manucurist", "", "Snow", "#FFFFFF", "Crème", "White"],
+  ["manucurist", "", "Milky White", "#F7F3EE", "Milky", "White"],
+  ["manucurist", "", "Pale Rose", "#F9E2E6", "Sheer", "Pink"],
+  ["manucurist", "", "Rose", "#F7C1CC", "Crème", "Pink"],
+  ["manucurist", "", "Old Rose", "#D98A94", "Crème", "Rose"],
+  ["manucurist", "", "Peony", "#E75480", "Crème", "Pink"],
+  ["manucurist", "", "Geranium", "#E85A4F", "Crème", "Coral"],
+  ["manucurist", "", "Corail", "#FF7A6B", "Crème", "Coral"],
+  ["manucurist", "", "Orange Sunset", "#E85D2A", "Crème", "Orange"],
+  ["manucurist", "", "Anemone", "#C1272D", "Crème", "Red"],
+  ["manucurist", "", "Poppy Red", "#A6192E", "Crème", "Red"],
+  ["manucurist", "", "Artemisia", "#722640", "Crème", "Berry"],
+  ["manucurist", "", "Aubergine", "#3B2A4A", "Crème Eggplant", "Purple"],
+  ["manucurist", "", "Iris", "#7D3C98", "Crème", "Purple"],
+  ["manucurist", "", "Lilas", "#C5A9D6", "Crème", "Lilac"],
+  ["manucurist", "", "Hortencia", "#7FB0D6", "Crème", "Blue"],
+  ["manucurist", "", "Bleu Lagon", "#4A90D9", "Crème", "Blue"],
+  ["manucurist", "", "Mint", "#A9D6C5", "Crème", "Mint"],
+  ["manucurist", "", "Green Nana", "#7AA95C", "Crème", "Green"],
+  ["manucurist", "", "Noir / Licorice", "#111111", "Crème", "Black"],
+];
+
+// group: salon | luxury | everyday | indie. gel: the brand has a salon gel version of its shades.
 const BRANDS = {
-  opi:   { label: "OPI", sample: "NL S86", blurb: "Codes start with NL for Nail Lacquer, then a letter and number. Most salons stock OPI, and many shades also come in OPI gel under the same name." },
-  dnd:   { label: "DND", sample: "601 · DC 064", blurb: "The number is printed on the cap. DND duos pair a gel and a regular polish in the same shade, so one number works for both. Say \"DC\" or \"DIVA\" for those lines." },
-  apres: { label: "Aprés", sample: "Gel-X + 401", blurb: "Aprés makes Gel-X soft-gel extensions and numbered gel colors. Ask for the tip shape and length, then the color number. Their colors are gel only." },
+  opi:        { label: "OPI", line: "OPI Nail Lacquer", group: "salon", price: "$11–25", known: "Salon standard", ask: "NL + letter and number", gel: true },
+  dnd:        { label: "DND", group: "salon", price: "Salon", known: "Gel & lacquer duos", ask: "Number on the cap", gel: true },
+  apres:      { label: "Aprés", group: "salon", price: "Salon", known: "Gel-X extensions", ask: "Gel number", gel: true },
+  cnd:        { label: "CND", line: "CND Vinylux / Shellac", group: "salon", price: "$12–18", known: "Gel inventor (Shellac)", ask: "Shade name", gel: true },
+  chinaGlaze: { label: "China Glaze", group: "salon", price: "$8–10", known: "Neons & brights", ask: "Shade name" },
+  orly:       { label: "ORLY", group: "salon", price: "$11–13", known: "Breathable line", ask: "Shade name" },
+  zoya:       { label: "Zoya", group: "salon", price: "$12–14", known: "Clean, huge range", ask: "Shade name" },
+  chanel:     { label: "CHANEL", line: "CHANEL Le Vernis", group: "luxury", price: "$32–34", known: "Luxury icons", ask: "Number on the bottle" },
+  dior:       { label: "Dior", line: "DIOR Vernis", group: "luxury", price: "$30–32", known: "Couture reds", ask: "Number on the bottle" },
+  hermes:     { label: "Hermès", line: "Hermès Les Mains", group: "luxury", price: "$59–69", known: "Ultra-luxury", ask: "Number on the bottle" },
+  gucci:      { label: "Gucci", line: "Gucci Vernis", group: "luxury", price: "$35", known: "Designer plant-based", ask: "Number on the bottle" },
+  lippmann:   { label: "Deborah Lippmann", group: "luxury", price: "$20–22", known: "Glitters", ask: "Shade name" },
+  butter:     { label: "butter LONDON", group: "luxury", price: "$18–20", known: "British fashion", ask: "Shade name" },
+  jinsoon:    { label: "JINsoon", group: "luxury", price: "$18", known: "Minimalist editor pick", ask: "Shade name" },
+  essie:      { label: "essie", group: "everyday", price: "$10–13", known: "Sheers & classics", ask: "Shade name" },
+  sally:      { label: "Sally Hansen", group: "everyday", price: "$8–13", known: "Drugstore gel-effect", ask: "Shade name" },
+  oliveJune:  { label: "Olive & June", group: "everyday", price: "$9–10", known: "Clean system", ask: "Shade name" },
+  ellaMila:   { label: "Ella + Mila", group: "everyday", price: "$11–13", known: "17-Free clean", ask: "Shade name" },
+  londontown: { label: "Londontown", line: "Londontown Lakur", group: "everyday", price: "$16", known: "Treatment color", ask: "Shade name" },
+  manucurist: { label: "Manucurist", line: "Manucurist Green", group: "everyday", price: "$14–19", known: "Bio-sourced clean", ask: "Shade name" },
+  ilnp:       { label: "ILNP", group: "indie", price: "$10–13", known: "Holographic", ask: "Shade name" },
+  cirque:     { label: "Cirque Colors", group: "indie", price: "$14–17", known: "Jellies & indie", ask: "Shade name" },
 };
-const displayCode = s => s.brand === "opi" ? `NL ${s.code}` : s.brand === "dnd" ? `DND ${s.code}` : `Aprés ${s.code}`;
+const BRAND_GROUPS = [["salon", "Salon brands"], ["luxury", "Luxury"], ["everyday", "Everyday & clean"], ["indie", "Indie"]];
+const CODE_CARDS = [
+  { key: "opi", sample: "NL S86", blurb: "Codes start with NL for Nail Lacquer, then a letter and number. Many shades also come in OPI gel under the same name." },
+  { key: "dnd", sample: "601 · DC 064", blurb: "The number is printed on the cap. DND duos pair a gel and a regular polish in the same shade, so one number works for both. Say \"DC\" or \"DIVA\" for those lines." },
+  { key: "apres", sample: "Gel-X + 401", blurb: "Aprés makes Gel-X soft-gel extensions and numbered gel colors. Ask for the tip shape and length, then the color number. Their colors are gel only." },
+  { key: "chanel", label: "Luxury lines", sample: "CHANEL 155 · Dior 999", blurb: "CHANEL, Dior, Hermès and Gucci print a shade number on the bottle. Every other brand is asked for by its shade name." },
+];
+const NUMBER_PREFIX = { opi: "NL ", dnd: "DND ", apres: "Aprés ", chanel: "CHANEL ", dior: "Dior ", hermes: "Hermès ", gucci: "Gucci " };
+const displayCode = s => s.code && NUMBER_PREFIX[s.brand] ? NUMBER_PREFIX[s.brand] + s.code : "";
+const askText = s => displayCode(s) ? `${displayCode(s)} ${s.name}` : `${BRANDS[s.brand].label} ${s.name}`;
 const brandLine = s => {
-  if (s.brand === "opi") return "OPI Nail Lacquer";
   if (s.brand === "dnd") return s.code.startsWith("DC") ? "DND DC duo" : s.code.startsWith("DIVA") ? "DND DIVA duo" : "DND Gel & Lacquer duo";
-  return s.code === "213" ? "Aprés Gel Couleur" : "Aprés Light & Shadow sheer gel";
+  if (s.brand === "apres") return s.code === "213" ? "Aprés Gel Couleur" : "Aprés Light & Shadow sheer gel";
+  return BRANDS[s.brand].line || `${BRANDS[s.brand].label} nail polish`;
 };
 const gelOnly = s => s.brand === "apres";
+const hasGel = s => !!BRANDS[s.brand].gel;
 
 const GROUPS = {
   season: [["spring","Spring"],["summer","Summer"],["fall","Fall"],["winter","Winter"]],
@@ -729,11 +1284,78 @@ const GROUPS = {
   mood: [["elegant","Elegant"],["romantic","Romantic"],["calm","Calm"],["playful","Playful"],["bold","Bold"],["edgy","Edgy"]],
   tone: [["any","Any"],["cool","Cool"],["warm","Warm"],["neutral","Neutral"]],
   service: [["polish","Regular polish"],["gel","Gel manicure"],["gelx","Gel-X extensions"]],
-  brand: [["all","All brands"],["opi","OPI"],["dnd","DND"],["apres","Aprés"]],
+  brand: [["all","All brands"], ...Object.entries(BRANDS).map(([k, b]) => [k, b.label])],
 };
 const LABEL = Object.fromEntries(Object.values(GROUPS).flat());
 
-const FAMILIES = [["all","All colors"],["nude","Nudes & sheers"],["pink","Pinks"],["red","Reds"],["berry","Berries & wines"],["orange","Corals & sunny"],["purple","Purples"],["blue","Blues & greens"],["dark","Neutrals & darks"]];
+const FAMILIES = [["all","All colors"],["nude","Nudes & sheers"],["pink","Pinks"],["red","Reds"],["berry","Berries & wines"],["orange","Corals & sunny"],["purple","Purples"],["blue","Blues & greens"],["dark","Neutrals & darks"],["sparkle","Metallics & glitter"]];
+
+// Catalog families folded into the app's color families.
+const FAMILY_MAP = {
+  Nude: "nude", White: "nude", Beige: "nude", Greige: "nude",
+  Pink: "pink", Rose: "pink", Mauve: "pink", Red: "red", Berry: "berry",
+  Purple: "purple", Lavender: "purple", Lilac: "purple",
+  Blue: "blue", Navy: "blue", Teal: "blue", Mint: "blue", Turquoise: "blue", Aqua: "blue", "Tiffany Blue": "blue", Green: "blue", Khaki: "blue",
+  Coral: "orange", Orange: "orange", Yellow: "orange", Peach: "orange",
+  Brown: "dark", Black: "dark", Grey: "dark", Taupe: "dark",
+  Glitter: "sparkle", Metallic: "sparkle", Gold: "sparkle", Silver: "sparkle", "Rose Gold": "sparkle", Copper: "sparkle", "Green/Purple": "sparkle",
+};
+function hsl(hex) {
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, d = max - min;
+  if (!d) return { h: 0, s: 0, l };
+  const s = d / (1 - Math.abs(2 * l - 1));
+  const h = 60 * (max === r ? ((g - b) / d + 6) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4);
+  return { h, s, l };
+}
+// Rule-of-thumb tags from lightness, saturation and hue: pastels lean spring, brights summer, deep shades fall and winter.
+function deriveTags(fam, hex, finish) {
+  const { h, s, l } = hsl(hex);
+  let se, oc, mo;
+  switch (fam) {
+    case "nude": se = ALL4; oc = "everyday work interview wedding"; mo = "calm elegant"; break;
+    case "pink":
+      if (l > .8) { se = "spring summer"; oc = "everyday date wedding"; mo = "romantic calm playful"; }
+      else if (s > .5 && l > .45) { se = "summer spring"; oc = "vacation party date"; mo = "playful bold"; }
+      else { se = "fall spring"; oc = "everyday work date"; mo = "romantic elegant"; }
+      break;
+    case "red":
+      if (l < .3) { se = "fall winter"; oc = "date party work"; mo = "elegant romantic"; }
+      else if (h >= 4 && h <= 25 && l > .4) { se = "summer"; oc = "vacation party date"; mo = "bold playful"; }
+      else { se = "winter fall summer"; oc = "date party everyday"; mo = "bold elegant"; }
+      break;
+    case "berry": se = "fall winter"; oc = "date party"; mo = s > .5 ? "romantic bold" : "romantic elegant"; break;
+    case "orange":
+      if (l < .4) { se = "fall"; oc = "everyday party"; mo = "bold elegant"; }
+      else if (l > .75) { se = "spring summer"; oc = "everyday vacation"; mo = "playful calm"; }
+      else { se = "summer"; oc = "vacation party"; mo = "playful bold"; }
+      break;
+    case "purple":
+      if (l > .7) { se = "spring"; oc = "everyday date vacation"; mo = "playful calm romantic"; }
+      else if (l < .3) { se = "fall winter"; oc = "party date"; mo = "edgy elegant"; }
+      else { se = "fall spring"; oc = "date party"; mo = "romantic bold"; }
+      break;
+    case "blue":
+      if (l > .72) { se = "spring summer"; oc = "everyday vacation"; mo = "calm playful"; }
+      else if (l < .3) { se = "winter fall"; oc = "work party date"; mo = "edgy elegant"; }
+      else if (s > .45) { se = "summer"; oc = "vacation party"; mo = "bold playful"; }
+      else { se = "fall winter"; oc = "everyday work"; mo = "calm edgy"; }
+      break;
+    case "dark":
+      if (l < .16) { se = "fall winter"; oc = "party date"; mo = "edgy bold"; }
+      else if (s < .12 || l > .5) { se = "fall winter"; oc = "work everyday interview"; mo = "calm edgy elegant"; }
+      else { se = "fall winter"; oc = "everyday work"; mo = "elegant edgy"; }
+      break;
+    default: se = "winter"; oc = "party date"; mo = h >= 30 && h <= 55 && s > .3 ? "elegant bold" : "bold playful";
+  }
+  if (fam !== "sparkle" && /glitter|holo|metallic|chrome|foil|flakie|iridescent|multichrome|pixie/i.test(finish)) { se += " winter"; oc += " party"; }
+  const tone = s < .12 ? "all" : h >= 12 && h <= 70 ? "warm" : h >= 170 && h <= 345 ? "cool" : "all";
+  return [se, oc, mo, tone];
+}
+for (const [brand, code, name, hex, finish, catFam] of PDF_ROWS) {
+  const fam = FAMILY_MAP[catFam] || "nude";
+  SHADES.push(mk(brand, code, name, hex, finish, fam, ...deriveTags(fam, hex, finish)));
+}
 
 // Nail plate outlines, viewBox 0 0 60 100. Cuticle sits at the bottom.
 const SHAPES = {
@@ -869,6 +1491,8 @@ function score(s) {
     else if (state.tone === "neutral") v += .4;
   }
   if (state.service === "gelx" && s.brand === "apres") v += .8;
+  // For gel services, prefer brands that make a salon gel of the shade.
+  if (state.service !== "polish" && !hasGel(s)) v -= 1;
   return v;
 }
 
@@ -895,11 +1519,18 @@ function chipsHtml(group, values, current, name = group) {
   return values.map(([v, l]) =>
     `<label class="chip"><input type="radio" name="${name}" id="${name}-${v}" value="${v}" ${current === v ? "checked" : ""}><span>${l}</span></label>`).join("");
 }
+function brandOptions(current) {
+  return `<option value="all">All brands</option>` + BRAND_GROUPS.map(([g, label]) =>
+    `<optgroup label="${label}">${Object.entries(BRANDS).filter(([, b]) => b.group === g)
+      .map(([k, b]) => `<option value="${k}" ${current === k ? "selected" : ""}>${esc(b.label)}</option>`).join("")}</optgroup>`).join("");
+}
 function syncPickers() {
   document.querySelectorAll("#pickers input").forEach(i => { i.checked = state[i.name] === i.value; });
+  $("#brandSelect").value = state.brand;
 }
 function renderPickers() {
   document.querySelectorAll("[data-group]").forEach(box => { box.innerHTML = chipsHtml(box.dataset.group, GROUPS[box.dataset.group], state[box.dataset.group]); });
+  $("#brandSelect").innerHTML = brandOptions(state.brand);
   $("#pickers").addEventListener("change", e => {
     const { name, value } = e.target;
     state[name] = value;
@@ -937,8 +1568,9 @@ function renderResults() {
       s.moods.includes(state.mood) && LABEL[state.mood],
     ].filter(Boolean);
     const extra = s.moods.filter(m => m !== state.mood).slice(0, 2).map(m => LABEL[m]);
-    const shimmer = /shimmer|pearl/i.test(s.finish);
+    const shimmer = /shimmer|pearl|glitter|holo|metallic|chrome|foil|flakie|iridescent|multichrome|pixie/i.test(s.finish) || s.family === "sparkle";
     const code = displayCode(s);
+    const gelHint = state.service !== "polish" && !hasGel(s) ? `<p class="gel-hint">Regular polish. For gel, ask your tech to match this color.</p>` : "";
     return `<article class="card ${shimmer ? "shimmer" : ""}" style="--i:${i}">
       <div class="swatch" style="--c:${s.hex}">
         <span class="badge rank">#${i + 1} match</span>
@@ -953,9 +1585,12 @@ function renderResults() {
           </button>
         </div>
         <div class="code-row">
-          <div><div class="label">Salon code</div><div class="code">${esc(code)}</div></div>
-          <button class="copy" type="button" data-copy="${esc(code)} ${esc(s.name)}">Copy</button>
+          ${code
+            ? `<div><div class="label">Salon code</div><div class="code">${esc(code)}</div></div>`
+            : `<div><div class="label">Ask for it by name</div><div class="code byname">${esc(BRANDS[s.brand].label)} ${esc(s.name)}</div></div>`}
+          <button class="copy" type="button" data-copy="${esc(askText(s))}">Copy</button>
         </div>
+        ${gelHint}
         <dl class="meta">
           <dt>Shape</dt><dd>${nailSvg(currentLook.shape, "currentColor")}${SHAPES[currentLook.shape].label}</dd>
           <dt>Length</dt><dd>${currentLook.length}</dd>
@@ -985,7 +1620,7 @@ function paintTheme(list) {
   }
   $("#aura").style.setProperty("--a1", top.hex);
   $("#aura").style.setProperty("--a2", (list[1] || top).hex);
-  $("#fanLabel").innerHTML = `<span class="mono">${esc(displayCode(top))}</span><b>${esc(top.name)}</b>Top match right now`;
+  $("#fanLabel").innerHTML = `<span class="mono">${esc(displayCode(top) || BRANDS[top.brand].label)}</span><b>${esc(top.name)}</b>Top match right now`;
   $("#brandDot").style.background = top.hex;
   document.querySelectorAll(".shape").forEach(el => {
     el.classList.toggle("picked", el.dataset.shape === currentLook.shape);
@@ -997,7 +1632,7 @@ function paintTheme(list) {
 function renderShortlist() {
   const box = $("#shortlist");
   box.innerHTML = favs.length
-    ? favs.map((id, i) => { const s = byId[id]; return `<button class="mini" type="button" data-open="${id}" style="animation-delay:${i * 40}ms"><i style="--c:${s.hex}"></i>${esc(s.name)} <span class="mono">${esc(displayCode(s))}</span></button>`; }).join("")
+    ? favs.map((id, i) => { const s = byId[id]; return `<button class="mini" type="button" data-open="${id}" style="animation-delay:${i * 40}ms"><i style="--c:${s.hex}"></i>${esc(s.name)} <span class="mono">${esc(displayCode(s) || BRANDS[s.brand].label)}</span></button>`; }).join("")
     : `<p class="empty">Tap the heart on any shade to save it here. Your shortlist stays on this device.</p>`;
 }
 
@@ -1013,18 +1648,27 @@ function toggleFav(id, fromEl) {
 }
 
 function renderBrands() {
-  $("#brandGrid").innerHTML = Object.entries(BRANDS).map(([key, b]) => {
-    const shades = SHADES.filter(s => s.brand === key);
+  const numbered = ["chanel", "dior", "hermes", "gucci"];
+  $("#brandGrid").innerHTML = CODE_CARDS.map(c => {
+    const keys = c.key === "chanel" ? numbered : [c.key];
+    const shades = SHADES.filter(s => keys.includes(s.brand));
     const strip = shades.filter((_, i) => i % Math.ceil(shades.length / 8) === 0).slice(0, 8);
+    const label = c.label || BRANDS[c.key].label;
     return `<div class="brand-card">
       <div class="strip">${strip.map(s => `<i style="--c:${s.hex}"></i>`).join("")}</div>
-      <h3>${b.label}</h3>
-      <div class="sample">${b.sample}</div>
-      <p>${b.blurb}</p>
+      <h3>${label}</h3>
+      <div class="sample">${c.sample}</div>
+      <p>${c.blurb}</p>
       <span class="count">${shades.length} shades in Mani Match</span>
-      <button class="btn small" type="button" data-brand="${key}">Show ${b.label} matches</button>
+      <button class="btn small" type="button" data-brand="${c.key}">Show ${BRANDS[c.key].label} matches</button>
     </div>`;
   }).join("");
+  $("#brandTable").innerHTML = `<thead><tr><th>Brand</th><th>Type</th><th class="num">Shades</th><th>Price</th><th>Known for</th><th>How to ask</th></tr></thead><tbody>` +
+    Object.entries(BRANDS).map(([key, b]) => {
+      const shades = SHADES.filter(s => s.brand === key);
+      return `<tr><td><button class="brand-link" type="button" data-brand="${key}"><span class="dots">${shades.slice(0, 4).map(s => `<i style="--c:${s.hex}"></i>`).join("")}</span>${esc(b.label)}</button></td>
+        <td>${BRAND_GROUPS.find(([g]) => g === b.group)[1]}</td><td class="num">${shades.length}</td><td>${b.price}</td><td>${b.known}</td><td>${b.ask}${b.gel ? " · gel available" : ""}</td></tr>`;
+    }).join("") + `</tbody>`;
   $("#tipGrid").innerHTML = GELX_TIPS.map(([key, label, note]) =>
     `<div class="tip-card"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${SHAPES[key].path}"/></svg><b>${label}</b><span>${note}</span></div>`).join("");
 }
@@ -1044,20 +1688,29 @@ function renderShapes() {
     `<div class="shape" data-shape="${key}"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}"/></svg><b>${sh.label}</b><p>${sh.note}</p></div>`).join("");
 }
 
-const lib = { brand: "all", family: "all" };
+const LIB_PAGE = 48;
+const lib = { brand: "all", family: "all", query: "", limit: LIB_PAGE };
 function renderLibrary() {
-  $("#brandFilters").innerHTML = chipsHtml("brand", GROUPS.brand, lib.brand, "libBrand");
+  $("#libBrand").innerHTML = brandOptions(lib.brand);
   $("#filters").innerHTML = chipsHtml("family", FAMILIES, lib.family, "libFamily");
   drawLibrary();
-  $("#brandFilters").addEventListener("change", e => { lib.brand = e.target.value; drawLibrary(); });
-  $("#filters").addEventListener("change", e => { lib.family = e.target.value; drawLibrary(); });
+  $("#libBrand").addEventListener("change", e => { lib.brand = e.target.value; lib.limit = LIB_PAGE; drawLibrary(); });
+  $("#filters").addEventListener("change", e => { lib.family = e.target.value; lib.limit = LIB_PAGE; drawLibrary(); });
+  $("#libSearch").addEventListener("input", e => { lib.query = e.target.value.trim().toLowerCase(); lib.limit = LIB_PAGE; drawLibrary(); });
+  $("#libMore").addEventListener("click", () => { const from = lib.limit; lib.limit += LIB_PAGE; drawLibrary(from); });
 }
-function drawLibrary() {
-  const list = SHADES.filter(s => (lib.brand === "all" || s.brand === lib.brand) && (lib.family === "all" || s.family === lib.family));
-  $("#libCount").textContent = `${list.length} ${list.length === 1 ? "shade" : "shades"}`;
-  $("#libraryGrid").innerHTML = list.length ? list.map((s, i) =>
-    `<button class="lib" type="button" data-open="${s.id}" style="--i:${Math.min(i, 24)}"><i style="--c:${s.hex}"></i><div><b>${esc(s.name)}</b><span class="mono">${esc(displayCode(s))}</span></div></button>`).join("")
-    : `<p class="empty">No ${BRANDS[lib.brand]?.label || ""} shades in this color family yet.</p>`;
+function drawLibrary(from = 0) {
+  const q = lib.query;
+  const list = SHADES.filter(s => (lib.brand === "all" || s.brand === lib.brand) && (lib.family === "all" || s.family === lib.family)
+    && (!q || `${s.name} ${displayCode(s)} ${BRANDS[s.brand].label}`.toLowerCase().includes(q)));
+  const shown = list.slice(0, lib.limit);
+  $("#libCount").textContent = `${list.length} ${list.length === 1 ? "shade" : "shades"}${list.length > shown.length ? `, showing ${shown.length}` : ""}`;
+  $("#libraryGrid").innerHTML = shown.length ? shown.map((s, i) =>
+    `<button class="lib" type="button" data-open="${s.id}" style="--i:${Math.min(Math.max(i - from, 0), 24)}"><i style="--c:${s.hex}"></i><div><b>${esc(s.name)}</b><span class="lib-brand">${esc(BRANDS[s.brand].label)}</span>${displayCode(s) ? `<span class="mono">${esc(displayCode(s))}</span>` : `<span class="by-name">Ask by name</span>`}</div></button>`).join("")
+    : `<p class="empty">No shades match. Try another brand, color family or search.</p>`;
+  const left = list.length - shown.length;
+  $("#libMore").hidden = left <= 0;
+  $("#libMore").textContent = `Show ${Math.min(left, LIB_PAGE)} more`;
 }
 
 // ---------- Salon card ----------
@@ -1069,10 +1722,13 @@ function openCard(id, evt) {
   const code = displayCode(s);
   dlg.style.setProperty("--c", s.hex);
   dlg.style.setProperty("--t", textOn(s.hex));
-  $("#scBrand").textContent = brandLine(s);
-  $("#scCode").textContent = code;
-  $("#scCode").classList.toggle("long", code.length > 8);
-  $("#scName").textContent = s.name;
+  $("#scBrand").textContent = code ? brandLine(s) : `${brandLine(s)} · ask for it by name`;
+  $("#scCode").textContent = code || s.name;
+  $("#scCode").classList.toggle("long", !!code && code.length > 8);
+  $("#scCode").classList.toggle("byname", !code);
+  $("#scName").textContent = code ? s.name : "";
+  $("#scName").hidden = !code;
+  $("#scCopy").textContent = code ? "Copy code" : "Copy name";
   $("#scFinish").textContent = s.finish;
   $("#scShape").textContent = SHAPES[currentLook.shape].label;
   $("#scLength").textContent = currentLook.length;
@@ -1082,7 +1738,10 @@ function openCard(id, evt) {
   const fit = `Shape and length suit ${LABEL[state.occasion].toLowerCase()} with ${article(state.mood)} ${LABEL[state.mood].toLowerCase()} mood.`;
   const brandNote = s.brand === "opi" ? `Want gel? Ask for "${s.name}" in OPI gel.`
     : s.brand === "dnd" ? `DND duos include matching gel and regular polish, so ${s.code} works for either.`
-    : `Gel only. Pairs well with Gel-X extensions.`;
+    : s.brand === "apres" ? `Gel only. Pairs well with Gel-X extensions.`
+    : s.brand === "cnd" ? `CND makes this shade as Vinylux polish and Shellac gel.`
+    : state.service !== "polish" ? `This is a regular polish. For gel, ask your tech to match the color.`
+    : code ? `The number is on the bottle's label.` : `This brand doesn't use shade numbers, so ask for it by name.`;
   $("#scNote").textContent = `${brandNote} ${fit}`;
   $("#scSave").textContent = favs.includes(s.id) ? "Saved ✓" : "Save to shortlist";
   if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
@@ -1097,7 +1756,7 @@ function openCard(id, evt) {
 }
 $("#scClose").addEventListener("click", () => $("#salonCard").close());
 $("#salonCard").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
-$("#scCopy").addEventListener("click", e => openShade && copyText(`${displayCode(openShade)} ${openShade.name}`, e.currentTarget));
+$("#scCopy").addEventListener("click", e => openShade && copyText(askText(openShade), e.currentTarget));
 $("#scSave").addEventListener("click", () => {
   if (!openShade) return;
   $("#scSave").textContent = toggleFav(openShade.id) ? "Saved ✓" : "Save to shortlist";
@@ -1160,6 +1819,7 @@ function setupReveal() {
 
 // ---------- Boot ----------
 $("#statShades").dataset.count = SHADES.length;
+$("#statBrands").dataset.count = Object.keys(BRANDS).length;
 renderShapes();
 renderBrands();
 renderPickers();
