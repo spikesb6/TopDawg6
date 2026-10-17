@@ -6,6 +6,9 @@ lot to keys in hand, without skipping a step.
 Open `index.html` in a browser. No build step or dependencies. Progress is saved in the browser
 (localStorage), and a backup code on the My build tab moves it to another device.
 
+The phone app (iPhone and Android, built with Expo) is in [`mobile/`](mobile/). It uses the same
+guidance from `content.js`, and backup codes move a build between the two.
+
 ## What's in it
 
 - **Roadmap**: 14 phases and 97 steps in build order, from financing and land to the
@@ -27,7 +30,8 @@ Open `index.html` in a browser. No build step or dependencies. Progress is saved
 
 - `index.html`: layout, styles and app logic.
 - `content.js`: all guidance content (phases, steps, land checks, permits, contract terms).
-  Edit this file to change or add guidance.
+  Edit this file to change or add guidance, then run `npm run gen:content` in `mobile/`.
+- `mobile/`: the phone app.
 
 Build It is a guide, not legal, financial or engineering advice. Codes, permits and lien laws
 are local; the user's building department and licensed professionals have the final word.

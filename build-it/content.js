@@ -424,25 +424,25 @@ const LOT_GROUPS = [
   ]}
 ];
 
-/* Permits. `when` keys gate them on the profile. */
+/* Permits. `when` lists profile values that must all match for the permit to apply. */
 const PERMITS = [
-  { id: "hoa", t: "HOA or architectural review approval", by: "HOA", stage: "Before building permit", when: p => p.hoa },
+  { id: "hoa", t: "HOA or architectural review approval", by: "HOA", stage: "Before building permit", when: { hoa: true } },
   { id: "zoning", t: "Zoning or land-use approval (if required)", by: "Planning and zoning", stage: "Before building permit" },
   { id: "site", t: "Site plan approval", by: "Planning or building department", stage: "With building permit" },
   { id: "building", t: "Building permit", by: "Building department", stage: "Before any construction" },
   { id: "grading", t: "Grading or land disturbance permit", by: "County or city engineering", stage: "Before clearing" },
-  { id: "npdes", t: "Stormwater (NPDES) construction permit and plan", by: "State environmental agency", stage: "Before clearing", when: p => p.acre },
+  { id: "npdes", t: "Stormwater (NPDES) construction permit and plan", by: "State environmental agency", stage: "Before clearing", when: { acre: true } },
   { id: "drive", t: "Driveway or curb-cut permit", by: "Road authority (city, county or state DOT)", stage: "Before driveway work" },
-  { id: "tree", t: "Tree removal permit (if your town protects trees)", by: "City or county", stage: "Before clearing", when: p => p.trees },
-  { id: "demo", t: "Demolition permit", by: "Building department", stage: "Before demolition", when: p => p.demo },
-  { id: "flood", t: "Floodplain development permit and elevation certificate", by: "Floodplain administrator", stage: "Before building permit", when: p => p.flood },
-  { id: "septic", t: "Septic system permit", by: "Health department", stage: "Before building permit", when: p => p.utilities === "private" },
-  { id: "well", t: "Well permit", by: "Health department or state water agency", stage: "Before drilling", when: p => p.utilities === "private" },
-  { id: "tap", t: "Water and sewer tap or connection permits", by: "Water and sewer utility", stage: "Before utility work", when: p => p.utilities === "public" },
+  { id: "tree", t: "Tree removal permit (if your town protects trees)", by: "City or county", stage: "Before clearing", when: { trees: true } },
+  { id: "demo", t: "Demolition permit", by: "Building department", stage: "Before demolition", when: { demo: true } },
+  { id: "flood", t: "Floodplain development permit and elevation certificate", by: "Floodplain administrator", stage: "Before building permit", when: { flood: true } },
+  { id: "septic", t: "Septic system permit", by: "Health department", stage: "Before building permit", when: { utilities: "private" } },
+  { id: "well", t: "Well permit", by: "Health department or state water agency", stage: "Before drilling", when: { utilities: "private" } },
+  { id: "tap", t: "Water and sewer tap or connection permits", by: "Water and sewer utility", stage: "Before utility work", when: { utilities: "public" } },
   { id: "elec", t: "Electrical permit", by: "Building department", stage: "Before electrical rough-in" },
   { id: "plumb", t: "Plumbing permit", by: "Building department", stage: "Before plumbing rough-in" },
   { id: "mech", t: "Mechanical (HVAC) permit", by: "Building department", stage: "Before HVAC rough-in" },
-  { id: "gasp", t: "Gas piping permit", by: "Building department or gas utility", stage: "Before gas rough-in", when: p => p.gas },
+  { id: "gasp", t: "Gas piping permit", by: "Building department or gas utility", stage: "Before gas rough-in", when: { gas: true } },
   { id: "address", t: "Address assignment", by: "County addressing or 911 office", stage: "Before permits or utilities" },
   { id: "co", t: "Certificate of occupancy", by: "Building department", stage: "Before move-in" }
 ];

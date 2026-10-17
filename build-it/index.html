@@ -486,7 +486,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
 
   V.permits = () => {
     const P = S.profile;
-    const list = PERMITS.filter(x => !x.when || x.when(P));
+    const list = PERMITS.filter(x => !x.when || Object.entries(x.when).every(([k, v]) => P[k] === v));
     const statuses = [["todo", "Not started"], ["applied", "Applied"], ["approved", "Approved"], ["na", "Not needed here"]];
     const cnt = k => list.filter(x => (S.permits[x.id] || "todo") === k).length;
     return `
