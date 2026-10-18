@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Icon } from '@/components/icons';
+import { PhotoStrip } from '@/components/photo-strip';
 import { Pill, styles as ui } from '@/components/ui';
 import type { Step } from '@/data/content';
 import { useTheme } from '@/hooks/use-theme';
@@ -10,13 +11,14 @@ type Props = {
   step: Step;
   done: boolean;
   note: string;
+  photoCount: number;
   open: boolean;
   onToggleDone: () => void;
   onToggleOpen: () => void;
   onNote: (text: string) => void;
 };
 
-export function StepCard({ step, done, note, open, onToggleDone, onToggleOpen, onNote }: Props) {
+export function StepCard({ step, done, note, photoCount, open, onToggleDone, onToggleOpen, onNote }: Props) {
   const theme = useTheme();
 
   return (
@@ -50,11 +52,12 @@ export function StepCard({ step, done, note, open, onToggleDone, onToggleOpen, o
             ]}>
             {step.t}
           </Text>
-          {(step.gate || step.crit || !!note) && (
+          {(step.gate || step.crit || !!note || photoCount > 0) && (
             <View style={styles.tags}>
               {step.gate && <Pill tone="flag">Hold point · inspection</Pill>}
               {step.crit && <Pill tone="warn">Never skip</Pill>}
               {!!note && <Pill>Has notes</Pill>}
+              {photoCount > 0 && <Pill>{photoCount === 1 ? '1 photo' : `${photoCount} photos`}</Pill>}
             </View>
           )}
         </Pressable>
@@ -74,10 +77,11 @@ export function StepCard({ step, done, note, open, onToggleDone, onToggleOpen, o
             <View style={[styles.box, { backgroundColor: theme.flagSoft }]}>
               <Text style={[ui.body, { color: theme.text }]}>
                 <Text style={{ fontFamily: fonts.bodySemi, color: theme.flag }}>Hold point. </Text>
-                Do not cover, pour, close up or pay for this stage until it passes. Write the inspector’s name, date and result below.
+                Do not cover, pour, close up or pay for this stage until it passes. Take photos, and write the inspector’s name, date and result below.
               </Text>
             </View>
           )}
+          <PhotoStrip step={step.id} title={step.t} />
           <View style={{ gap: 5 }}>
             <Text style={[ui.fieldLabel, { color: theme.muted }]}>Notes, dates, names, inspection results</Text>
             <TextInput

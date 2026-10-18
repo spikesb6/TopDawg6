@@ -41,7 +41,16 @@
           }
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Build It uses the camera to photograph your build, like rebar before a pour or walls before drywall.",
+          "photosPermission": "Build It lets you add photos of your build from your library.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

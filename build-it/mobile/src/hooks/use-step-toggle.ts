@@ -11,8 +11,11 @@ export function goToStep(stepId: string) {
   if (s) router.push({ pathname: '/phase/[id]', params: { id: s.phase, step: stepId } });
 }
 
-/** Checks a step off (or back on) and warns when something earlier is still open. */
-export function useStepToggle() {
+/**
+ * Checks a step off (or back on) and warns when something earlier is still open.
+ * openHere opens a step on the current phase screen instead of pushing a new one.
+ */
+export function useStepToggle(openHere?: (stepId: string) => void) {
   const { state, update } = useBuild();
   const toast = useToast();
 
@@ -26,8 +29,8 @@ export function useStepToggle() {
 
     const step = ALL_STEPS.find((s) => s.id === stepId)!;
     const before = openBefore(stepId, done);
-    if (step.gate && !state.notes[stepId]) {
-      toast('Hold point checked. Write the inspector, date and result in its notes.');
+    if (step.gate && !state.notes[stepId] && !state.photos.some((p) => p.step === stepId)) {
+      toast('Hold point checked. Add a photo and the inspector’s name, date and result.', 'Add them', () => (openHere ? openHere(stepId) : goToStep(stepId)));
     } else if (before.length) {
       toast(`${plural(before.length, 'earlier step')} still open. No step gets skipped.`, 'Show me', () => goToStep(before[0].id));
     } else if (phaseStats(PHASES[step.pi], done).pct === 100) {

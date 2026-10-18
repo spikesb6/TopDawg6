@@ -5,6 +5,7 @@ import { Screen } from '@/components/screen';
 import { Body, Heading, LinkRow } from '@/components/ui';
 
 const LINKS: [string, string, Href][] = [
+  ['Account', 'Back up your build and photos, use it on any phone', '/account'],
   ['About your project', 'Size, foundation, utilities, HOA, flood zone', '/project'],
   ['Permits', 'Your permit list and where each one stands', '/permits'],
   ['Paying people', 'Payment log, lien waivers, retainage, golden rules', '/payments'],

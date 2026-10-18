@@ -45,6 +45,15 @@ export type Payment = {
   example?: boolean;
 };
 
+export type Photo = {
+  id: string;
+  /** The step it documents. */
+  step: string;
+  takenAt: string;
+  /** True once the file is in the account's cloud storage. */
+  uploaded: boolean;
+};
+
 export type BuildState = {
   profile: Profile;
   done: Record<string, boolean>;
@@ -54,6 +63,8 @@ export type BuildState = {
   vet: Record<string, boolean>;
   budget: Budget;
   payments: Payment[];
+  /** Phone app only. The web app keeps this list untouched when it restores a backup. */
+  photos: Photo[];
   retainPct: number;
 };
 
@@ -72,6 +83,7 @@ export function freshState(): BuildState {
     done: {}, notes: {}, lot: {}, permits: {}, vet: {},
     budget: { land: 85000, sqft: 2200, cpsf: 210, site: 30000, softPct: 10, contPct: 12, downPct: 20, rate: 7.5, months: 10, extras: 25000 },
     payments: EXAMPLE_PAYMENTS.slice(),
+    photos: [],
     retainPct: 10,
   };
 }

@@ -219,6 +219,11 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 10px; box-shadow: var(--shadow); max-width: min(560px, calc(100vw - 32px)); z-index: 20; font-size: .92rem; display: flex; gap: 12px; align-items: center; }
 .toast button { background: none; border: 0; color: var(--bg); font-weight: 700; text-decoration: underline; cursor: pointer; flex: none; }
 
+.photos { display: flex; flex-wrap: wrap; gap: 8px; }
+.photo { width: 104px; height: 104px; border-radius: 8px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo.pending { font-size: .78rem; color: var(--muted); text-align: center; padding: 6px; }
+
 footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var(--muted); font-size: .84rem; display: grid; gap: 8px; }
 
 @media (max-width: 820px) {
@@ -246,11 +251,13 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
   <main id="view"></main>
   <footer>
     <p>Build It is a guide, not legal, financial or engineering advice. Building codes, permits and lien laws are set locally and change. Your building department, licensed design professionals and attorney have the final word for your project.</p>
-    <p>Your progress is saved in this browser only. Use “Back up my build” on the My build tab to move it to another device.</p>
+    <p>Your progress is saved in this browser. Sign in, or use “Back up my build” on the My build tab, to carry it to another device or the phone app.</p>
   </footer>
 </div>
 <div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
 
+<script src="config.js"></script>
+<script src="sync.js"></script>
 <script src="content.js"></script>
 <script>
 (() => {
@@ -271,7 +278,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
     profile: { name: "", location: "", sqft: 2200, stories: "1", foundation: "slab", route: "gc", utilities: "public", hoa: false, flood: false, acre: false, trees: false, demo: false, gas: true },
     done: {}, notes: {}, lot: {}, permits: {}, vet: {},
     budget: { land: 85000, sqft: 2200, cpsf: 210, site: 30000, softPct: 10, contPct: 12, downPct: 20, rate: 7.5, months: 10, extras: 25000 },
-    payments: EXAMPLE_PAYMENTS.slice(), retainPct: 10
+    payments: EXAMPLE_PAYMENTS.slice(), photos: [], retainPct: 10
   });
 
   let S = load();
@@ -281,14 +288,144 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
   let openStep = null;
   let confirmReset = false;
 
+  // Fills in anything an older or partial save is missing.
+  function normalize(d) { const f = fresh(); return { ...f, ...d, profile: { ...f.profile, ...d.profile }, budget: { ...f.budget, ...d.budget } }; }
   function load() {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) { const d = JSON.parse(raw); const f = fresh(); return { ...f, ...d, profile: { ...f.profile, ...d.profile }, budget: { ...f.budget, ...d.budget } }; }
+      if (raw) return normalize(JSON.parse(raw));
     } catch (e) {}
     return fresh();
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(SYNC_KEY, JSON.stringify(meta)); } catch (e) {} }
+  /** Saves a change made here. When signed in, it reaches the account a couple of seconds later. */
+  function save() { meta.dirty = true; revision++; persist(); schedulePush(); }
+
+  /* ---------- Account and cloud sync (only when config.js has Supabase keys) ---------- */
+  const SYNC_KEY = "buildit.sync";
+  const CFG = window.BUILDIT_CONFIG || {};
+  const accountsOn = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+  let meta = (() => { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || { dirty: false, version: null }; } catch (e) { return { dirty: false, version: null }; } })();
+  let sb = null, user = null, revision = 0, pushTimer, running = false, again = false;
+  let syncState = "idle", syncError = "", lastSynced = null, codeSentTo = "", confirmDelete = false, pendingRender = false;
+  const photoUrls = {};
+
+  function schedulePush() { if (!user) return; clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+
+  // Re-render without yanking focus from a field someone is typing in.
+  function softRender() {
+    const a = document.activeElement;
+    if (a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT")) { pendingRender = true; return; }
+    render();
+  }
+  document.addEventListener("focusout", () => { if (pendingRender) { pendingRender = false; setTimeout(render, 0); } });
+
+  async function syncOnce() {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const rev = revision, local = JSON.parse(JSON.stringify(S));
+      const { data: row, error } = await sb.from("builds").select("data, version").eq("user_id", user.id).maybeSingle();
+      if (error) throw error;
+      const plan = BUILDIT_SYNC.planSync(local, meta.dirty, meta.version, row, normalize);
+      if (plan.action === "none") return;
+      if (plan.action === "pull") { S = plan.data; meta = { dirty: false, version: plan.version }; persist(); softRender(); return; }
+      let version = null;
+      if (plan.action === "create") {
+        const { error: e } = await sb.from("builds").insert({ user_id: user.id, data: plan.data, version: 1 });
+        if (e && e.code !== "23505") throw e;
+        if (!e) version = 1;
+      } else {
+        const { data: rows, error: e } = await sb.from("builds").update({ data: plan.data, version: plan.expectVersion + 1 })
+          .eq("user_id", user.id).eq("version", plan.expectVersion).select("version");
+        if (e) throw e;
+        if (rows.length) version = plan.expectVersion + 1;
+      }
+      if (version == null) continue; // Another device saved first. Look again.
+      const merged = JSON.stringify(plan.data) !== JSON.stringify(local);
+      if (revision === rev) { S = plan.data; meta = { dirty: false, version }; }
+      else { S = normalize(BUILDIT_SYNC.mergeBuilds(S, plan.data)); meta = { dirty: true, version }; }
+      persist();
+      if (merged) softRender();
+      return;
+    }
+  }
+
+  async function syncNow() {
+    if (!user) return;
+    if (running) { again = true; return; }
+    running = true; syncState = "syncing"; updateAccountStatus();
+    try {
+      do { again = false; await syncOnce(); } while (again);
+      syncState = "synced"; syncError = ""; lastSynced = new Date();
+    } catch (e) {
+      syncState = "error"; syncError = (e && e.message) || "Could not reach your account.";
+    } finally { running = false; updateAccountStatus(); }
+  }
+
+  function updateAccountStatus() { const el = $("#syncStatus"); if (el) el.outerHTML = syncStatusHTML(); }
+  function syncStatusHTML() {
+    const [tone, label] = { idle: ["plain", "Signed in"], syncing: ["info", "Saving"], synced: ["ok", "Up to date"], error: ["bad", "Not saved"] }[syncState];
+    const when = lastSynced ? ` Last saved at ${lastSynced.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.` : "";
+    return `<div id="syncStatus" class="stack" style="gap:6px"><span class="pill ${tone}" style="align-self:flex-start">${label}</span>
+      <p class="muted">${syncState === "error" ? `Couldn’t reach your account: ${esc(syncError)} Your changes are safe in this browser.` : `Your build and phone photos sync with your account.${when}`}</p></div>`;
+  }
+
+  function startAccounts() {
+    if (!accountsOn) return;
+    const tag = document.createElement("script");
+    tag.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+    tag.onload = () => {
+      sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
+      sb.auth.onAuthStateChange((_event, session) => {
+        const was = user && user.id;
+        user = session ? session.user : null;
+        if (user && user.id !== was) { setTimeout(syncNow, 0); }
+        if (tab === "home" || tab === "roadmap") softRender();
+      });
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncNow(); });
+    };
+    tag.onerror = () => { syncState = "error"; syncError = "Couldn’t load sign-in. Check your connection."; };
+    document.head.appendChild(tag);
+  }
+
+  function accountHTML() {
+    if (!accountsOn) return "";
+    if (!sb) return `<section class="card stack"><h3>Account</h3><p class="muted">Loading sign-in…</p></section>`;
+    if (!user) return `<section class="card stack"><h3>Sign in to sync with your phone</h3>
+      <p class="muted">Use the same email as the Build It phone app. We email you a 6-digit code. No password to remember.</p>
+      <div class="fields">
+        <label class="field"><span>Email</span><input id="acct-email" type="email" autocomplete="email" value="${esc(codeSentTo)}" placeholder="you@example.com"></label>
+        ${codeSentTo ? `<label class="field"><span>6-digit code from the email</span><input id="acct-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>` : ""}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${codeSentTo ? `<button class="btn primary" id="verifyCode">Sign in</button><button class="btn" id="sendCode">Send a new code</button>` : `<button class="btn primary" id="sendCode">Email me a code</button>`}</div>
+    </section>`;
+    return `<section class="card stack"><h3>Account</h3><p><b>${esc(user.email)}</b></p>${syncStatusHTML()}
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" id="syncNow">Save now</button><button class="btn" id="signOut">Sign out</button>
+      ${confirmDelete ? `<span style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Delete your account, its saved build and photos?</b><button class="btn danger" id="doDelete">Yes, delete it</button><button class="btn" id="cancelDelete">Keep it</button></span>` : `<button class="btn danger" id="askDelete">Delete account</button>`}</div>
+    </section>`;
+  }
+
+  // Photos are taken in the phone app. Signed in, the web app shows the ones that are backed up.
+  function photosHTML(stepId) {
+    const list = (S.photos || []).filter(p => p.step === stepId);
+    if (!list.length) return "";
+    if (!user) return `<p class="muted">${list.length} photo${list.length > 1 ? "s" : ""} in the phone app.${accountsOn ? " Sign in on the My build tab to see them here." : ""}</p>`;
+    return `<div class="photos">${list.map(p => p.uploaded
+      ? `<a class="photo" data-photo-link="${esc(p.id)}" target="_blank" rel="noopener"><img data-photo="${esc(p.id)}" alt="Photo from ${new Date(p.takenAt).toLocaleDateString()}"></a>`
+      : `<span class="photo pending">Still on the phone</span>`).join("")}</div>`;
+  }
+  async function fillPhotos() {
+    if (!user) return;
+    for (const img of document.querySelectorAll("img[data-photo]")) {
+      const id = img.dataset.photo;
+      if (!photoUrls[id]) {
+        const { data, error } = await sb.storage.from("photos").createSignedUrl(`${user.id}/${id}.jpg`, 3600);
+        if (error) continue;
+        photoUrls[id] = data.signedUrl;
+      }
+      img.src = photoUrls[id];
+      const link = img.closest("a"); if (link) link.href = photoUrls[id];
+    }
+  }
 
   const $ = s => document.querySelector(s);
   const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -383,9 +520,10 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
         ${P.route === "owner" ? `<p class="pill warn" style="white-space:normal;text-transform:none;letter-spacing:0;font-size:.85rem;line-height:1.4">Owner-builder: check your state’s owner-builder rules, your lender’s policy and your insurance before you commit.</p>` : ""}
       </section>
     </div>
+    ${accountsOn ? `<div style="margin-top:16px">${accountHTML()}</div>` : ""}
     <section class="card stack" style="margin-top:16px">
       <h3>Back up my build</h3>
-      <p class="muted">Progress lives in this browser. Copy a backup code and paste it on another device to carry on there.</p>
+      <p class="muted">${user ? "Your build syncs with your account. A backup code is a copy you keep yourself." : "Progress lives in this browser."} Copy a backup code and paste it on another device or the phone app to carry on there.</p>
       <div style="display:flex;flex-wrap:wrap;gap:8px">
         <button class="btn" id="copyBackup">Copy backup code</button>
         <button class="btn" id="showRestore">Restore from a code</button>
@@ -453,6 +591,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
       ${open ? `<div class="st-body">
         <p>${s.d}</p>
         <div class="pro"><b>How the best builders do it</b>${s.pro}</div>
+        ${photosHTML(s.id)}
         ${s.gate ? `<div class="hold"><b>Hold point.</b> Do not cover, pour, close up or pay for this stage until it passes. Write the inspector’s name, date and result in your notes.</div>` : ""}
         <label class="field"><span>Notes, dates, names, inspection results</span><textarea id="note-${s.id}" data-note="${s.id}" placeholder="Passed 4/12, inspector J. Ruiz. Photos in binder.">${esc(S.notes[s.id] || "")}</textarea></label>
       </div>` : ""}
@@ -662,6 +801,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
   function render() {
     renderTabs(); renderDim();
     $("#view").innerHTML = V[tab]();
+    fillPhotos();
   }
 
   function go(t) { tab = t; try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo({ top: 0 }); }
@@ -684,7 +824,9 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
       case "clearEx": S.payments = S.payments.filter(x => !x.example); save(); render(); toast("Examples cleared"); break;
       case "askReset": confirmReset = true; render(); break;
       case "cancelReset": confirmReset = false; render(); break;
-      case "doReset": S = fresh(); S.payments = []; confirmReset = false; openPhase = PHASES[0].id; save(); render(); toast("Started a fresh build"); break;
+      case "doReset":
+        if (user && S.photos.length) sb.storage.from("photos").remove(S.photos.map(p => `${user.id}/${p.id}.jpg`));
+        S = fresh(); S.payments = []; confirmReset = false; openPhase = PHASES[0].id; save(); render(); toast("Started a fresh build"); break;
       case "showRestore": $("#restoreBox").hidden = !$("#restoreBox").hidden; break;
       case "copyBackup": {
         const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
@@ -693,11 +835,39 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
         if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(() => toast("Backup code copied"), fallback); else fallback();
         break;
       }
+      case "sendCode": {
+        const email = ($("#acct-email").value || "").trim();
+        if (!/^\S+@\S+\.\S+$/.test(email)) { toast("Enter your full email address, like you@example.com."); break; }
+        sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } }).then(({ error }) => {
+          if (error) { toast(error.message); return; }
+          codeSentTo = email; render(); toast("Code sent. Check your email.");
+        });
+        break;
+      }
+      case "verifyCode": {
+        const token = ($("#acct-code").value || "").trim();
+        if (!/^\d{6}$/.test(token)) { toast("Enter the 6 digits from the email."); break; }
+        sb.auth.verifyOtp({ email: codeSentTo, token, type: "email" }).then(({ error }) => {
+          if (error) { toast(error.message); return; }
+          codeSentTo = ""; toast("Signed in. Your build is syncing.");
+        });
+        break;
+      }
+      case "syncNow": syncNow(); break;
+      case "signOut": sb.auth.signOut().then(() => { meta = { dirty: false, version: null }; persist(); render(); toast("Signed out. Your build stays in this browser."); }); break;
+      case "askDelete": confirmDelete = true; render(); break;
+      case "cancelDelete": confirmDelete = false; render(); break;
+      case "doDelete":
+        sb.functions.invoke("delete-account", { method: "POST" }).then(async ({ error }) => {
+          if (error) { toast("Couldn’t delete the account. Check your connection and try again."); return; }
+          await sb.auth.signOut(); meta = { dirty: false, version: null }; confirmDelete = false; persist(); render(); toast("Account deleted.");
+        });
+        break;
       case "doRestore": {
         try {
           const d = JSON.parse(decodeURIComponent(escape(atob($("#restoreText").value.trim()))));
           if (!d || !d.profile || !d.done) throw 0;
-          const f = fresh(); S = { ...f, ...d, profile: { ...f.profile, ...d.profile }, budget: { ...f.budget, ...d.budget } };
+          S = normalize(d);
           save(); openPhase = currentPhase().id; render(); toast("Build restored");
         } catch (err) { toast("That code didn’t work. Copy the whole code again and paste it here."); }
         break;
@@ -712,7 +882,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
       if (t.checked) {
         const i = ALL_STEPS.findIndex(s => s.id === id), s = ALL_STEPS[i];
         const before = ALL_STEPS.slice(0, i).filter(x => !S.done[x.id]);
-        if (s.gate && !S.notes[id]) toast("Hold point checked. Record the inspector, date and result in its notes.", "Add notes", () => gotoStep(id));
+        if (s.gate && !S.notes[id] && !(S.photos || []).some(p => p.step === id)) toast("Hold point checked. Record the inspector, date and result in its notes, and photograph it in the phone app.", "Add notes", () => gotoStep(id));
         else if (before.length) toast(`${before.length} earlier step${before.length > 1 ? "s are" : " is"} still open. No step gets skipped.`, "Show me", () => gotoStep(before[0].id));
         const ph = PHASES[s.pi];
         if (phaseStats(ph).pct === 100 && !before.length) toast(`${ph.name} is complete.`, s.pi < PHASES.length - 1 ? "Next phase" : null, () => { openPhase = PHASES[s.pi + 1].id; openStep = null; render(); window.scrollTo({ top: 0 }); });
@@ -747,6 +917,7 @@ footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var
   document.addEventListener("change", e => { if (e.target.id === "phaseSelect") { openPhase = e.target.value; openStep = null; render(); } });
 
   render();
+  startAccounts();
 })();
 </script>
 </body>

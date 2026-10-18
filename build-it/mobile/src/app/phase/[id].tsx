@@ -9,6 +9,7 @@ import { PHASES } from '@/data/content';
 import { useStepToggle } from '@/hooks/use-step-toggle';
 import { useTheme } from '@/hooks/use-theme';
 import { plural } from '@/lib/format';
+import { photoCounts } from '@/lib/photos';
 import { phaseStats } from '@/lib/progress';
 import { useBuild } from '@/store/build-store';
 import { fonts, radius } from '@/theme/theme';
@@ -17,12 +18,13 @@ export default function PhaseScreen() {
   const { id, step } = useLocalSearchParams<{ id: string; step?: string }>();
   const { state, update } = useBuild();
   const theme = useTheme();
-  const toggle = useStepToggle();
   const [open, setOpen] = useState<string | null>(step ?? null);
+  const toggle = useStepToggle(setOpen);
 
   const idx = Math.max(PHASES.findIndex((p) => p.id === id), 0);
   const p = PHASES[idx];
   const st = phaseStats(p, state.done);
+  const photos = photoCounts(state.photos);
   const prev = PHASES[idx - 1];
   const next = PHASES[idx + 1];
 
@@ -49,6 +51,7 @@ export default function PhaseScreen() {
             step={s}
             done={!!state.done[s.id]}
             note={state.notes[s.id] ?? ''}
+            photoCount={photos[s.id] ?? 0}
             open={open === s.id}
             onToggleDone={() => toggle(s.id)}
             onToggleOpen={() => setOpen(open === s.id ? null : s.id)}

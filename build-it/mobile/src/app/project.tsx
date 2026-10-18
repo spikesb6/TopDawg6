@@ -4,8 +4,11 @@ import { Share, View } from 'react-native';
 import { Screen } from '@/components/screen';
 import { Body, Button, Card, Field, H3, Heading, Label, Segmented, Strong, ToggleRow } from '@/components/ui';
 import { makeBackup, readBackup } from '@/lib/backup';
+import { deleteLocalPhoto } from '@/lib/photo-files';
+import { deleteRemotePhoto } from '@/lib/remote';
 import { toNumber } from '@/lib/format';
 import { freshState, type Profile } from '@/lib/state';
+import { useAccount } from '@/store/account-store';
 import { useBuild } from '@/store/build-store';
 import { useToast } from '@/store/toast-store';
 
@@ -21,6 +24,7 @@ const TOGGLES: [keyof Profile, string][] = [
 export default function Project() {
   const { state, update, replace } = useBuild();
   const toast = useToast();
+  const account = useAccount();
   const P = state.profile;
   const [sqft, setSqft] = useState(String(P.sqft));
   const [code, setCode] = useState('');
@@ -34,9 +38,10 @@ export default function Project() {
       <Heading eyebrow="My build" title="About your project" lede="These details shape your permit list and budget." />
       <Card>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-          <Field label="Project name" value={P.name} onChangeText={(t) => set('name', t)} placeholder="The Oak Hill house" />
-          <Field label="City, county and state" value={P.location} onChangeText={(t) => set('location', t)} placeholder="Wake County, NC" />
+          <Field row label="Project name" value={P.name} onChangeText={(t) => set('name', t)} placeholder="The Oak Hill house" />
+          <Field row label="City, county and state" value={P.location} onChangeText={(t) => set('location', t)} placeholder="Wake County, NC" />
           <Field
+            row
             label="Heated square feet"
             value={sqft}
             keyboardType="number-pad"
@@ -65,7 +70,7 @@ export default function Project() {
 
       <Card>
         <H3>Back up my build</H3>
-        <Body muted>Your build is saved on this phone. Share a backup code to keep it safe, or paste one to carry on from another phone or the Build It web app.</Body>
+        <Body muted>{account.userId ? 'Your build backs up to your account automatically. ' : ''}A backup code holds your whole build except the photo files. Paste one here to carry on from another phone or the Build It web app.</Body>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
           <Button label="Share backup code" onPress={() => Share.share({ message: makeBackup(state) }).catch(() => {})} />
           <Button label="Restore from a code" onPress={() => setRestoring(!restoring)} />
@@ -90,12 +95,16 @@ export default function Project() {
         )}
         {confirmReset ? (
           <View style={{ gap: 8 }}>
-            <Body><Strong>Erase everything?</Strong> This clears every checked step, note, payment and setting on this phone.</Body>
+            <Body><Strong>Erase everything?</Strong> This clears every checked step, note, payment, photo and setting{account.userId ? ' on this phone and in your account' : ' on this phone'}.</Body>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               <Button
                 kind="danger"
                 label="Yes, start over"
                 onPress={() => {
+                  state.photos.forEach((p) => {
+                    deleteLocalPhoto(p.id);
+                    if (account.userId) deleteRemotePhoto(account.userId, p.id).catch(() => {});
+                  });
                   replace({ ...freshState(), payments: [] });
                   setSqft(String(freshState().profile.sqft));
                   setConfirmReset(false);

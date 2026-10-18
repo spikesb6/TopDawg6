@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 
 import { ErrorScreen } from '@/components/error-screen';
 import { useScheme, useTheme } from '@/hooks/use-theme';
+import { AccountProvider } from '@/store/account-store';
 import { BuildStoreProvider, useBuild } from '@/store/build-store';
 import { ToastProvider } from '@/store/toast-store';
 
@@ -45,6 +46,8 @@ function Navigator() {
       <Stack.Screen name="team" />
       <Stack.Screen name="built-to-last" />
       <Stack.Screen name="project" />
+      <Stack.Screen name="account" />
+      <Stack.Screen name="photo" />
     </Stack>
   );
 }
@@ -53,10 +56,12 @@ export default function RootLayout() {
   const scheme = useScheme();
   return (
     <BuildStoreProvider>
-      <ToastProvider>
-        <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <Navigator />
-      </ToastProvider>
+      <AccountProvider>
+        <ToastProvider>
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+          <Navigator />
+        </ToastProvider>
+      </AccountProvider>
     </BuildStoreProvider>
   );
 }

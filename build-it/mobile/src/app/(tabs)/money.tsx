@@ -33,6 +33,7 @@ function NumberField({ k, label }: { k: keyof Budget; label: string }) {
   const [text, setText] = useState(String(state.budget[k]));
   return (
     <Field
+      row
       label={label}
       value={text}
       keyboardType="decimal-pad"

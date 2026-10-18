@@ -7,7 +7,10 @@ Open `index.html` in a browser. No build step or dependencies. Progress is saved
 (localStorage), and a backup code on the My build tab moves it to another device.
 
 The phone app (iPhone and Android, built with Expo) is in [`mobile/`](mobile/). It uses the same
-guidance from `content.js`, and backup codes move a build between the two.
+guidance from `content.js`, adds inspection photos, and has optional accounts that sync a build
+between phones and this web app. To switch accounts on, follow
+[`mobile/supabase/README.md`](mobile/supabase/README.md) and put the keys in `config.js`. Signed in
+here, you also see the photos taken on the phone. Backup codes move a build between the two too.
 
 ## What's in it
 
@@ -29,6 +32,8 @@ guidance from `content.js`, and backup codes move a build between the two.
 ## Files
 
 - `index.html`: layout, styles and app logic.
+- `config.js`: Supabase keys for accounts. Empty means accounts are off.
+- `sync.js`: cloud sync rules, matching `mobile/src/lib/sync.ts` (a test checks they agree).
 - `content.js`: all guidance content (phases, steps, land checks, permits, contract terms).
   Edit this file to change or add guidance, then run `npm run gen:content` in `mobile/`.
 - `mobile/`: the phone app.

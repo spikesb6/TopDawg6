@@ -115,10 +115,11 @@ export function Checkbox({ checked, onToggle, label, children }: { checked: bool
   );
 }
 
-export function Field({ label, ...input }: { label: string } & TextInputProps) {
+/** A labeled text box. `row` lets it share a wrapping row with other fields. */
+export function Field({ label, row, ...input }: { label: string; row?: boolean } & TextInputProps) {
   const theme = useTheme();
   return (
-    <View style={{ gap: 5, flexGrow: 1, flexBasis: 140 }}>
+    <View style={[{ gap: 5 }, row && { flexGrow: 1, flexBasis: 140 }]}>
       <Text style={[styles.fieldLabel, { color: theme.muted }]}>{label}</Text>
       <TextInput
         accessibilityLabel={label}

@@ -23,9 +23,17 @@ Switch your phone to dark mode to see the dark theme.
 
 ## Your data
 
-Everything is saved on the phone. On **More → About your project**, *Share backup code* sends
-a code you can keep (in Notes, email, anywhere) and *Restore from a code* brings a build back.
-Codes work both ways between the phone app and the web app.
+Everything is saved on the phone first, so the app works with no signal on a job site.
+
+- **Photos:** open any step and tap *Take photo* or *Choose photo*. Hold points (inspections) ask
+  for a photo, like rebar before a pour or walls before drywall.
+- **Account (optional):** under **More → Account**, sign in with your email and a 6-digit code.
+  Your build and photos then back up and sync with your other phones and the Build It web app.
+  Accounts need a one-time Supabase setup: see [`supabase/README.md`](supabase/README.md). Without
+  it, sign-in is hidden and everything stays on the phone.
+- **Backup codes:** on **More → About your project**, *Share backup code* sends a code you can keep
+  and *Restore from a code* brings a build back. Codes work between the phone app and the web app.
+  They carry everything except the photo files.
 
 ## Changing the guidance
 
@@ -52,4 +60,7 @@ Change `bundleIdentifier` and `package` in `app.json` to your own before a store
 npx tsc --noEmit
 npx expo lint
 npm test
+npm run test:functions   # the delete-account Edge Function (Deno)
 ```
+
+The database rules have their own test, `supabase/tests/rls.test.sql`; see `supabase/README.md`.

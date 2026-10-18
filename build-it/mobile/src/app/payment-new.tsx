@@ -43,9 +43,9 @@ export default function NewPayment() {
     <Screen back>
       <Heading eyebrow="Paying people" title="Log a payment" />
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
-        <Field label="Paid to (company)" value={payee} onChangeText={setPayee} placeholder="Company on the contract" autoCapitalize="words" />
-        <Field label="Amount ($)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="12500" />
-        <Field label="Date (YYYY-MM-DD)" value={date} onChangeText={setDate} placeholder="2026-05-01" />
+        <Field row label="Paid to (company)" value={payee} onChangeText={setPayee} placeholder="Company on the contract" autoCapitalize="words" />
+        <Field row label="Amount ($)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="12500" />
+        <Field row label="Date (YYYY-MM-DD)" value={date} onChangeText={setDate} placeholder="2026-05-01" />
       </View>
       <Label>Phase</Label>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
