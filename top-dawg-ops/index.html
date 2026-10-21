@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Top Dawg Ops</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<!-- ============ HUD ============ -->
+<div id="hud" class="hidden">
+  <div id="vignette"></div>
+  <div id="hitflash"></div>
+  <div id="armorflash"></div>
+  <div id="overdrive" class="hidden"></div>
+  <div id="glint"></div>
+  <div id="scope" class="hidden"><div class="scope-ring"></div></div>
+
+  <div id="crosshair"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="c"></i></div>
+  <div id="reticle" class="reticle hidden"></div>
+  <div id="hitmarker" class="hitmarker"><i></i><i></i><i></i><i></i></div>
+  <div id="dmgdirs"></div>
+  <div id="nadewarn" class="hidden">💣</div>
+
+  <div id="topleft">
+    <canvas id="minimap" width="190" height="190"></canvas>
+    <div id="waveinfo"><span>WAVE</span><b id="wave">0</b><small id="enemiesleft"></small></div>
+    <div id="contract" class="hidden"><b id="ctitle"></b><span id="ctext"></span></div>
+  </div>
+
+  <div id="killfeed"></div>
+  <div id="xppops"></div>
+  <div id="toasts"></div>
+  <div id="banner"></div>
+  <div id="prompt" class="hidden"></div>
+  <div id="pickups"></div>
+  <div id="platebar" class="cbar"><i></i><span>Applying plate</span></div>
+  <div id="reloadbar" class="cbar"><i></i><span>Reloading</span></div>
+  <div id="reloadhint" class="hidden">R  RELOAD</div>
+
+  <div id="bottomleft">
+    <div id="streak">
+      <div class="sn"><b id="streaknum">0</b><span>STREAK</span></div>
+      <div><small id="streaknext"></small><small id="streakluck" class="luck"></small></div>
+    </div>
+    <div id="streakbar"></div>
+    <div id="vitals">
+      <div class="armor"><div class="ap"><i id="ap0"></i></div><div class="ap"><i id="ap1"></i></div><div class="ap"><i id="ap2"></i></div></div>
+      <div class="hp"><i id="hpfill"></i></div>
+      <div class="inv"><span title="Armor plates (F)">▣ <b id="plates">0</b></span><span title="Frag grenades (G)">● <b id="nades">0</b></span><span title="Self-revive kits">✚ <b id="revives">0</b></span></div>
+    </div>
+  </div>
+
+  <div id="bottomright">
+    <div id="wname"></div>
+    <div id="wrarity"></div>
+    <div class="ammoline"><b id="ammo">0</b><span>/</span><span id="reserve">0</span></div>
+    <div id="wother"></div>
+  </div>
+
+  <div id="downed" class="hidden"><b>DOWNED</b><span id="downedt"></span></div>
+</div>
+
+<!-- ============ MENUS ============ -->
+<div id="menus">
+  <section id="mainmenu" class="screen">
+    <div class="brand">
+      <div class="logo">TOP DAWG <span>OPS</span></div>
+      <div class="tag">Solo wave survival · loot-driven gunsmithing</div>
+      <div class="touchnote">Top Dawg Ops needs a keyboard and mouse. Open it on a desktop browser to play.</div>
+    </div>
+    <div class="mainwrap">
+      <nav class="mainnav">
+        <button class="primary" data-act="deploy">Deploy</button>
+        <button data-act="loadout">Loadout</button>
+        <button data-act="armory">Armory</button>
+        <button data-act="challenges">Challenges</button>
+        <button data-act="settings">Settings</button>
+        <button data-act="howto">How to play</button>
+      </nav>
+      <aside class="mainside">
+        <div id="mainrank"></div>
+        <div class="diff">
+          <small>DIFFICULTY</small>
+          <div class="seg"><button data-diff="recruit">Recruit</button><button data-diff="regular">Regular</button><button data-diff="veteran">Veteran</button></div>
+        </div>
+        <div id="mainloadout"></div>
+        <p id="mainstats" class="hint"></p>
+      </aside>
+    </div>
+  </section>
+
+  <section id="loadout" class="screen hidden">
+    <header><h2>Loadout</h2><div class="seg"><button data-loslot="primary">Primary</button><button data-loslot="secondary">Secondary</button></div><button data-act="main" class="back">Back</button></header>
+    <div class="lo-grid">
+      <div id="lo-weapons" class="lo-col"></div>
+      <div class="lo-col"><div id="lo-detail"></div><div id="lo-atts"></div></div>
+      <div id="lo-picker" class="lo-col"></div>
+    </div>
+  </section>
+
+  <section id="armory" class="screen hidden">
+    <header><h2>Armory</h2><span id="armoryhead" class="hint"></span><button data-act="main" class="back">Back</button></header>
+    <div class="seg filters">
+      <button data-afilter="all">All</button><button data-afilter="optic">Optics</button><button data-afilter="muzzle">Muzzles</button><button data-afilter="barrel">Barrels</button>
+      <button data-afilter="underbarrel">Underbarrels</button><button data-afilter="magazine">Magazines</button><button data-afilter="stock">Stocks</button>
+    </div>
+    <div class="armory-grid">
+      <div id="armorylist" class="scroll"></div>
+      <div><h4>Weapon blueprints</h4><p class="hint">Weapon rarity raises base damage and reload speed. Find a higher-rarity gun in the field or spend Salvage.</p><div id="armoryweapons"></div></div>
+    </div>
+  </section>
+
+  <section id="challenges" class="screen hidden">
+    <header><h2>Challenges</h2><span class="hint">Progress carries across every deployment. Rewards are granted the moment a tier completes.</span><button data-act="main" class="back">Back</button></header>
+    <div class="chal-grid">
+      <div id="challist" class="scroll"></div>
+      <div><h4>Weapon camos</h4><div id="camolist" class="scroll"></div></div>
+    </div>
+  </section>
+
+  <section id="settings" class="screen hidden">
+    <header><h2>Settings</h2><button id="settingsback" data-act="settings-back" class="back">Back</button></header>
+    <div class="settings">
+      <label>Mouse sensitivity <b id="lbl-sens"></b><input id="set-sens" type="range" min="0.1" max="3" step="0.05"></label>
+      <label>ADS sensitivity multiplier <b id="lbl-adssens"></b><input id="set-adssens" type="range" min="0.3" max="1.5" step="0.05"></label>
+      <label>Field of view (horizontal) <b id="lbl-fov"></b><input id="set-fov" type="range" min="75" max="120" step="1"></label>
+      <label>Volume <b id="lbl-vol"></b><input id="set-vol" type="range" min="0" max="1" step="0.05"></label>
+      <label class="check"><input id="set-dmg" type="checkbox"> Damage numbers</label>
+      <label class="check"><input id="set-shadows" type="checkbox"> Shadows</label>
+      <label class="check"><input id="set-invert" type="checkbox"> Invert Y axis</label>
+      <button data-act="reset" class="danger">Reset all progress</button>
+    </div>
+  </section>
+
+  <section id="howto" class="screen hidden">
+    <header><h2>How to play</h2><button data-act="main" class="back">Back</button></header>
+    <div class="howto">
+      <div>
+        <h4>Controls</h4>
+        <table>
+          <tr><td>WASD</td><td>Move</td></tr><tr><td>Mouse</td><td>Look · Left fire · Right aim down sights</td></tr>
+          <tr><td>Shift</td><td>Sprint</td></tr><tr><td>C</td><td>Crouch · while sprinting: slide</td></tr>
+          <tr><td>Space</td><td>Jump (cancels a slide)</td></tr><tr><td>R</td><td>Reload</td></tr>
+          <tr><td>1 / 2 · Q · Wheel</td><td>Switch weapon</td></tr><tr><td>V</td><td>Melee</td></tr>
+          <tr><td>G</td><td>Frag grenade</td></tr><tr><td>F</td><td>Insert armor plate (hold to chain)</td></tr>
+          <tr><td>E</td><td>Pick up gear · hold to open crates</td></tr><tr><td>3 – 7</td><td>Call in kill streak rewards</td></tr>
+          <tr><td>Tab</td><td>Inventory: swap attachments</td></tr><tr><td>Enter</td><td>Skip the break between waves</td></tr>
+          <tr><td>Esc</td><td>Pause</td></tr>
+        </table>
+      </div>
+      <div>
+        <h4>The loop</h4>
+        <p><b>Survive waves.</b> Hostiles push in from the edges of the compound. Every 5th wave brings a Juggernaut. HVT Commanders (gold diamond) carry guaranteed Epic+ loot.</p>
+        <p><b>Chain kills.</b> Every kill without going down adds to your streak. At 3, 6, 9, 13 and 18 kills you earn UAV, Airstrike, Sentry Gun, Overdrive and Hellstorm. Every 5 kills you pick one of three <b>Field Upgrades</b> that stay on your gun for the run. Longer streaks also boost loot luck.</p>
+        <p><b>Loot everything.</b> Enemies drop ammo, plates and gear. Hold E on supply crates. After each wave a supply drop lands under red smoke. Better-rarity attachments auto-equip; the rest go in your bag (Tab).</p>
+        <p><b>Keep what you find.</b> All attachments you pick up are secured to your Armory when the run ends. Any gun you find unlocks that weapon and its rarity blueprint. Salvage upgrades attachment and weapon rarity.</p>
+        <p><b>Challenges</b> unlock new weapons and pay out gear. Weapon kills level up mastery (bonus damage) and unlock camos.</p>
+        <p>Health regenerates after a few seconds out of fire. Armor plates soak damage first. Going down uses a self-revive kit and ends your streak. With no kits left, the run ends.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="pause" class="screen hidden">
+    <div class="center-card">
+      <h2>Paused</h2>
+      <p id="pausestats" class="hint"></p>
+      <button class="primary" data-act="resume">Resume</button>
+      <button data-act="pause-settings">Settings</button>
+      <button data-act="quit">End run &amp; secure loot</button>
+    </div>
+  </section>
+
+  <section id="inventory" class="screen hidden">
+    <header><h2>Inventory</h2><span id="inv-sum" class="hint"></span><button data-act="resume" class="back">Resume (Tab)</button></header>
+    <div class="inv-grid">
+      <div id="inv-weapons"></div>
+      <div><h4>Bag</h4><div id="inv-bag" class="scroll"></div></div>
+    </div>
+  </section>
+
+  <section id="fieldupgrade" class="screen hidden">
+    <div class="center-card wide">
+      <small class="kicker">KILL STREAK · FIELD UPGRADE</small>
+      <h2>Choose an upgrade</h2>
+      <p id="fu-weapon" class="hint"></p>
+      <div id="fu-choices"></div>
+      <p class="hint">Press 1, 2 or 3</p>
+    </div>
+  </section>
+
+  <section id="summary" class="screen hidden">
+    <div class="center-card wide">
+      <small class="kicker">AFTER ACTION REPORT</small>
+      <h2 id="sum-title">K.I.A.</h2>
+      <div id="sum-stats" class="sumstats"></div>
+      <h4>Loot secured</h4>
+      <div id="sum-loot" class="sumloot"></div>
+      <h4>Challenges</h4>
+      <div id="sum-chal" class="sumchal"></div>
+      <div id="sum-rank"></div>
+      <div class="row"><button class="primary" data-act="deploy">Redeploy</button><button data-act="loadout">Loadout</button><button data-act="main">Main menu</button></div>
+    </div>
+  </section>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/save.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/world.js"></script>
+<script src="js/fx.js"></script>
+<script src="js/weapons.js"></script>
+<script src="js/player.js"></script>
+<script src="js/enemies.js"></script>
+<script src="js/loot.js"></script>
+<script src="js/hud.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
