@@ -2,7 +2,10 @@
 
 A solo, browser-based 3D shooter. The gunplay is modeled on Call of Duty: fast time-to-kill, snappy aim-down-sights, sprint, slide, hitmarkers and kill streaks. The progression borrows from Battlefield: loot, attachments and tiered challenges. You defend a walled compound against waves of AI soldiers, and your guns get stronger from kill streaks and from the gear you find.
 
-Open `index.html` in a desktop browser (Chrome, Edge or Firefox). There is no build step. Three.js r149 is vendored in `vendor/`. Click **Deploy** to capture the mouse, and press Esc to pause.
+Open `index.html` in a browser. There is no build step. Three.js r149 is vendored in `vendor/`.
+
+- **Desktop:** click **Deploy** to capture the mouse, and press Esc to pause. If the page can't capture the mouse (some embedded views block it), free look turns on: move the mouse to aim, and hold the cursor at the left or right edge to keep turning.
+- **Phones and tablets:** on-screen touch controls appear, with a move stick on the left, swipe to look on the right, action buttons and light aim assist. Play in landscape.
 
 ## Controls
 

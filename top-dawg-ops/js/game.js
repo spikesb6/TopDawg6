@@ -18,8 +18,14 @@ const Game = (() => {
 
   // ---------- Setup ----------
   function init() {
+    if (Touch.detect()) {
+      Input.touch = true;
+      document.body.classList.add('touch');
+      // Phones: start with shadows off for frame rate (players can turn them back on).
+      if (!SAVE.settings.touchTuned) { SAVE.settings.touchTuned = true; SAVE.settings.shadows = false; SAVE.settings.fov = 90; persist(); }
+    }
     renderer = new THREE.WebGLRenderer({ canvas: $('game'), antialias: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, Input.touch ? 1 : 1.5));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = SAVE.settings.shadows;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -55,6 +61,7 @@ const Game = (() => {
     Player.init(G.camera, vmCamera, vmScene);
     HUD.init();
     Menu.bind();
+    Touch.init();
     buildKillstreakBar();
 
     geoNade = new THREE.SphereGeometry(0.09, 8, 6);
@@ -70,7 +77,7 @@ const Game = (() => {
     window.addEventListener('resize', onResize);
     $('game').addEventListener('click', () => {
       if (G.state === 'paused') resume();
-      else if (G.state === 'playing' && !document.pointerLockElement) lockPointer();
+      else if (G.state === 'playing' && !document.pointerLockElement && !Input.touch) lockPointer();
     });
     document.addEventListener('pointerlockerror', onLockFailed);
     // Idle camera for the menu backdrop
@@ -121,6 +128,7 @@ const Game = (() => {
     spawnCrates(3);
     Menu.screen(null);
     HUD.show(true);
+    Touch.show(Input.touch);
     G.state = 'playing';
     HUD.banner('OPERATION TOP DAWG', 'Hold the compound. Loot everything. First wave inbound.', '#ffb627');
     lockPointer();
@@ -128,19 +136,35 @@ const Game = (() => {
 
   function lockPointer() {
     if (TEST) { Input.locked = true; return; }
+    if (Input.touch) return;
     const c = $('game');
     try {
       const p = c.requestPointerLock();
       if (p && p.catch) p.catch(onLockFailed);
     } catch (e) { onLockFailed(); }
+    // Some embedded views ignore the request without reporting an error.
+    setTimeout(() => { if (!document.pointerLockElement) onLockFailed(); }, 800);
   }
 
-  // Browsers refuse a re-lock for a moment after Esc; fall back to the pause screen.
+  // Mouse capture was refused (embedded view, or too soon after Esc): keep playing with free look.
+  let freeLookTold = false;
   function onLockFailed() {
+    if (G.state !== 'playing' || document.pointerLockElement || Input.freeLook) return;
+    Input.freeLook = true;
+    document.body.classList.add('freelook');
+    if (!freeLookTold) {
+      freeLookTold = true;
+      HUD.toast('Mouse capture is blocked here, so free look is on.<br><small>Move the mouse to aim. Hold the cursor at the left or right edge to keep turning. Esc pauses.</small>', '#ffb627', true);
+    }
+  }
+
+  function pause() {
     if (G.state !== 'playing') return;
     G.state = 'paused';
+    Input.mouse.left = Input.mouse.right = false;
+    if (!TEST && document.pointerLockElement) document.exitPointerLock();
     Menu.screen('pause');
-    $('pausestats').innerHTML = pauseText() + '<br>Click Resume to take back mouse control.';
+    $('pausestats').innerHTML = pauseText();
   }
 
   function onPointerUnlock() {
@@ -181,6 +205,9 @@ const Game = (() => {
     persist();
     if (!TEST && document.pointerLockElement) document.exitPointerLock();
     HUD.show(false);
+    Touch.show(false);
+    Input.freeLook = false;
+    document.body.classList.remove('freelook');
     Menu.summary({ ...r, wave: G.wave, shots: Player.P.shotsFired, hits: Player.P.shotsHit, quit: quitting });
     G.run = null;
   }
@@ -679,7 +706,7 @@ const Game = (() => {
   }
 
   return Object.assign(G, {
-    init, start, resume, quit, gameOver, onPointerUnlock, applySettings, onKill, onPlayerDowned, onCrateOpened,
+    init, start, resume, quit, pause, gameOver, onPointerUnlock, applySettings, onKill, onPlayerDowned, onCrateOpened,
     playerFired, stat, statMax, chooseUpgrade, useStreak, spawnGrenade, explode, nearestEnemyGrenade, enemiesRemaining, startWave,
   });
 })();

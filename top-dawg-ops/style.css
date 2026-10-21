@@ -292,5 +292,63 @@ header .back { margin-left: auto; }
   #fu-choices, .sumstats { grid-template-columns: 1fr 1fr; }
 }
 
-.touchnote { display: none; color: var(--accent); font-size: 14px; margin-top: 10px; }
-@media (pointer: coarse) { .touchnote { display: block; } }
+
+/* ================= Layers ================= */
+#hud { z-index: 6; }
+#touch { position: fixed; inset: 0; z-index: 5; touch-action: none; -webkit-touch-callout: none; }
+#menus { z-index: 10; }
+body.freelook #game { cursor: none; }
+
+/* ================= Touch controls ================= */
+.touchnote { display: none; color: var(--accent); font-size: 14px; margin-top: 10px; max-width: 520px; line-height: 1.5; }
+body.touch .touchnote { display: block; }
+#t-stick { position: absolute; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: rgba(0,0,0,.18); pointer-events: none; }
+#t-stick i { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.55); transform: translate(-50%,-50%); }
+#t-stick.sprint { border-color: var(--accent); }
+#t-stick.sprint i { background: var(--accent); }
+.tbtn { position: absolute; width: 54px; height: 54px; border-radius: 50%; border: 2px solid rgba(255,255,255,.35); background: rgba(10,14,12,.38); color: var(--text); font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: .5px; padding: 0; touch-action: none; -webkit-tap-highlight-color: transparent; }
+.tbtn.on { background: rgba(255,182,39,.45); border-color: var(--accent); }
+.tbtn.lit { border-color: var(--accent); color: var(--accent); }
+#t-fire { width: 84px; height: 84px; font-size: 15px; right: max(24px, calc(env(safe-area-inset-right, 0px) + 12px)); bottom: max(28px, calc(env(safe-area-inset-bottom, 0px) + 16px)); border-color: rgba(255,90,79,.7); background: rgba(120,20,15,.35); }
+#t-ads { width: 64px; height: 64px; right: max(122px, calc(env(safe-area-inset-right, 0px) + 110px)); bottom: max(22px, calc(env(safe-area-inset-bottom, 0px) + 10px)); }
+#t-jump { right: max(28px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: 128px; }
+#t-crouch { right: max(96px, calc(env(safe-area-inset-right, 0px) + 84px)); bottom: 104px; }
+#t-reload { right: max(164px, calc(env(safe-area-inset-right, 0px) + 152px)); bottom: 96px; }
+#t-swap { right: max(28px, calc(env(safe-area-inset-right, 0px) + 16px)); bottom: 192px; }
+#t-use { right: max(196px, calc(env(safe-area-inset-right, 0px) + 184px)); bottom: 28px; width: 60px; height: 60px; border-color: rgba(79,209,106,.6); }
+#t-nade { right: max(96px, calc(env(safe-area-inset-right, 0px) + 84px)); bottom: 168px; }
+#t-plate { right: max(164px, calc(env(safe-area-inset-right, 0px) + 152px)); bottom: 160px; }
+#t-melee { right: max(232px, calc(env(safe-area-inset-right, 0px) + 220px)); bottom: 104px; }
+#t-bag { left: calc(50% + 28px); top: max(8px, env(safe-area-inset-top, 0px)); width: 46px; height: 40px; border-radius: 20px; }
+#t-skip { left: 50%; top: max(56px, calc(env(safe-area-inset-top, 0px) + 48px)); width: 120px; height: 34px; margin-left: -60px; border-radius: 17px; border-color: var(--accent); color: var(--accent); }
+#t-pause { left: 50%; top: max(8px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; margin-left: -20px; font-size: 13px; }
+#t-rotate { display: none; position: absolute; inset: 0; background: rgba(8,10,9,.94); color: var(--text); font-family: var(--display); font-size: 22px; letter-spacing: 1px; align-items: center; justify-content: center; text-align: center; padding: 24px; }
+@media (orientation: portrait) { #t-rotate { display: flex; } }
+body.touch #streakbar .ks { pointer-events: auto; cursor: pointer; }
+body.touch #killfeed, body.touch #wother, body.touch #reloadhint { display: none; }
+body.touch #bottomright { bottom: auto; top: 58px; right: max(16px, calc(env(safe-area-inset-right, 0px) + 8px)); }
+body.touch #pickups { bottom: auto; top: 150px; }
+body.touch #bottomleft { left: max(16px, calc(env(safe-area-inset-left, 0px) + 8px)); }
+
+/* ================= Short screens (phones in landscape) ================= */
+@media (max-height: 520px) {
+  #topleft { width: 170px; left: 10px; top: 8px; }
+  #minimap { width: 104px; height: 104px; }
+  #waveinfo b { font-size: 22px; }
+  #waveinfo small, #contract { font-size: 12px; }
+  #bottomleft { width: 270px; bottom: 8px; }
+  #streak .sn b { font-size: 24px; }
+  #streak small { font-size: 11px; }
+  .ks { padding: 2px 4px; } .ks b { font-size: 10px; } .ks small { display: none; }
+  #wname { font-size: 16px; } .ammoline b { font-size: 34px; } .ammoline { font-size: 16px; }
+  #banner .bt { font-size: 32px; letter-spacing: 3px; } #banner .bs { font-size: 13px; }
+  .toast { font-size: 14px; } .toast.big { font-size: 17px; }
+  #toasts { top: 14%; }
+  .screen { padding: 14px max(16px, env(safe-area-inset-left, 0px)); }
+  .brand { margin: 1vh 0 2vh; }
+  .logo { font-size: 44px; }
+  .mainnav button { font-size: 17px; padding: 8px 14px; }
+  .center-card { margin: 3vh auto; padding: 16px; }
+  .fu { min-height: 100px; padding: 10px !important; }
+  .fu b { font-size: 17px; }
+}

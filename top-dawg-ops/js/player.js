@@ -6,15 +6,22 @@ const Input = (() => {
   const keys = new Set(), pressed = new Set();
   let mdx = 0, mdy = 0, wheel = 0;
   const mouse = { left: false, right: false, leftPressed: false };
-  let locked = false;
+  // axis: analog movement from the touch joystick (x = strafe, y = forward).
+  const axis = { x: 0, y: 0, sprint: false };
+  // freeLook: mouse capture is blocked (some embedded views), so look with the free cursor.
+  const cursor = { x: 0.5, y: 0.5, inside: false };
+  let locked = false, freeLook = false, touch = false, lastX = null, lastY = null;
+  const looking = () => locked || (freeLook && Game.state === 'playing');
   window.addEventListener('keydown', e => {
     if (['Space', 'Tab', 'KeyF', 'KeyG'].includes(e.code) || (e.code.startsWith('Digit') && Game.state === 'playing')) e.preventDefault();
+    if (e.code === 'Escape' && freeLook && !locked && Game.state === 'playing') Game.pause();
     if (!keys.has(e.code)) pressed.add(e.code);
     keys.add(e.code);
   });
   window.addEventListener('keyup', e => keys.delete(e.code));
   window.addEventListener('blur', () => { keys.clear(); mouse.left = mouse.right = false; });
   window.addEventListener('mousedown', e => {
+    if (touch) return;
     if (e.button === 0) { mouse.left = true; mouse.leftPressed = true; }
     if (e.button === 2) mouse.right = true;
   });
@@ -24,23 +31,45 @@ const Input = (() => {
   });
   window.addEventListener('contextmenu', e => e.preventDefault());
   window.addEventListener('mousemove', e => {
-    if (!locked) return;
-    mdx += e.movementX || 0; mdy += e.movementY || 0;
+    cursor.x = e.clientX / window.innerWidth; cursor.y = e.clientY / window.innerHeight; cursor.inside = true;
+    if (locked) { mdx += e.movementX || 0; mdy += e.movementY || 0; return; }
+    if (freeLook && Game.state === 'playing') {
+      const dx = e.movementX !== undefined ? e.movementX : (lastX === null ? 0 : e.clientX - lastX);
+      const dy = e.movementY !== undefined ? e.movementY : (lastY === null ? 0 : e.clientY - lastY);
+      mdx += dx; mdy += dy;
+    }
+    lastX = e.clientX; lastY = e.clientY;
   });
-  window.addEventListener('wheel', e => { if (locked) wheel += Math.sign(e.deltaY); }, { passive: true });
+  document.addEventListener('mouseleave', () => { cursor.inside = false; });
+  window.addEventListener('wheel', e => { if (looking()) wheel += Math.sign(e.deltaY); }, { passive: true });
   document.addEventListener('pointerlockchange', () => {
     locked = document.pointerLockElement != null;
+    if (locked) { freeLook = false; document.body.classList.remove('freelook'); }
     if (!locked) { mouse.left = mouse.right = false; Game.onPointerUnlock(); }
   });
   return {
-    keys, pressed, mouse,
+    keys, pressed, mouse, axis, cursor,
     down: c => keys.has(c),
     hit: c => pressed.has(c),
+    press(c) { if (!keys.has(c)) pressed.add(c); keys.add(c); },
+    release(c) { keys.delete(c); },
+    addLook(dx, dy) { mdx += dx; mdy += dy; },
     takeMouse() { const r = [mdx, mdy]; mdx = mdy = 0; return r; },
     takeWheel() { const w = wheel; wheel = 0; return w; },
+    // In free-look mode, holding the cursor near the left/right edge keeps turning.
+    edgeTurn() {
+      if (!freeLook || locked || !cursor.inside) return 0;
+      if (cursor.x < 0.07) return -(0.07 - cursor.x) / 0.07;
+      if (cursor.x > 0.93) return (cursor.x - 0.93) / 0.07;
+      return 0;
+    },
     endFrame() { pressed.clear(); mouse.leftPressed = false; },
     get locked() { return locked; },
     set locked(v) { locked = v; },
+    get freeLook() { return freeLook; },
+    set freeLook(v) { freeLook = v; lastX = lastY = null; },
+    get touch() { return touch; },
+    set touch(v) { touch = v; },
   };
 })();
 
@@ -165,23 +194,27 @@ const Player = (() => {
     const adsZoomFov = adsFov(s);
     const fovRatio = lerp(1, adsZoomFov / baseFov(), P.adsT);
     const sens = 0.0022 * set.sens * lerp(1, set.adsSens * fovRatio, P.adsT);
-    P.yaw -= mx * sens;
+    P.yaw -= mx * sens + Input.edgeTurn() * 2.6 * dt * lerp(1, fovRatio, P.adsT);
     P.pitch -= my * sens * (set.invertY ? -1 : 1);
     P.pitch = Math.max(-1.52, Math.min(1.52, P.pitch));
     vmSway.x = lerp(vmSway.x, Math.max(-1, Math.min(1, mx * 0.02)), Math.min(1, dt * 10));
     vmSway.y = lerp(vmSway.y, Math.max(-1, Math.min(1, my * 0.02)), Math.min(1, dt * 10));
 
+    if (Input.touch && (Input.mouse.left || P.adsT > 0.3)) aimAssist(dt);
+
     // Basis
     fwd.set(-Math.sin(P.yaw), 0, -Math.cos(P.yaw));
     right.set(Math.cos(P.yaw), 0, -Math.sin(P.yaw));
 
-    const kF = (Input.down('KeyW') ? 1 : 0) - (Input.down('KeyS') ? 1 : 0);
-    const kR = (Input.down('KeyD') ? 1 : 0) - (Input.down('KeyA') ? 1 : 0);
+    let kF = (Input.down('KeyW') ? 1 : 0) - (Input.down('KeyS') ? 1 : 0);
+    let kR = (Input.down('KeyD') ? 1 : 0) - (Input.down('KeyA') ? 1 : 0);
+    let analog = 1;
+    if (Input.axis.x || Input.axis.y) { kF = Input.axis.y; kR = Input.axis.x; analog = Math.min(1, Math.hypot(kF, kR)); }
     const wantAds = Input.mouse.right && P.plating <= 0 && P.meleeT <= 0;
     const busy = P.plating > 0 || P.throwT > 0 || P.meleeT > 0;
 
     // Sprint: hold Shift while moving forward; ADS or firing cancels.
-    const wantSprint = Input.down('ShiftLeft') && kF > 0 && !wantAds && P.sliding <= 0 && !P.crouching;
+    const wantSprint = (Input.down('ShiftLeft') || Input.axis.sprint) && kF > 0 && !wantAds && P.sliding <= 0 && !P.crouching;
     if (wantSprint && !P.sprinting) P.sprinting = true;
     if (!wantSprint) { if (P.sprinting) P.sprintOut = 0.14; P.sprinting = false; }
     P.sprintOut = Math.max(0, P.sprintOut - dt);
@@ -218,6 +251,7 @@ const Player = (() => {
     else if (P.crouching) speed = 2.7 * s.speed;
     speed *= lerp(1, 0.55, P.adsT);
     if (P.plating > 0) speed *= 0.8;
+    if (P.sliding <= 0) speed *= Math.max(0.35, analog);
     let wx = fwd.x * kF + right.x * kR, wz = fwd.z * kF + right.z * kR;
     const wl = Math.hypot(wx, wz);
     if (wl > 0) { wx /= wl; wz /= wl; }
@@ -338,6 +372,28 @@ const Player = (() => {
       }
     }
     if (!Input.mouse.left) P.recoilHold = 0;
+  }
+
+  // Touch only: gently pull the aim toward a visible enemy that is already close to the crosshair.
+  function aimAssist(dt) {
+    let best = null, bestAng = 0.1;
+    const ex = P.pos.x, ey = P.pos.y + P.eye, ez = P.pos.z;
+    for (const e of Enemies.list) {
+      if (e.dead) continue;
+      const sc = e.type.scale || 1;
+      const dx = e.pos.x - ex, dy = e.pos.y + 1.25 * sc - ey, dz = e.pos.z - ez;
+      const flat = Math.hypot(dx, dz);
+      if (flat > 70) continue;
+      let dyaw = Math.atan2(-dx, -dz) - P.yaw;
+      while (dyaw > Math.PI) dyaw -= Math.PI * 2; while (dyaw < -Math.PI) dyaw += Math.PI * 2;
+      const dpitch = Math.atan2(dy, flat) - P.pitch;
+      const ang = Math.hypot(dyaw, dpitch);
+      if (ang < bestAng) { bestAng = ang; best = { e, dyaw, dpitch, dx, dy, dz }; }
+    }
+    if (!best || !World.lineOfSight(ex, ey, ez, ex + best.dx, ey + best.dy, ez + best.dz)) return;
+    const k = Math.min(1, dt * 4.5);
+    P.yaw += best.dyaw * k;
+    P.pitch += best.dpitch * k;
   }
 
   function startReload(s) {

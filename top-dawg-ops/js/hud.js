@@ -93,6 +93,7 @@ const HUD = (() => {
   function prompt(html, progress) {
     const el = $('prompt');
     if (!html) { if (lastPromptHtml !== null) { el.classList.add('hidden'); lastPromptHtml = null; } return; }
+    if (Input.touch) html = html.replace('<b>E</b>', '<b>USE</b>');
     if (html !== lastPromptHtml) { el.innerHTML = html + '<div class="pbar"><i></i></div>'; lastPromptHtml = html; el.classList.remove('hidden'); }
     el.querySelector('.pbar').style.display = progress !== undefined ? 'block' : 'none';
     if (progress !== undefined) el.querySelector('.pbar i').style.width = (progress * 100) + '%';
@@ -145,7 +146,8 @@ const HUD = (() => {
     }
     // Wave
     $('wave').textContent = Game.wave;
-    $('enemiesleft').textContent = Game.intermission > 0 ? `Next wave in ${Math.ceil(Game.intermission)}s · ENTER to skip` : `${Game.enemiesRemaining()} hostiles remaining`;
+    $('enemiesleft').textContent = Game.intermission > 0 ? `Next wave in ${Math.ceil(Game.intermission)}s${Input.touch ? '' : ' · ENTER to skip'}` : `${Game.enemiesRemaining()} hostiles remaining`;
+    if (Input.touch) $('t-skip').classList.toggle('hidden', !(Game.intermission > 0));
     // Contract
     const c = Game.contract;
     if (c) {
@@ -504,7 +506,11 @@ const Menu = (() => {
       if (act === 'quit') Game.quit();
       if (act === 'pause-settings') settings(true);
       if (act === 'settings-back') { if (t.dataset.back === 'pause') screen('pause'); else main(); }
-      if (act === 'reset') { if (confirm('Erase all progress, loot and unlocks?')) { resetSave(); main(); } }
+      if (act === 'reset') {
+        // Two-step confirm in the page itself (embedded views block confirm()).
+        if (t.dataset.armed) { resetSave(); delete t.dataset.armed; t.textContent = 'Reset all progress'; main(); }
+        else { t.dataset.armed = '1'; t.textContent = 'Click again to erase all progress, loot and unlocks'; setTimeout(() => { if (t.dataset.armed) { delete t.dataset.armed; t.textContent = 'Reset all progress'; } }, 4000); }
+      }
       if (t.dataset.diff) { SAVE.difficulty = t.dataset.diff; persist(); main(); }
       if (t.dataset.loslot) { loadoutSlot = t.dataset.loslot; pickTarget = null; renderLoadout(); }
       if (t.dataset.wid) {
