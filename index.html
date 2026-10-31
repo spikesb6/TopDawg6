@@ -3,652 +3,618 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A0B0F">
 <title>Mani Match</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..700&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap">
 <style>
-/* Layout: a salon swatch-ring hero, then one working "consultation" panel (pick → matched shades with salon codes), then reference sections. */
+/* Layout: a night-black showroom. One lacquer swatch is unveiled each month under a starlit headliner;
+   the collection, library and guide sit behind a quiet coachline navigation. Single dark world by design. */
 :root {
-  --bg: #FAF6F6;          /* porcelain, faint blush bias */
-  --surface: #FFFFFF;
-  --surface-2: #F4ECEE;
-  --ink: #2B1822;         /* plum ink */
-  --muted: #7A6670;
-  --line: #E9DCE0;
-  --accent: #B3124F;      /* lacquer magenta */
-  --accent-soft: #F8DCE6;
-  --on-accent: #FFFFFF;
-  --bare: #EFD9D3;        /* unpainted nail plate */
-  --shadow: 0 1px 2px rgba(43,24,34,.06), 0 8px 24px rgba(43,24,34,.08);
-  --f-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
-  --f-body: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --f-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  --r: 14px;
-  --ease: cubic-bezier(.2,.8,.2,1);
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161014; --surface: #211A1E; --surface-2: #2A2126; --ink: #F7ECEF; --muted: #B7A3AC;
-    --line: #3A2D34; --accent: #F2679A; --accent-soft: #46202F; --on-accent: #1B0D13; --bare: #4A3A41;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #161014; --surface: #211A1E; --surface-2: #2A2126; --ink: #F7ECEF; --muted: #B7A3AC;
-  --line: #3A2D34; --accent: #F2679A; --accent-soft: #46202F; --on-accent: #1B0D13; --bare: #4A3A41;
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+  --night: #0A0B0F;        /* showroom black, faint blue bias */
+  --surface: #111318;
+  --surface-2: #171A21;
+  --ivory: #EEE9DF;        /* text */
+  --muted: #A39E94;
+  --faint: #6F6B64;
+  --line: rgba(238, 233, 223, .12);
+  --line-2: rgba(238, 233, 223, .24);
+  --champagne: #CDB892;    /* coachline accent */
+  --champagne-2: #E4D5B6;
+  --on-champagne: #15120C;
+  --f-display: "Cormorant Garamond", "Didot", "Bodoni 72", Georgia, serif;
+  --f-body: "Jost", "Futura", "Century Gothic", system-ui, sans-serif;
+  --ease: cubic-bezier(.16, 1, .3, 1);
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { -webkit-text-size-adjust: 100%; background: var(--night); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink);
-  font: 16px/1.6 var(--f-body);
-  padding-inline: 16px;
-  overflow-x: clip;
+  margin: 0; background: var(--night); color: var(--ivory);
+  font: 300 16px/1.65 var(--f-body);
+  padding-inline: 16px; overflow-x: clip; min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 1160px; margin: 0 auto; }
-h1, h2, h3 { font-family: var(--f-display); font-weight: 500; line-height: 1.08; text-wrap: balance; margin: 0; }
-h2 { font-size: clamp(1.9rem, 4vw, 2.6rem); }
-h3 { font-size: 1.3rem; }
-p { margin: 0; }
-.eyebrow { font: 600 .74rem/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
-.lede { color: var(--muted); max-width: 60ch; }
+[hidden] { display: none !important; }
+img, svg { max-width: 100%; }
 button { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 1px solid var(--champagne); outline-offset: 4px; }
+::selection { background: var(--champagne); color: var(--on-champagne); }
 
-/* ---------- Top bar ---------- */
-.bar {
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding-block: 18px; border-bottom: 1px solid var(--line);
-}
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--f-display); font-size: 1.45rem; font-style: italic; }
-.brand-dot { width: 14px; height: 20px; border-radius: 7px 7px 3px 3px; background: var(--accent); transition: background .8s; animation: dotBob 3.2s ease-in-out infinite; }
-@keyframes dotBob { 50% { transform: translateY(-2px) rotate(-6deg); } }
-.bar nav { display: flex; gap: 18px; flex-wrap: wrap; }
-.bar nav a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; position: relative; }
-.bar nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px; border-radius: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--ease); }
-.bar nav a:hover { color: var(--ink); }
-.bar nav a:hover::after { transform: scaleX(1); }
-@media (max-width: 720px) { .bar nav { display: none; } }
+#sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .75; }
+.wrap { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; }
 
-/* ---------- Hero ---------- */
-.hero {
-  display: grid; grid-template-columns: 1.1fr .9fr; gap: 32px; align-items: center;
-  padding-block: 48px 24px;
-}
-.hero h1 { font-size: clamp(2.5rem, 6.2vw, 4.5rem); letter-spacing: -.01em; }
-.hero h1 .line { display: block; animation: rise .8s var(--ease) backwards; }
-.hero h1 .line:nth-child(2) { animation-delay: .12s; }
-.rotator { display: inline-grid; font-style: italic; color: var(--accent); transition: color .8s; }
-.rot-word { grid-area: 1 / 1; opacity: 0; transform: translateY(.45em); transition: opacity .55s var(--ease), transform .55s var(--ease); white-space: nowrap; }
-.rot-word.on { opacity: 1; transform: none; }
-.rot-word.off { opacity: 0; transform: translateY(-.45em); }
-.hero .lede { margin-top: 18px; font-size: 1.08rem; animation: rise .8s .24s var(--ease) backwards; }
-.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 28px; animation: rise .8s .34s var(--ease) backwards; }
+h1, h2, h3, h4 { font-family: var(--f-display); font-weight: 300; line-height: 1.04; margin: 0; letter-spacing: -.005em; text-wrap: balance; }
+p { margin: 0; }
+.label { font: 400 .68rem/1.3 var(--f-body); letter-spacing: .32em; text-transform: uppercase; color: var(--champagne); }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.coachline { height: 1px; border: 0; margin: 0; background: linear-gradient(90deg, transparent, var(--champagne) 20%, var(--champagne) 80%, transparent); opacity: .7; }
+.code { font: 400 1.45rem/1.2 var(--f-body); letter-spacing: .16em; font-variant-numeric: tabular-nums; }
+
+/* ---------- Buttons ---------- */
 .btn {
-  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--surface);
-  padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .92rem; cursor: pointer; text-decoration: none; color: var(--ink);
-  transition: transform .2s var(--ease), background .2s, border-color .2s, box-shadow .2s; position: relative; overflow: hidden;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  font: 400 .7rem/1 var(--f-body); letter-spacing: .26em; text-transform: uppercase; text-decoration: none;
+  padding: 17px 26px; border: 1px solid var(--line-2); border-radius: 2px; background: transparent; color: var(--ivory);
+  cursor: pointer; overflow: hidden; transition: border-color .5s var(--ease), color .5s var(--ease), background .5s var(--ease);
 }
-.btn:hover { transform: translateY(-2px); border-color: var(--muted); box-shadow: var(--shadow); }
-.btn:active { transform: translateY(0) scale(.97); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
-.btn.primary::after {
-  content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.35) 50%, transparent 70%);
-  transform: translateX(-100%); animation: sheen 3.6s 1.2s ease-in-out infinite;
+.btn::before { content: ""; position: absolute; inset: 0; background: var(--champagne); opacity: .08; transform: scaleX(0); transform-origin: left; transition: transform .7s var(--ease); }
+.btn:hover { border-color: var(--champagne); }
+.btn:hover::before { transform: scaleX(1); }
+.btn.primary { background: var(--champagne); border-color: var(--champagne); color: var(--on-champagne); }
+.btn.primary::before { background: #fff; opacity: .18; }
+.btn.small { padding: 12px 16px; font-size: .64rem; }
+.btn.link { border: 0; padding: 6px 0; color: var(--muted); }
+.btn.link::before { display: none; }
+.btn.link:hover { color: var(--ivory); }
+.btn > * { position: relative; }
+.icon-btn {
+  width: 50px; height: 50px; flex: none; display: grid; place-items: center; border: 1px solid var(--line-2); border-radius: 2px;
+  background: transparent; cursor: pointer; transition: border-color .4s, transform .3s var(--ease);
 }
-@keyframes sheen { 0%, 60% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-.btn.small { padding: 7px 12px; font-size: .82rem; }
-.hero-stats { display: flex; gap: 28px; margin-top: 34px; flex-wrap: wrap; animation: rise .8s .44s var(--ease) backwards; }
-.hero-stats div { display: grid; gap: 2px; }
-.hero-stats b { font-family: var(--f-display); font-size: 1.7rem; font-weight: 500; font-variant-numeric: tabular-nums; }
-.hero-stats span { font-size: .8rem; color: var(--muted); }
+.icon-btn:hover { border-color: var(--champagne); }
+.icon-btn:active { transform: scale(.94); }
+.icon-btn svg { width: 18px; height: 18px; fill: none; stroke: var(--ivory); stroke-width: 1.4; transition: fill .4s, stroke .4s; }
+.icon-btn[aria-pressed="true"] svg { fill: var(--champagne); stroke: var(--champagne); }
+.icon-btn.beat { animation: beat .5s var(--ease); }
+@keyframes beat { 40% { transform: scale(1.14); } }
 
-.fan-stage { position: relative; width: 100%; max-width: 440px; aspect-ratio: 1 / .78; margin-inline: auto; }
-.aura {
-  position: absolute; inset: 6% 6% 16%; border-radius: 50%; filter: blur(34px); opacity: .5;
-  background: radial-gradient(circle at 30% 45%, var(--a1, #F2D4CD), transparent 62%), radial-gradient(circle at 72% 55%, var(--a2, #B5122B), transparent 60%);
-  animation: breathe 7s ease-in-out infinite alternate;
+/* ---------- Top bar & navigation ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-block: 22px; border-bottom: 1px solid var(--line); }
+.mark { display: flex; align-items: center; gap: 14px; color: var(--ivory); text-decoration: none; font: 400 .78rem/1 var(--f-body); letter-spacing: .44em; text-transform: uppercase; }
+.mark svg { width: 15px; height: 24px; }
+.mark svg path { fill: none; stroke: var(--champagne); stroke-width: 3; }
+.top nav { display: flex; gap: 34px; }
+.top nav a, .tabbar a { color: var(--muted); text-decoration: none; font: 400 .66rem/1 var(--f-body); letter-spacing: .3em; text-transform: uppercase; position: relative; padding-block: 8px; transition: color .4s; }
+.top nav a::after { content: ""; position: absolute; left: 0; right: .3em; bottom: 0; height: 1px; background: var(--champagne); transform: scaleX(0); transition: transform .6s var(--ease); }
+.top nav a:hover, .top nav a.active { color: var(--ivory); }
+.top nav a.active::after { transform: scaleX(1); }
+.monogram {
+  width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line-2); background: transparent; cursor: pointer;
+  font: italic 400 1.25rem/1 var(--f-display); color: var(--champagne); display: grid; place-items: center; transition: border-color .4s;
 }
-@keyframes breathe { from { transform: scale(.92) rotate(-6deg); } to { transform: scale(1.06) rotate(6deg); } }
-.fan { position: absolute; inset: 0; transform-origin: 50% 92%; animation: sway 7s ease-in-out infinite alternate; }
-.stick {
-  position: absolute; left: 50%; bottom: 8%; width: 13%; height: 80%; margin-left: -6.5%;
-  transform-origin: 50% 100%; transform: rotate(var(--a));
-  animation: fanOut 1.3s var(--ease) both; animation-delay: calc(var(--i) * 70ms);
-  display: flex; flex-direction: column; align-items: center;
-}
-.stick .tip {
-  width: 100%; aspect-ratio: 1 / 1.45; border-radius: 50% 50% 18% 18% / 42% 42% 14% 14%;
-  background: var(--c); box-shadow: inset 0 -6px 10px rgba(0,0,0,.12), 0 6px 14px rgba(43,24,34,.18);
-  position: relative; overflow: hidden; transition: background .8s ease;
-}
-.stick .tip::after {
-  content: ""; position: absolute; top: 10%; left: 16%; width: 22%; height: 58%; border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,.65), rgba(255,255,255,0)); filter: blur(.5px);
-}
-.stick .tip.pop { animation: tipPop .7s var(--ease); animation-delay: calc(var(--i) * 45ms); }
-@keyframes tipPop { 40% { transform: translateY(-9%) scale(1.07); } }
-.stick .rod { flex: 1; width: 9%; background: linear-gradient(90deg, var(--line), var(--surface), var(--line)); border-radius: 0 0 4px 4px; }
-.hub {
-  position: absolute; left: 50%; bottom: 4%; width: 11%; aspect-ratio: 1; transform: translateX(-50%);
-  border-radius: 50%; background: var(--surface); border: 3px solid var(--line); box-shadow: var(--shadow);
-}
-.fan-label {
-  position: absolute; right: 0; top: 4%; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-  padding: 10px 14px; box-shadow: var(--shadow); font-size: .78rem; max-width: 62%;
-  animation: rise .8s .9s var(--ease) backwards; transition: transform .3s var(--ease);
-}
-.fan-label.bump { animation: labelBump .5s var(--ease); }
-@keyframes labelBump { 40% { transform: translateY(-4px) scale(1.03); } }
-.fan-label b { display: block; font-family: var(--f-display); font-size: 1.05rem; font-weight: 500; line-height: 1.2; }
-.fan-label .mono { color: var(--accent); }
-@keyframes fanOut { from { transform: rotate(0deg); } to { transform: rotate(var(--a)); } }
-@keyframes sway { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
-@media (max-width: 860px) {
-  .hero { grid-template-columns: 1fr; padding-block: 32px 8px; }
-  .fan-stage { max-width: 340px; }
+.monogram:hover { border-color: var(--champagne); }
+.tabbar { display: none; }
+@media (max-width: 760px) {
+  .top nav { display: none; }
+  .tabbar {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    background: rgba(10, 11, 15, .9); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-top: 1px solid var(--line);
+    padding: 6px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  }
+  .tabbar a { display: grid; justify-items: center; gap: 6px; font-size: .56rem; letter-spacing: .2em; padding-block: 8px; }
+  .tabbar a svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.3; }
+  .tabbar a.active { color: var(--champagne); }
+  body { padding-bottom: 92px; }
 }
 
-/* ---------- Shared motion ---------- */
-@keyframes rise { from { opacity: .001; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes riseSoft { from { opacity: .25; transform: translateY(22px); } to { opacity: 1; transform: none; } }
-.reveal.pending > * { opacity: .25; transform: translateY(22px); }
-.reveal.in > * { animation: riseSoft .65s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 50ms); }
+/* ---------- Views & motion ---------- */
+.view { padding-block: 48px 96px; }
+.view.enter > * { animation: rise 1.1s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 90ms); }
+@keyframes rise { from { opacity: .001; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: .001; } }
+.section-head { display: grid; gap: 14px; margin-bottom: 36px; max-width: 640px; }
+.section-head h2 { font-size: clamp(2.4rem, 5.4vw, 3.8rem); }
+.section-head p:not(.label) { color: var(--muted); }
 
-/* ---------- Consultation panel ---------- */
-section { padding-block: 56px; scroll-margin-top: 12px; }
-.section-head { display: grid; gap: 10px; margin-bottom: 28px; }
-.consult {
-  background: var(--surface); border: 1px solid var(--line); border-radius: 24px; box-shadow: var(--shadow);
-  padding: clamp(18px, 3vw, 32px); display: grid; gap: 28px;
+/* ---------- The stage: lacquer under light ---------- */
+.stage {
+  --rx: 0deg; --ry: 0deg;
+  position: relative; width: 100%; max-width: 460px; aspect-ratio: 4 / 5; margin-inline: auto; overflow: hidden;
+  border: 1px solid var(--line); perspective: 900px; isolation: isolate;
+  background: radial-gradient(120% 75% at 50% 8%, color-mix(in srgb, var(--c) 34%, #0A0B0F) 0%, #08090C 72%);
 }
-.pickers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 32px; }
-@media (max-width: 760px) { .pickers { grid-template-columns: 1fr; } }
-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
-legend { font-weight: 700; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; padding: 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.stage .halo { position: absolute; inset: 18% 12% 22%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 55%, transparent), transparent); filter: blur(28px); opacity: .55; animation: breathe 9s ease-in-out infinite alternate; }
+@keyframes breathe { to { transform: scale(1.08); opacity: .7; } }
+.stage .plinth { position: absolute; left: 22%; right: 22%; bottom: 13%; height: 7%; border-radius: 50%; background: radial-gradient(closest-side, rgba(0,0,0,.75), transparent); }
+.stage .lacquer { position: absolute; inset: 0; display: grid; place-items: center; transform: rotateX(var(--rx)) rotateY(var(--ry)); transition: transform .9s var(--ease); transform-style: preserve-3d; }
+.stage .lacquer svg { width: 34%; height: auto; filter: drop-shadow(0 26px 30px rgba(0,0,0,.55)); animation: float 7s ease-in-out infinite alternate; }
+@keyframes float { from { transform: translateY(-1.5%); } to { transform: translateY(1.5%); } }
+.stage .sheen {
+  position: absolute; inset: -30%; pointer-events: none; mix-blend-mode: screen;
+  background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,.16) 49%, rgba(255,255,255,.04) 53%, transparent 58%);
+  animation: sheen 8s var(--ease) infinite; transform: translateX(-60%);
+}
+@keyframes sheen { 0%, 35% { transform: translateX(-60%); } 75%, 100% { transform: translateX(60%); } }
+.stage.sparkle::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: .45;
+  background-image: radial-gradient(circle, rgba(255,255,255,.95) 0 .7px, transparent 1.3px), radial-gradient(circle, rgba(255,255,255,.7) 0 .6px, transparent 1.2px), radial-gradient(circle, rgba(255,240,215,.8) 0 .9px, transparent 1.5px);
+  background-size: 31px 23px, 47px 41px, 67px 59px; background-position: 0 0, 17px 11px, 29px 37px; animation: twinkle 5s linear infinite;
+  -webkit-mask-image: radial-gradient(42% 38% at 50% 52%, #000 30%, transparent 100%); mask-image: radial-gradient(42% 38% at 50% 52%, #000 30%, transparent 100%);
+}
+@keyframes twinkle { 50% { opacity: .12; background-position: 5px 3px, 7px 15px; } }
+.stage .drape {
+  position: absolute; inset: -2px; z-index: 3; display: grid; place-items: center; text-align: center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.05), transparent 30%, rgba(0,0,0,.35)),
+    repeating-linear-gradient(98deg, #16181F 0 7%, #262A33 10%, #1A1D24 13%, #111318 18%);
+  box-shadow: inset 0 -40px 60px rgba(0,0,0,.55);
+  transition: transform 2.2s var(--ease), opacity 2.2s var(--ease);
+}
+.stage .drape::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--champagne); opacity: .7; }
+.drape-text { display: grid; gap: 14px; padding: 24px; transition: opacity .6s; }
+.drape-text b { font: italic 300 clamp(1.8rem, 5vw, 2.6rem)/1.1 var(--f-display); color: var(--ivory); }
+.stage.unveiled .drape { transform: translateY(-102%); }
+.stage.unveiled .drape-text { opacity: 0; }
+.stage.instant .drape { transition: none; }
+.stage.small { aspect-ratio: 1 / 1; max-width: none; }
+.stage.small .lacquer svg { width: 30%; }
+
+/* ---------- Welcome ---------- */
+.welcome { display: grid; grid-template-columns: 1.15fr .85fr; gap: 56px; align-items: center; }
+.welcome h1 { font-size: clamp(3rem, 7.6vw, 6rem); margin-top: 22px; }
+.welcome h1 em { font-style: italic; color: var(--champagne-2); }
+.welcome .lede { margin-top: 26px; max-width: 46ch; color: var(--muted); font-size: 1.06rem; }
+.welcome .cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 38px; }
+.promises { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 56px; padding-top: 26px; border-top: 1px solid var(--line); }
+.promises b { display: block; font: 400 1.3rem/1.2 var(--f-display); margin-top: 8px; }
+.promises span { font-size: .84rem; color: var(--muted); }
+.welcome-stage figcaption { margin-top: 16px; text-align: center; font-size: .82rem; color: var(--muted); }
+@media (max-width: 860px) { .welcome { grid-template-columns: 1fr; gap: 40px; } .welcome-stage .stage { max-width: 340px; } }
+@media (max-width: 560px) { .promises { grid-template-columns: 1fr; } }
+
+/* ---------- Consultation ---------- */
+.consult { max-width: 860px; margin: 0 auto; }
+.consult-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+.progress { height: 1px; background: var(--line); position: relative; margin-bottom: 52px; }
+.progress::after { content: ""; position: absolute; inset: 0 auto 0 0; width: calc(var(--p, 0) * 100%); background: var(--champagne); transition: width 1s var(--ease); }
+#cBody { min-height: 380px; }
+#cBody.next { animation: stepNext .8s var(--ease); }
+#cBody.prev { animation: stepPrev .8s var(--ease); }
+@keyframes stepNext { from { opacity: .001; transform: translateX(28px); } }
+@keyframes stepPrev { from { opacity: .001; transform: translateX(-28px); } }
+#cBody h2 { font-size: clamp(2.3rem, 6vw, 3.8rem); }
+#cBody .sub { color: var(--muted); margin-top: 14px; max-width: 52ch; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 36px; }
+.opt {
+  position: relative; text-align: left; display: grid; gap: 8px; align-content: start; padding: 22px 22px 24px; cursor: pointer;
+  background: rgba(17, 19, 24, .78); border: 1px solid var(--line); border-radius: 2px;
+  transition: border-color .5s var(--ease), background .5s var(--ease), transform .5s var(--ease);
+}
+.opt:hover { border-color: var(--line-2); transform: translateY(-2px); }
+.opt b { font: 400 1.55rem/1.1 var(--f-display); }
+.opt span { font-size: .86rem; color: var(--muted); }
+.opt::after { content: ""; position: absolute; top: 18px; right: 18px; width: 7px; height: 7px; border-radius: 50%; border: 1px solid var(--line-2); transition: background .4s, border-color .4s; }
+.opt.on { border-color: var(--champagne); background: linear-gradient(180deg, rgba(205, 184, 146, .1), rgba(17, 19, 24, .78)); }
+.opt.on::after { background: var(--champagne); border-color: var(--champagne); }
+.field { margin-top: 40px; max-width: 520px; }
+.field input {
+  width: 100%; background: transparent; border: 0; border-bottom: 1px solid var(--line-2); border-radius: 0; color: var(--ivory);
+  font: italic 300 clamp(2rem, 6vw, 3rem)/1.3 var(--f-display); padding: 8px 0; transition: border-color .5s;
+}
+.field input::placeholder { color: var(--faint); }
+.field input:focus { outline: none; border-color: var(--champagne); }
+.consult-nav { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line); }
+
+/* ---------- The Edition ---------- */
+.ed-head { display: grid; gap: 12px; margin-bottom: 44px; }
+.ed-meta { display: flex; flex-wrap: wrap; gap: 10px 28px; align-items: baseline; }
+.ed-head h1 { font-size: clamp(3.2rem, 9vw, 7rem); font-style: italic; }
+.ed-head .story { color: var(--muted); max-width: 54ch; font-size: 1.04rem; }
+.personalize { display: inline-flex; align-items: center; gap: 10px; color: var(--champagne); text-decoration: none; font-size: .9rem; border-bottom: 1px solid rgba(205,184,146,.35); padding-bottom: 2px; width: fit-content; }
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 56px; align-items: center; transition: opacity .5s var(--ease), transform .5s var(--ease); }
+.hero.swap { opacity: .08; transform: translateY(10px); }
+.details { display: grid; gap: 22px; min-width: 0; }
+.shade-name { font-size: clamp(2.8rem, 6.6vw, 5.2rem); font-style: italic; overflow-wrap: anywhere; }
+.brandline { color: var(--muted); font-size: .95rem; letter-spacing: .02em; }
+.code-block { display: grid; gap: 8px; padding-block: 18px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.code-block .byname { font: italic 400 1.45rem/1.2 var(--f-display); letter-spacing: 0; }
+.check-tag { color: var(--champagne); font-size: .76rem; letter-spacing: .04em; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 18px; margin: 0; }
+.facts div { display: grid; gap: 6px; min-width: 0; }
+.facts dt { font: 400 .62rem/1.2 var(--f-body); letter-spacing: .28em; text-transform: uppercase; color: var(--faint); }
+.facts dd { margin: 0; font: 400 1.25rem/1.2 var(--f-display); }
+.facts dd small { display: block; font: 300 .76rem/1.3 var(--f-body); color: var(--muted); margin-top: 3px; }
+.note { font: italic 300 1.28rem/1.5 var(--f-display); color: var(--ivory); opacity: .9; max-width: 44ch; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.replay { justify-self: center; margin-top: 14px; }
+.occasion { margin-top: 72px; display: grid; gap: 18px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
 .chip { position: relative; }
-.chip input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.chip input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
 .chip span {
-  display: inline-flex; align-items: center; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); font-size: .9rem; font-weight: 500; white-space: nowrap;
-  transition: background .25s, color .25s, border-color .25s, transform .15s var(--ease);
+  display: inline-flex; align-items: center; gap: 9px; padding: 11px 18px; border: 1px solid var(--line); border-radius: 999px;
+  font-size: .86rem; color: var(--muted); white-space: nowrap; transition: border-color .5s var(--ease), color .5s var(--ease);
 }
-.chip span::before {
-  content: ""; width: 0; height: 8px; margin-right: 0; border-radius: 50%; background: var(--accent);
-  transition: width .25s var(--ease), margin .25s var(--ease);
+.chip span::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--champagne); transform: scale(0); transition: transform .5s var(--ease); }
+.chip input:hover + span { border-color: var(--line-2); color: var(--ivory); }
+.chip input:checked + span { border-color: var(--champagne); color: var(--ivory); }
+.chip input:checked + span::before { transform: scale(1); }
+.chip input:focus-visible + span { outline: 1px solid var(--champagne); outline-offset: 3px; }
+.alts-head { margin-top: 84px; display: grid; gap: 10px; margin-bottom: 26px; }
+.alts-head h2 { font-size: clamp(2rem, 4.6vw, 3rem); }
+.alts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.alt { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); border: 1px solid var(--line); background: rgba(17, 19, 24, .7); transition: border-color .6s var(--ease); }
+.alt:hover { border-color: var(--line-2); }
+.alt .stage { border: 0; border-right: 1px solid var(--line); height: 100%; }
+.alt-body { padding: 24px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.alt-body h3 { font-size: 2rem; font-style: italic; overflow-wrap: anywhere; }
+.alt-body .code-sm { letter-spacing: .14em; color: var(--ivory); }
+.alt-body .actions { margin-top: 8px; }
+.next-ed { margin-top: 84px; display: grid; gap: 22px; justify-items: center; text-align: center; }
+.next-ed p { font: italic 300 1.4rem/1.4 var(--f-display); color: var(--muted); }
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 36px; }
+  .alts { grid-template-columns: 1fr; }
 }
-.chip input:hover + span { border-color: var(--muted); }
-.chip input:active + span { transform: scale(.95); }
-.chip input:checked + span { background: var(--ink); border-color: var(--ink); color: var(--bg); }
-.chip input:checked + span::before { width: 8px; margin-right: 7px; }
-.chip input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
-.hint { font-size: .8rem; color: var(--muted); margin-top: 8px; }
+@media (max-width: 520px) { .alt { grid-template-columns: 1fr; } .alt .stage { border-right: 0; border-bottom: 1px solid var(--line); aspect-ratio: 16 / 10; } }
 
-.results-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 24px; }
-.results-head h3 { font-size: 1.55rem; }
-.results-head p { color: var(--muted); font-size: .9rem; }
-.results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-@media (max-width: 960px) { .results { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 560px) { .results { grid-template-columns: 1fr; } }
-.results.out .card { opacity: .001; transform: translateY(8px) scale(.97); transition: opacity .16s, transform .16s; }
+/* ---------- Collection ---------- */
+.year { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 860px) { .year { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (max-width: 420px) { .year { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.yr { display: grid; grid-template-rows: auto auto; align-content: start; gap: 10px; padding: 0; border: 0; background: none; text-align: left; color: inherit; min-width: 0; }
+.yr i { display: block; height: 128px; border: 1px dashed var(--line-2); border-radius: 999px 999px 6px 6px; position: relative; overflow: hidden; }
+.yr.has { cursor: pointer; }
+.yr.has i { border: 0; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 78%, #fff), var(--c) 45%, color-mix(in srgb, var(--c) 65%, #000)); box-shadow: 0 14px 30px rgba(0,0,0,.4); transition: transform .6s var(--ease); }
+.yr.has i::after { content: ""; position: absolute; top: 14%; left: 22%; width: 12%; height: 50%; border-radius: 999px; background: rgba(255,255,255,.35); }
+.yr.has:hover i { transform: translateY(-4px); }
+.yr.now i { border-color: var(--champagne); }
+.yr.future i { opacity: .4; }
+.yr b { font: 400 .62rem/1.2 var(--f-body); letter-spacing: .26em; text-transform: uppercase; color: var(--muted); }
+.yr.now b { color: var(--champagne); }
+.yr small { display: block; font: italic 400 .95rem/1.2 var(--f-display); color: var(--ivory); margin-top: 3px; overflow-wrap: anywhere; }
+.insight { margin-top: 44px; padding: 30px; border: 1px solid var(--line); background: rgba(17, 19, 24, .7); display: grid; gap: 10px; }
+.insight p:not(.label) { font: italic 300 1.5rem/1.4 var(--f-display); }
+.col-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 40px; margin-top: 56px; }
+@media (max-width: 860px) { .col-grid { grid-template-columns: 1fr; } }
+.col-grid h3 { font-size: 1.9rem; margin-bottom: 18px; }
+.rows { display: grid; }
+.row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-top: 0; text-align: left; cursor: pointer; color: inherit; transition: padding .5s var(--ease); }
+.row:hover { padding-left: 6px; }
+.row i { width: 44px; height: 44px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); }
+.row b { font: italic 400 1.2rem/1.2 var(--f-display); display: block; overflow-wrap: anywhere; }
+.row span { font-size: .8rem; color: var(--muted); }
+.row em { font-style: normal; font-size: .62rem; letter-spacing: .24em; text-transform: uppercase; color: var(--champagne); }
+.empty { color: var(--muted); padding: 22px; border: 1px dashed var(--line-2); font-size: .92rem; }
+.prefs { display: grid; grid-template-columns: auto 1fr; gap: 10px 22px; margin: 0 0 22px; font-size: .92rem; }
+.prefs dt { color: var(--faint); font-size: .62rem; letter-spacing: .26em; text-transform: uppercase; padding-top: 4px; }
+.prefs dd { margin: 0; }
+.confirm { margin-top: 16px; padding: 18px; border: 1px solid var(--line-2); display: grid; gap: 14px; }
 
-.card {
-  border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; background: var(--bg);
-  display: flex; flex-direction: column; animation: rise .55s var(--ease) backwards; animation-delay: calc(var(--i) * 70ms);
-  transition: transform .25s var(--ease), box-shadow .25s;
+/* ---------- Library & guide ---------- */
+.lib-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.search { flex: 1 1 280px; min-width: 0; }
+.search input, .select select {
+  width: 100%; background: rgba(17, 19, 24, .8); border: 1px solid var(--line); border-radius: 2px; color: var(--ivory);
+  font: 300 .98rem/1.2 var(--f-body); padding: 15px 18px; transition: border-color .4s;
 }
-.card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
-.swatch {
-  position: relative; height: 164px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden;
-  background: linear-gradient(160deg, color-mix(in srgb, var(--c) 18%, var(--surface)), color-mix(in srgb, var(--c) 42%, var(--surface-2)));
-}
-.badge {
-  position: absolute; top: 12px; font: 500 .72rem/1 var(--f-mono); padding: 5px 8px; border-radius: 999px;
-  background: rgba(255,255,255,.85); color: #2B1822;
-}
-.badge.rank { left: 12px; }
-.badge.brand-tag { right: 12px; font-family: var(--f-body); font-weight: 700; letter-spacing: .06em; }
-.nailwrap { position: relative; width: 104px; height: 174px; margin-bottom: -48px; transition: transform .45s var(--ease); filter: drop-shadow(0 10px 16px rgba(43,24,34,.26)); }
-.nailwrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.nailwrap .paint { animation: paint 1s cubic-bezier(.6,.05,.3,1) backwards; animation-delay: calc(var(--i, 0) * 80ms + .25s); }
-@keyframes paint { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
-.card:hover .nailwrap { transform: translateY(-8px) rotate(-4deg); }
-.swatch::before {
-  content: ""; position: absolute; inset: -40% auto -40% -60%; width: 40%; transform: rotate(18deg); z-index: 2;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent); transition: left .8s ease;
-}
-.card:hover .swatch::before { left: 130%; }
-.shimmer .swatch::after {
-  content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: .55;
-  background-image: radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.5px), radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.5px);
-  background-size: 23px 19px, 31px 27px; background-position: 0 0, 11px 7px; animation: twinkle 3.5s linear infinite;
-}
-@keyframes twinkle { 50% { opacity: .15; background-position: 6px 4px, 3px 12px; } }
-.card-body { padding: 16px; display: grid; gap: 12px; flex: 1; align-content: start; }
-.card-title { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
-.card-title h4 { font-family: var(--f-display); font-weight: 500; font-size: 1.22rem; line-height: 1.15; margin: 0; }
-.card-title small { display: block; color: var(--muted); font-size: .8rem; margin-top: 4px; }
-.heart {
-  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface);
-  display: grid; place-items: center; cursor: pointer; transition: transform .2s var(--ease);
-}
-.heart svg { width: 17px; height: 17px; fill: none; stroke: var(--muted); stroke-width: 2; transition: fill .2s, stroke .2s; }
-.heart[aria-pressed="true"] svg { fill: var(--accent); stroke: var(--accent); }
-.heart:active { transform: scale(.85); }
-.heart.beat { animation: beat .45s var(--ease); }
-@keyframes beat { 35% { transform: scale(1.25); } 70% { transform: scale(.94); } }
-.drop {
-  position: fixed; width: 8px; height: 10px; margin: -5px 0 0 -4px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  background: var(--c); pointer-events: none; z-index: 60; animation: dropFly .7s ease-out forwards;
-}
-@keyframes dropFly { to { transform: translate(var(--dx), var(--dy)) scale(.3); opacity: 0; } }
-.code-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 8px 12px; border-radius: 10px;
-  background: var(--surface); border: 1px dashed var(--line);
-}
-.code-row > div { min-width: 0; }
-.code-row .label { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-.code-row .code { font-family: var(--f-mono); font-weight: 500; font-size: 1.12rem; letter-spacing: .04em; }
-.copy {
-  flex: none; border: 0; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: .78rem; padding: 7px 11px; border-radius: 8px; cursor: pointer;
-  transition: background .2s, color .2s, transform .15s;
-}
-.copy:active { transform: scale(.94); }
-.copy.done { background: var(--accent); color: var(--on-accent); }
-.meta { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; font-size: .84rem; margin: 0; }
-.meta dt { color: var(--muted); }
-.meta dd { margin: 0; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.meta dd svg { width: 14px; height: 22px; }
-.meta dd small { font-weight: 500; color: var(--muted); font-size: .76rem; }
-.why { display: flex; flex-wrap: wrap; gap: 6px; }
-.why span { font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
-.why span.hit { background: var(--accent-soft); color: var(--accent); }
-.card-actions { padding: 0 16px 16px; }
-.card-actions .btn { width: 100%; justify-content: center; }
-.no-results { grid-column: 1 / -1; }
-
-/* ---------- Shortlist ---------- */
-.shortlist { display: flex; gap: 10px; flex-wrap: wrap; }
-.mini {
-  display: inline-flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--surface); cursor: pointer; font-size: .86rem; font-weight: 600; animation: rise .4s var(--ease) backwards;
-  transition: transform .2s var(--ease), box-shadow .2s;
-}
-.mini:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
-.mini i { width: 26px; height: 26px; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
-.mini .mono { color: var(--muted); font-weight: 400; font-size: .78rem; }
-.empty { color: var(--muted); font-size: .92rem; padding: 18px; border: 1px dashed var(--line); border-radius: var(--r); width: 100%; }
-
-/* ---------- Brands ---------- */
-.brands { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-@media (max-width: 1080px) { .brands { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 620px) { .brands { grid-template-columns: 1fr; } }
-.brand-card {
-  border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 22px; display: grid; gap: 14px; align-content: start;
-  position: relative; overflow: hidden; transition: transform .25s var(--ease), box-shadow .25s;
-}
-.brand-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.brand-card .strip { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
-.brand-card .strip i { flex: 1; background: var(--c); transition: flex .4s var(--ease); }
-.brand-card:hover .strip i:nth-child(odd) { flex: 1.8; }
-.brand-card h3 { font-size: 1.6rem; }
-.brand-card .sample { font-family: var(--f-mono); font-size: 1.35rem; color: var(--accent); }
-.brand-card p { color: var(--muted); font-size: .9rem; }
-.brand-card .count { font-size: .8rem; font-weight: 700; color: var(--ink); }
-
-.gelx { margin-top: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: clamp(18px, 3vw, 28px); display: grid; gap: 20px; }
-.gelx-top { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 760px) { .gelx-top { grid-template-columns: 1fr; } }
-.gelx-top p { color: var(--muted); font-size: .9rem; }
-.gelx-top b { color: var(--ink); }
-.tips { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 760px) { .tips { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 420px) { .tips { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.tip-card { display: grid; justify-items: center; gap: 6px; text-align: center; padding: 14px 8px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
-.tip-card svg { width: 40px; height: 76px; transition: transform .35s var(--ease); }
-.tip-card:hover svg { transform: translateY(-5px) rotate(-5deg); }
-.tip-card svg path { fill: var(--accent); fill-opacity: .18; stroke: var(--accent); stroke-width: 1.2; }
-.tip-card b { font-size: .92rem; }
-.tip-card span { font-size: .74rem; color: var(--muted); }
-
-/* ---------- Month calendar ---------- */
-.months { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 900px) { .months { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (max-width: 520px) { .months { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.month {
-  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 0; overflow: hidden; text-align: left; cursor: pointer;
-  display: flex; flex-direction: column; transition: transform .25s var(--ease), box-shadow .25s;
-}
-.month:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.month .chip-color { height: 64px; background: var(--c); position: relative; transition: height .35s var(--ease); }
-.month:hover .chip-color { height: 76px; }
-.month .chip-color::after { content: ""; position: absolute; left: 12px; top: 10px; width: 6px; height: 34px; border-radius: 3px; background: rgba(255,255,255,.4); }
-.month .m-body { padding: 10px 12px 12px; display: grid; gap: 2px; }
-.month .m-name { font: 600 .7rem/1.2 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.month .m-shade { font-family: var(--f-display); font-size: 1rem; line-height: 1.2; }
-.month .m-why { font-size: .76rem; color: var(--muted); }
-.month.now { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.month.now .m-name { color: var(--accent); }
-
-/* ---------- Shapes ---------- */
-.shapes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 980px) { .shapes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-@media (max-width: 520px) { .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.shape {
-  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); padding: 16px 12px; display: grid; gap: 8px; justify-items: center; text-align: center;
-  transition: border-color .25s, box-shadow .25s;
-}
-.shape.picked { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-.shape svg { width: 54px; height: 92px; transition: transform .4s var(--ease); }
-.shape:hover svg { transform: translateY(-6px) rotate(-5deg); }
-.shape svg path { fill: var(--accent); stroke: var(--muted); stroke-width: .8; transition: fill .8s; }
-.shape b { font-family: var(--f-display); font-weight: 500; font-size: 1.1rem; }
-.shape p { font-size: .78rem; color: var(--muted); line-height: 1.45; }
-.lengths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }
-@media (max-width: 640px) { .lengths { grid-template-columns: 1fr; } }
-.length { display: flex; gap: 14px; align-items: center; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
-.length .bar-vis { flex: none; width: 10px; height: 46px; border-radius: 5px; background: var(--surface-2); position: relative; overflow: hidden; }
-.length .bar-vis i { position: absolute; left: 0; right: 0; bottom: 0; height: var(--h); background: var(--accent); border-radius: 5px; }
-.reveal.in .bar-vis i { animation: grow .9s .25s var(--ease) backwards; }
-@keyframes grow { from { height: 0; } }
-.length b { display: block; }
-.length span { font-size: .82rem; color: var(--muted); }
-
-/* ---------- Library ---------- */
-.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.library { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 18px; }
-.lib {
-  border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 0; overflow: hidden; cursor: pointer; text-align: left;
-  transition: transform .25s var(--ease), box-shadow .25s; animation: rise .45s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 18ms);
-}
-.lib:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.lib i { display: block; height: 56px; background: var(--c); position: relative; overflow: hidden; }
-.lib i::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); transform: translateX(-100%); transition: transform .7s ease; }
-.lib:hover i::after { transform: translateX(100%); }
-.lib div { padding: 9px 11px 11px; display: grid; gap: 2px; }
-.lib b { font-size: .84rem; line-height: 1.25; }
-.lib .mono { font-size: .76rem; color: var(--accent); }
-.lib-count { font-size: .84rem; color: var(--muted); }
-
-/* ---------- Salon card dialog ---------- */
-dialog {
-  border: 0; padding: 0; width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); border-radius: 26px; overflow: auto;
-  background: var(--c); color: var(--t); box-shadow: 0 30px 80px rgba(0,0,0,.35);
-}
-dialog::backdrop { background: rgba(20,10,16,.55); backdrop-filter: blur(4px); }
-dialog.flood { animation: flood .7s var(--ease); }
-@keyframes flood { from { clip-path: circle(0 at var(--x, 50%) var(--y, 50%)); } to { clip-path: circle(150% at var(--x, 50%) var(--y, 50%)); } }
-dialog.flood .salon > * { animation: rise .5s var(--ease) backwards; }
-dialog.flood .salon > *:nth-child(2) { animation-delay: .12s; }
-dialog.flood .salon > *:nth-child(3) { animation-delay: .18s; }
-dialog.flood .salon > *:nth-child(4) { animation-delay: .24s; }
-dialog.flood .salon > *:nth-child(n+5) { animation-delay: .3s; }
-.salon { padding: 28px; display: grid; gap: 18px; }
-.salon .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-.salon .tag { font: 700 .7rem/1 var(--f-body); letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
-.salon .x { width: 38px; height: 38px; border-radius: 50%; border: 1px solid currentColor; background: transparent; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: .8; transition: transform .25s var(--ease); }
-.salon .x:hover { transform: rotate(90deg); }
-.salon .big { font-family: var(--f-mono); font-weight: 500; font-size: clamp(2.6rem, 13vw, 4.6rem); line-height: 1; letter-spacing: .02em; overflow-wrap: anywhere; }
-.salon .big.long { font-size: clamp(2.1rem, 10vw, 3.4rem); }
-.salon .brandline { font-weight: 600; opacity: .85; }
-.salon h3 { font-size: clamp(1.6rem, 6vw, 2.2rem); font-style: italic; }
-.salon .facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; border-top: 1px solid currentColor; border-bottom: 1px solid currentColor; padding-block: 14px; }
-.salon .facts div { display: grid; gap: 2px; min-width: 0; }
-.salon .facts span { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; opacity: .75; font-weight: 700; }
-.salon .facts b { font-size: .98rem; }
-.salon .gelx-line { font-weight: 700; border: 1px solid currentColor; border-radius: 12px; padding: 10px 14px; }
-.salon .gelx-line span { display: block; font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
-.salon .note { font-size: .84rem; opacity: .85; }
-.salon .acts { display: flex; gap: 10px; flex-wrap: wrap; }
-.salon .acts button { border: 1px solid currentColor; background: transparent; color: inherit; padding: 10px 16px; border-radius: 999px; font-weight: 700; cursor: pointer; transition: transform .15s; }
-.salon .acts button:active { transform: scale(.95); }
-.salon .acts button.solid { background: var(--t); color: var(--c); border-color: var(--t); }
-
-/* ---------- Selects, search, brand table ---------- */
-.select { position: relative; display: inline-flex; max-width: 100%; }
-.select select {
-  appearance: none; -webkit-appearance: none; font: 500 .92rem/1.2 var(--f-body); color: var(--ink); background: var(--bg);
-  border: 1px solid var(--line); border-radius: 999px; padding: 10px 40px 10px 16px; cursor: pointer; max-width: 100%;
-  transition: border-color .2s, box-shadow .2s;
-}
-.select select:hover { border-color: var(--muted); }
-.select select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.select::after {
-  content: ""; position: absolute; right: 16px; top: 50%; width: 7px; height: 7px; margin-top: -6px; pointer-events: none;
-  border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg);
-}
-.lib-controls { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-.search { flex: 1 1 260px; min-width: 0; }
-.search input {
-  width: 100%; font: 500 .95rem/1.2 var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line);
-  border-radius: 999px; padding: 11px 18px; transition: border-color .2s, box-shadow .2s;
-}
-.search input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search input:focus, .select select:focus { outline: none; border-color: var(--champagne); }
+.select { position: relative; display: block; flex: 0 1 260px; min-width: 0; }
+.select select { appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer; }
+.select::after { content: ""; position: absolute; right: 18px; top: 50%; width: 7px; height: 7px; margin-top: -6px; border-right: 1px solid var(--champagne); border-bottom: 1px solid var(--champagne); transform: rotate(45deg); pointer-events: none; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.more-row { display: flex; justify-content: center; margin-top: 18px; }
-.lib .lib-brand { font-size: .72rem; color: var(--muted); }
-.lib .by-name { font-size: .74rem; color: var(--muted); font-style: italic; }
-.code-row .code.byname { font-family: var(--f-body); font-weight: 600; font-size: .98rem; letter-spacing: 0; overflow-wrap: anywhere; }
-.gel-hint { font-size: .78rem; color: var(--muted); margin-top: -4px; }
-.salon .big.byname { font-family: var(--f-display); font-style: italic; font-weight: 500; font-size: clamp(2.2rem, 9vw, 3.4rem); line-height: 1.05; letter-spacing: 0; }
-.table-wrap { overflow-x: auto; margin-top: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
-.brand-table { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 760px; }
-.brand-table th { text-align: left; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 14px 16px; border-bottom: 1px solid var(--line); }
-.brand-table td { padding: 10px 16px; border-bottom: 1px solid var(--line); color: var(--muted); }
+.lib-count { font-size: .82rem; color: var(--muted); margin-block: 14px; }
+.library { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.tile {
+  border: 1px solid var(--line); background: rgba(17, 19, 24, .78); padding: 0; text-align: left; cursor: pointer; color: inherit; overflow: hidden;
+  transition: border-color .5s var(--ease), transform .5s var(--ease); animation: rise .7s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 16ms);
+}
+.tile:hover { border-color: var(--line-2); transform: translateY(-3px); }
+.tile i { display: block; height: 70px; background: linear-gradient(160deg, color-mix(in srgb, var(--c) 82%, #fff), var(--c) 40%, color-mix(in srgb, var(--c) 72%, #000)); }
+.tile div { padding: 12px 14px 14px; display: grid; gap: 3px; }
+.tile b { font: italic 400 1.08rem/1.15 var(--f-display); }
+.tile span { font-size: .72rem; color: var(--muted); }
+.tile .c { font-size: .7rem; letter-spacing: .14em; color: var(--champagne); }
+.more-row { display: flex; justify-content: center; margin-top: 26px; }
+.guide-block { margin-top: 80px; }
+.guide-block:first-of-type { margin-top: 0; }
+.cards4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1000px) { .cards4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .cards4 { grid-template-columns: 1fr; } }
+.gcard { border: 1px solid var(--line); background: rgba(17, 19, 24, .7); padding: 24px; display: grid; gap: 12px; align-content: start; }
+.gcard h3 { font-size: 1.7rem; }
+.gcard .code { color: var(--champagne-2); font-size: 1.05rem; }
+.gcard p { color: var(--muted); font-size: .9rem; }
+.table-wrap { overflow-x: auto; margin-top: 16px; border: 1px solid var(--line); }
+.brand-table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: .88rem; }
+.brand-table th { text-align: left; font: 400 .6rem/1.2 var(--f-body); letter-spacing: .26em; text-transform: uppercase; color: var(--faint); padding: 16px; border-bottom: 1px solid var(--line); }
+.brand-table td { padding: 12px 16px; border-bottom: 1px solid var(--line); color: var(--muted); }
 .brand-table tr:last-child td { border-bottom: 0; }
-.brand-table tbody tr { transition: background .2s; }
-.brand-table tbody tr:hover { background: var(--bg); }
-.brand-table .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
-.brand-link { border: 0; background: none; padding: 0; cursor: pointer; font-weight: 700; color: var(--ink); display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
-.brand-link:hover { color: var(--accent); }
-.brand-link .dots { display: inline-flex; }
-.brand-link .dots i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); border: 2px solid var(--surface); margin-left: -5px; transition: margin .25s var(--ease); }
-.brand-link .dots i:first-child { margin-left: 0; }
-.brand-link:hover .dots i { margin-left: -1px; }
+.brand-table .num { text-align: right; font-variant-numeric: tabular-nums; color: var(--ivory); }
+.brand-table td:first-child { color: var(--ivory); }
+.shapes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 1000px) { .shapes { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.shape { border: 1px solid var(--line); background: rgba(17, 19, 24, .7); padding: 20px 14px; display: grid; gap: 10px; justify-items: center; text-align: center; }
+.shape svg { width: 46px; height: 80px; transition: transform .7s var(--ease); }
+.shape:hover svg { transform: translateY(-5px) rotate(-4deg); }
+.shape svg path { fill: rgba(205, 184, 146, .14); stroke: var(--champagne); stroke-width: 1; }
+.shape b { font: italic 400 1.25rem/1 var(--f-display); }
+.shape p { font-size: .76rem; color: var(--muted); line-height: 1.5; }
+.lengths { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+@media (max-width: 640px) { .lengths { grid-template-columns: 1fr; } }
+.length { display: flex; gap: 16px; align-items: center; padding: 18px; border: 1px solid var(--line); background: rgba(17, 19, 24, .7); }
+.length i { flex: none; width: 2px; height: 48px; background: var(--line); position: relative; }
+.length i::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: var(--h); background: var(--champagne); }
+.length b { display: block; font: italic 400 1.2rem/1.2 var(--f-display); }
+.length span { font-size: .82rem; color: var(--muted); }
+.almanac { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 900px) { .almanac { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .almanac { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* ---------- Footer / toast ---------- */
-footer { border-top: 1px solid var(--line); padding-block: 28px 40px; color: var(--muted); font-size: .84rem; display: grid; gap: 8px; }
+/* ---------- Presentation card ---------- */
+dialog {
+  border: 1px solid var(--line-2); border-radius: 2px; padding: 0; width: min(480px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto;
+  background: var(--surface); color: var(--ivory); box-shadow: 0 40px 120px rgba(0,0,0,.7);
+}
+dialog::backdrop { background: rgba(5, 6, 8, .78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+dialog[open] { animation: cardIn .9s var(--ease); }
+@keyframes cardIn { from { opacity: .001; transform: translateY(24px) scale(.98); } }
+.pc-band { position: relative; height: 210px; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; background: radial-gradient(110% 90% at 50% 0%, color-mix(in srgb, var(--c) 70%, #fff 6%), var(--c) 45%, color-mix(in srgb, var(--c) 55%, #000)); }
+.pc-band svg { width: 92px; margin-bottom: -46px; filter: drop-shadow(0 14px 20px rgba(0,0,0,.45)); }
+dialog[open] .pc-band svg { animation: paintUp 1.2s .2s var(--ease) backwards; }
+@keyframes paintUp { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+.pc-band::after { content: ""; position: absolute; inset: -40%; pointer-events: none; background: linear-gradient(115deg, transparent 44%, rgba(255,255,255,.22) 50%, transparent 56%); transform: translateX(-60%); }
+dialog[open] .pc-band::after { animation: sweep 1.8s .4s var(--ease) forwards; }
+@keyframes sweep { to { transform: translateX(60%); } }
+.pc-top { position: absolute; z-index: 2; top: 16px; left: 18px; right: 18px; display: flex; justify-content: space-between; align-items: center; color: #fff; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
+.pc-top .label { color: inherit; }
+.pc-close { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.55); background: rgba(0,0,0,.18); color: #fff; cursor: pointer; transition: transform .5s var(--ease); }
+.pc-close:hover { transform: rotate(90deg); }
+.pc-body { padding: 30px 28px 28px; display: grid; gap: 16px; }
+.pc-body .for { font: italic 400 1rem/1.2 var(--f-display); color: var(--champagne); }
+.pc-code { font: 400 clamp(1.9rem, 8vw, 2.6rem)/1.15 var(--f-body); letter-spacing: .14em; overflow-wrap: anywhere; }
+.pc-code.byname { font: italic 300 clamp(2rem, 8vw, 2.8rem)/1.1 var(--f-display); letter-spacing: 0; }
+.pc-name { font-size: 2rem; font-style: italic; }
+.pc-body .facts { padding-block: 16px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.pc-body .note { font-size: 1.05rem; }
+.rate { display: grid; gap: 10px; }
+.rate button { text-align: left; }
+
+/* ---------- Footer & toast ---------- */
+footer { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; border-top: 1px solid var(--line); padding-block: 30px 44px; color: var(--faint); font-size: .8rem; display: grid; gap: 8px; }
 .toast {
-  position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, calc(100% + 40px));
-  background: var(--ink); color: var(--bg); padding: 11px 18px; border-radius: 999px; font-weight: 600; font-size: .9rem;
-  transition: transform .35s cubic-bezier(.2,.9,.3,1.2), opacity .2s; z-index: 50; white-space: nowrap; opacity: 0; pointer-events: none;
+  position: fixed; left: 50%; bottom: calc(26px + env(safe-area-inset-bottom, 0px)); z-index: 60; transform: translate(-50%, 30px); opacity: 0; pointer-events: none;
+  background: var(--ivory); color: var(--night); padding: 13px 22px; font: 400 .7rem/1 var(--f-body); letter-spacing: .22em; text-transform: uppercase; white-space: nowrap;
+  transition: transform .7s var(--ease), opacity .5s;
 }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
+@media (max-width: 760px) { .toast { bottom: calc(100px + env(safe-area-inset-bottom, 0px)); } }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
-  .reveal.pending > * { opacity: 1; transform: none; }
 }
 </style>
 </head>
 <body>
+<canvas id="sky" aria-hidden="true"></canvas>
 <div class="wrap">
 
-  <header class="bar">
-    <div class="brand"><span class="brand-dot" id="brandDot"></span>Mani Match</div>
+  <header class="top">
+    <a class="mark" href="#edition" aria-label="Mani Match, your edition">
+      <svg viewBox="0 0 30 48" aria-hidden="true"><path d="M3 46 V18 Q3 3 15 3 Q27 3 27 18 V46"/></svg>Mani Match
+    </a>
     <nav aria-label="Sections">
-      <a href="#finder">Find a shade</a>
-      <a href="#brands">Brands &amp; Gel-X</a>
-      <a href="#months">Shade of the month</a>
-      <a href="#shapes">Shapes &amp; length</a>
-      <a href="#library">All shades</a>
+      <a href="#edition" data-nav="edition">Edition</a>
+      <a href="#collection" data-nav="collection">Collection</a>
+      <a href="#library" data-nav="library">Library</a>
+      <a href="#guide" data-nav="guide">Guide</a>
     </nav>
+    <button class="monogram" id="monogram" type="button" aria-label="Your preferences">M</button>
   </header>
 
-  <div class="hero">
-    <div>
-      <p class="eyebrow" id="heroEyebrow">Your nail consultation</p>
-      <h1 style="margin-top:14px" aria-label="Walk in knowing your exact shade.">
-        <span class="line">Walk in knowing your</span>
-        <span class="line"><span class="rotator" id="rotator" aria-hidden="true"></span></span>
-      </h1>
-      <p class="lede">Pick the season, the event and your mood. Mani Match suggests the color, shape and length that fit, with the salon code or exact shade name from 22 brands, and the right Gel-X tip if you want extensions.</p>
-      <div class="hero-cta">
-        <a class="btn primary" href="#finder">Find my shade</a>
-        <a class="btn" href="#months">See this month's pick</a>
-      </div>
-      <div class="hero-stats">
-        <div><b data-count="0" id="statShades">0</b><span>salon shades</span></div>
-        <div><b data-count="0" id="statBrands">0</b><span>brands</span></div>
-        <div><b data-count="7">7</b><span>nail shapes</span></div>
-        <div><b data-count="12">12</b><span>monthly picks</span></div>
-      </div>
-    </div>
-    <div class="fan-stage" aria-hidden="true">
-      <div class="aura" id="aura"></div>
-      <div class="fan" id="fan"></div>
-      <div class="hub"></div>
-      <div class="fan-label" id="fanLabel"></div>
-    </div>
-  </div>
-
-  <section id="finder">
-    <div class="section-head">
-      <p class="eyebrow">Step 1 · Tell us about it</p>
-      <h2>Find your shade</h2>
-      <p class="lede">Your picks update the matches instantly. Save the ones you love, then open the salon card at your appointment.</p>
-    </div>
-
-    <div class="consult">
-      <form class="pickers" id="pickers" onsubmit="return false">
-        <fieldset><legend>Season</legend><div class="chips" data-group="season"></div></fieldset>
-        <fieldset><legend>Occasion</legend><div class="chips" data-group="occasion"></div></fieldset>
-        <fieldset><legend>Mood this month</legend><div class="chips" data-group="mood"></div></fieldset>
-        <fieldset>
-          <legend>Skin undertone</legend>
-          <div class="chips" data-group="tone"></div>
-          <p class="hint">Not sure? Veins that look blue usually mean cool, green means warm, a mix means neutral.</p>
-        </fieldset>
-        <fieldset>
-          <legend>Service</legend>
-          <div class="chips" data-group="service"></div>
-          <p class="hint">Gel-X is a soft-gel extension glued over your nail. Pick it for extra length.</p>
-        </fieldset>
-        <fieldset>
-          <legend>Brand</legend>
-          <span class="select"><select id="brandSelect" name="brand" aria-label="Brand"></select></span>
-          <p class="hint">Not every salon carries every brand, so ask which ones they stock. Aprés colors are gel only.</p>
-        </fieldset>
-      </form>
-
-      <div class="results-head">
+  <main>
+    <!-- Welcome: first visit only -->
+    <section class="view" id="v-welcome" hidden>
+      <div class="welcome">
         <div>
-          <p class="eyebrow">Step 2 · Your matches</p>
-          <h3 id="resultsTitle" style="margin-top:8px">Top shades</h3>
+          <p class="label">Mani Match · The Atelier</p>
+          <h1>A manicure, <em>commissioned</em> for you. Every month.</h1>
+          <p class="lede">Each month we unveil one signature shade chosen for your skin, your calendar and your style, with the exact code to hand your nail tech.</p>
+          <div class="cta">
+            <a class="btn primary" href="#consult"><span>Begin your consultation</span></a>
+            <button class="btn" type="button" id="skipConsult"><span>Show me this month</span></button>
+          </div>
+          <div class="promises">
+            <div><p class="label">Personal</p><b>Fitted to you</b><span>Six quick questions about your skin, hands and style.</span></div>
+            <div><p class="label">Monthly</p><b>A new edition</b><span>Unveiled on the first of every month.</span></div>
+            <div><p class="label">Salon-ready</p><b>The exact code</b><span>556 shades from 22 brands, ready to show.</span></div>
+          </div>
         </div>
-        <p id="resultsSub"></p>
+        <figure class="welcome-stage" style="margin:0">
+          <div id="welcomeStage"></div>
+          <figcaption id="welcomeCaption"></figcaption>
+        </figure>
       </div>
-      <div class="results" id="results" aria-live="polite"></div>
+    </section>
 
-      <div style="display:grid;gap:12px;border-top:1px solid var(--line);padding-top:22px">
-        <p class="eyebrow">Your shortlist</p>
-        <div class="shortlist" id="shortlist"></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="brands">
-    <div class="section-head reveal">
-      <p class="eyebrow">Know your brands</p>
-      <h2>How to ask for each shade</h2>
-      <p class="lede">Some brands print a shade number and some go by name only. Here's what to say at the front desk.</p>
-    </div>
-    <div class="brands reveal" id="brandGrid"></div>
-
-    <div class="table-wrap reveal">
-      <table class="brand-table" id="brandTable"></table>
-    </div>
-
-    <div class="gelx reveal">
-      <div class="gelx-top">
-        <div style="display:grid;gap:10px">
-          <p class="eyebrow">Gel-X by Aprés</p>
-          <h3 style="font-size:1.7rem">Ask for the tip shape, then the length</h3>
+    <!-- Consultation -->
+    <section class="view" id="v-consult" hidden>
+      <div class="consult">
+        <div class="consult-top">
+          <p class="label" id="cStep">I of VI</p>
+          <a class="btn link" href="#edition" id="cExit"><span>Close</span></a>
         </div>
-        <div style="display:grid;gap:10px">
-          <p>Gel-X tips come in five shapes and run from extra short to extra long. Not every shape comes in every length.</p>
-          <p><b>Natural</b> tips are flatter and suit flatter, wider nail beds. <b>Sculpted</b> tips have a higher arch and a deeper curve. Your tech will pick the one that fits your nails.</p>
+        <div class="progress" id="cProgress"></div>
+        <div id="cBody"></div>
+        <div class="consult-nav">
+          <button class="btn link" type="button" id="cBack"><span>Back</span></button>
+          <button class="btn primary" type="button" id="cNext"><span>Continue</span></button>
         </div>
       </div>
-      <div class="tips" id="tipGrid"></div>
-    </div>
-  </section>
+    </section>
 
-  <section id="months">
-    <div class="section-head reveal">
-      <p class="eyebrow">Mood of the month</p>
-      <h2>A shade for every month</h2>
-      <p class="lede">Can't decide? Start with the month. Each pick follows the season and the events that usually fill it.</p>
-    </div>
-    <div class="months reveal" id="monthGrid"></div>
-  </section>
+    <!-- The monthly edition -->
+    <section class="view" id="v-edition" hidden>
+      <div class="ed-head">
+        <div class="ed-meta"><p class="label" id="edNo"></p><p class="muted" id="edGreet"></p></div>
+        <h1 id="edTitle"></h1>
+        <p class="story" id="edStory"></p>
+        <a class="personalize" href="#consult" id="edPersonalize" hidden>Personalize your edition <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero" id="hero">
+        <div>
+          <div id="edStage"></div>
+          <div style="display:flex;justify-content:center"><button class="btn link replay" type="button" id="replay"><span>Replay the unveiling</span></button></div>
+        </div>
+        <div class="details" id="edDetails" aria-live="polite"></div>
+      </div>
+      <div class="occasion">
+        <p class="label">Anything on the calendar this month?</p>
+        <div class="chips" id="occasionChips"></div>
+      </div>
+      <div class="alts-head">
+        <p class="label">Also in your edition</p>
+        <h2>Two alternatives, for a change of mood</h2>
+      </div>
+      <div class="alts" id="alts"></div>
+      <div class="next-ed">
+        <hr class="coachline" style="width:min(420px, 80%)">
+        <p id="edNext"></p>
+      </div>
+    </section>
 
-  <section id="shapes">
-    <div class="section-head reveal">
-      <p class="eyebrow">Shape &amp; length guide</p>
-      <h2>Ask for the right shape</h2>
-      <p class="lede">Use these names at the salon. The shape outlined below is the one your current matches suggest.</p>
-    </div>
-    <div class="shapes reveal" id="shapeGrid"></div>
-    <div class="lengths reveal">
-      <div class="length"><span class="bar-vis"><i style="--h:30%"></i></span><div><b>Short</b><span>Free edge 1–3 mm past the fingertip. Typing, work, sports.</span></div></div>
-      <div class="length"><span class="bar-vis"><i style="--h:60%"></i></span><div><b>Medium</b><span>3–6 mm. Elegant without getting in the way.</span></div></div>
-      <div class="length"><span class="bar-vis"><i style="--h:100%"></i></span><div><b>Long</b><span>6 mm and up. Statement looks, usually gel or Gel-X.</span></div></div>
-    </div>
-  </section>
+    <!-- Collection -->
+    <section class="view" id="v-collection" hidden>
+      <div class="section-head">
+        <p class="label">Your collection</p>
+        <h2 id="colTitle">A year in colour</h2>
+        <p>Each month you mark a manicure as worn, it joins your year. Tell us how it wore and future editions learn from it.</p>
+      </div>
+      <div class="year" id="year"></div>
+      <div class="insight" id="insight"></div>
+      <div class="col-grid">
+        <div>
+          <h3>Worn</h3>
+          <div class="rows" id="history"></div>
+          <h3 style="margin-top:44px">Saved for later</h3>
+          <div class="library" id="savedGrid"></div>
+        </div>
+        <div>
+          <h3>Your preferences</h3>
+          <dl class="prefs" id="prefs"></dl>
+          <div class="actions">
+            <a class="btn small" href="#consult"><span>Edit preferences</span></a>
+            <button class="btn small link" type="button" id="clearAsk"><span>Clear my data</span></button>
+          </div>
+          <div class="confirm" id="clearConfirm" hidden>
+            <p class="small">This removes your preferences, collection and saved shades from this device.</p>
+            <div class="actions">
+              <button class="btn small" type="button" id="clearYes"><span>Clear everything</span></button>
+              <button class="btn small link" type="button" id="clearNo"><span>Keep them</span></button>
+            </div>
+          </div>
+          <p class="small muted" style="margin-top:22px">Your collection is stored privately on this device.</p>
+        </div>
+      </div>
+    </section>
 
-  <section id="library">
-    <div class="section-head reveal">
-      <p class="eyebrow">Shade library</p>
-      <h2>Browse every shade</h2>
-      <p class="lede">Filter by brand and color family. Tap any shade to open its salon card.</p>
-    </div>
-    <div class="lib-controls">
-      <label class="search"><span class="visually-hidden">Search shades</span><input type="search" id="libSearch" placeholder="Search by shade name or code" autocomplete="off"></label>
-      <span class="select"><select id="libBrand" aria-label="Brand"></select></span>
-    </div>
-    <div class="filters chips" id="filters"></div>
-    <p class="lib-count" id="libCount"></p>
-    <div class="library" id="libraryGrid"></div>
-    <div class="more-row"><button class="btn" type="button" id="libMore" hidden>Show more</button></div>
-  </section>
+    <!-- Library -->
+    <section class="view" id="v-library" hidden>
+      <div class="section-head">
+        <p class="label">The library</p>
+        <h2>Every shade, every code</h2>
+        <p>Search 556 shades from 22 brands. Tap one to open its salon card.</p>
+      </div>
+      <div class="lib-controls">
+        <label class="search"><span class="visually-hidden">Search shades</span><input type="search" id="libSearch" placeholder="Search by shade name or code" autocomplete="off"></label>
+        <span class="select"><select id="libBrand" aria-label="Brand"></select></span>
+      </div>
+      <div class="chips" id="libFamilies"></div>
+      <p class="lib-count" id="libCount"></p>
+      <div class="library" id="libGrid"></div>
+      <div class="more-row"><button class="btn" type="button" id="libMore" hidden><span>Show more</span></button></div>
+    </section>
 
-  <footer>
-    <p><b>About the codes.</b> OPI codes are Nail Lacquer numbers (for example NL S86). DND codes are the number on the cap, and DND duos come as a matching gel and regular polish. Aprés codes are gel shade numbers. essie, Zoya, CND, Sally Hansen, China Glaze, CHANEL, Dior, Hermès and Gucci print a shade number; essie's US and EU numbers differ. Brands without numbers are asked for by shade name. Codes come from the "All Nail Colors By Brand" guide (v2, October 2026) and retailer listings. Codes marked "double-check" came from a single retailer list.</p>
-    <p>Screen colors are approximate. Check the bottle or the salon's swatch ring before your tech starts, since shades can be discontinued or out of stock. Mani Match is an independent guide and is not affiliated with any brand listed.</p>
-  </footer>
+    <!-- Guide -->
+    <section class="view" id="v-guide" hidden>
+      <div class="section-head">
+        <p class="label">The guide</p>
+        <h2>Speak fluent salon</h2>
+        <p>How to ask for each brand's shades, the shapes and lengths to name, and how Gel-X works.</p>
+      </div>
+      <div class="guide-block">
+        <p class="label" style="margin-bottom:16px">How to ask</p>
+        <div class="cards4" id="codeCards"></div>
+        <div class="table-wrap"><table class="brand-table" id="brandTable"></table></div>
+      </div>
+      <div class="guide-block">
+        <p class="label" style="margin-bottom:16px">Shapes</p>
+        <div class="shapes" id="shapeGrid"></div>
+        <div class="lengths">
+          <div class="length"><i style="--h:30%"></i><div><b>Short</b><span>1–3 mm past the fingertip. Typing, training, everyday.</span></div></div>
+          <div class="length"><i style="--h:60%"></i><div><b>Medium</b><span>3–6 mm. Elegant without getting in the way.</span></div></div>
+          <div class="length"><i style="--h:100%"></i><div><b>Long</b><span>6 mm and up. Usually gel or Gel-X.</span></div></div>
+        </div>
+      </div>
+      <div class="guide-block">
+        <p class="label" style="margin-bottom:16px">Gel-X by Aprés</p>
+        <p class="muted" style="max-width:62ch;margin-bottom:18px">Gel-X tips come in five shapes, from extra short to extra long. Natural tips are flatter and suit wider nail beds; Sculpted tips have a higher arch. Your tech chooses the one that fits.</p>
+        <div class="shapes" id="tipGrid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))"></div>
+      </div>
+      <div class="guide-block">
+        <p class="label" style="margin-bottom:16px">The almanac · house picks by month</p>
+        <div class="almanac" id="almanac"></div>
+      </div>
+    </section>
+  </main>
 </div>
 
-<dialog id="salonCard" aria-labelledby="scName">
-  <div class="salon">
-    <div class="top">
-      <span class="tag">Show this to your nail tech</span>
-      <button class="x" type="button" id="scClose" aria-label="Close">✕</button>
+<footer>
+  <p>Codes come from brand and retailer listings. Screen colours are approximate, so check the bottle in daylight before your tech begins. Mani Match is independent and not affiliated with any brand listed.</p>
+</footer>
+
+<nav class="tabbar" aria-label="Sections">
+  <a href="#edition" data-nav="edition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21 V10 Q8 4 12 4 Q16 4 16 10 V21"/></svg>Edition</a>
+  <a href="#collection" data-nav="collection"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M4 10 H20 M9 3 V7 M15 3 V7"/></svg>Collection</a>
+  <a href="#library" data-nav="library"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M16 16 L20 20"/></svg>Library</a>
+  <a href="#guide" data-nav="guide"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4 H19 V20 H5 Z M9 8 H15 M9 12 H15 M9 16 H13"/></svg>Guide</a>
+</nav>
+
+<!-- Presentation card -->
+<dialog id="card" aria-labelledby="pcName">
+  <div class="pc-band" id="pcBand">
+    <div class="pc-top"><span class="label" id="pcDate"></span><button class="pc-close" type="button" id="pcClose" aria-label="Close">✕</button></div>
+    <div id="pcNail"></div>
+  </div>
+  <div class="pc-body">
+    <p class="for" id="pcFor"></p>
+    <p class="label" id="pcBrand"></p>
+    <div class="pc-code" id="pcCode"></div>
+    <h3 class="pc-name" id="pcName"></h3>
+    <dl class="facts" id="pcFacts"></dl>
+    <p class="note" id="pcNote"></p>
+    <div class="actions">
+      <button class="btn primary" type="button" id="pcCopy"><span>Copy for my salon</span></button>
+      <button class="icon-btn" type="button" id="pcSave" aria-pressed="false" aria-label="Save this shade"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></button>
     </div>
-    <div>
-      <p class="brandline" id="scBrand">OPI Nail Lacquer</p>
-      <div class="big" id="scCode">NL S86</div>
-    </div>
-    <h3 id="scName">Bubble Bath</h3>
-    <div class="facts">
-      <div><span>Finish</span><b id="scFinish">Sheer</b></div>
-      <div><span>Shape</span><b id="scShape">Oval</b></div>
-      <div><span>Length</span><b id="scLength">Short</b></div>
-    </div>
-    <div class="gelx-line" id="scGelx" hidden><span>Gel-X tip</span><b id="scGelxText"></b></div>
-    <p class="note" id="scNote"></p>
-    <div class="acts">
-      <button type="button" class="solid" id="scCopy">Copy code</button>
-      <button type="button" id="scSave">Save to shortlist</button>
+  </div>
+</dialog>
+
+<!-- After the appointment -->
+<dialog id="wore" aria-labelledby="woreTitle">
+  <div class="pc-body">
+    <p class="label">After your appointment</p>
+    <h3 class="pc-name" id="woreTitle">How did it wear?</h3>
+    <div class="rate">
+      <button class="btn" type="button" data-rate="loved"><span>Loved it, more like this</span></button>
+      <button class="btn" type="button" data-rate="fine"><span>It was fine</span></button>
+      <button class="btn" type="button" data-rate="no"><span>Not for me</span></button>
+      <button class="btn link" type="button" id="woreCancel"><span>Not yet</span></button>
     </div>
   </div>
 </dialog>
@@ -1396,38 +1362,37 @@ const MONTHS = [
   ["December", "opi-H08", "Holiday party shimmer"],
 ];
 
+
 // ---------- Helpers ----------
 const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const byId = Object.fromEntries(SHADES.map(s => [s.id, s]));
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const finePointer = window.matchMedia("(pointer: fine)").matches;
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
   set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
 };
-function lum(hex) {
-  const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4);
-  return .2126 * r + .7152 * g + .0722 * b;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pad = n => String(n).padStart(2, "0");
+const retrigger = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+function mix(hex, to, t) {
+  const a = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)), b = [1, 3, 5].map(i => parseInt(to.slice(i, i + 2), 16));
+  return "#" + a.map((v, i) => Math.round(v + (b[i] - v) * t).toString(16).padStart(2, "0")).join("");
 }
-const textOn = hex => lum(hex) > .36 ? "#2B1822" : "#FFFFFF";
-const esc = s => s.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const article = w => /^[aeiou]/i.test(w) ? "an" : "a";
-
-function nailSvg(shapeKey, fill, cls = "") {
-  const sh = SHAPES[shapeKey];
-  return `<svg class="${cls}" viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}" fill="${fill}" stroke="rgba(0,0,0,.12)" stroke-width="1"/><path d="M17 30 Q17 22 22 20 L22 70 Q17 68 17 60 Z" fill="rgba(255,255,255,.45)"/></svg>`;
+function hashStr(str) { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function mulberry32(a) {
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 }
-function paintedNail(shapeKey, hex) {
-  // A bare nail underneath, then the color "painted" over it from cuticle to tip.
-  const sh = SHAPES[shapeKey];
-  return `<div class="nailwrap"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}" fill="var(--bare)" stroke="rgba(0,0,0,.1)" stroke-width="1"/></svg>${nailSvg(shapeKey, hex, "paint")}</div>`;
-}
+const isSparkly = s => s.family === "sparkle" || /shimmer|pearl|glitter|holo|metallic|chrome|foil|flakie|iridescent|multichrome|pixie/i.test(s.finish);
 
 let toastTimer;
 function toast(msg) {
   const t = $("#toast"); t.textContent = msg; t.classList.add("show");
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2000);
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
 }
-async function copyText(text, btn) {
+async function copyText(text, okMsg = "Copied") {
   let ok = false;
   try { await navigator.clipboard.writeText(text); ok = true; }
   catch {
@@ -1436,270 +1401,409 @@ async function copyText(text, btn) {
     try { ok = document.execCommand("copy"); } catch {}
     ta.remove();
   }
-  toast(ok ? `Copied ${text}` : `Code: ${text}`);
-  if (btn && ok) {
-    const old = btn.textContent; btn.textContent = "Copied ✓"; btn.classList.add("done");
-    setTimeout(() => { btn.textContent = old; btn.classList.remove("done"); }, 1400);
-  }
+  toast(ok ? okMsg : text);
 }
-function burst(el, color) {
-  if (reduceMotion) return;
-  const r = el.getBoundingClientRect();
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2, d = document.createElement("i");
-    d.className = "drop";
-    d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;--c:${color};--dx:${Math.cos(a) * 30}px;--dy:${Math.sin(a) * 30}px`;
-    document.body.appendChild(d); setTimeout(() => d.remove(), 750);
-  }
-}
-const retrigger = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
 
-// ---------- State ----------
+// ---------- Time ----------
+const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const now = new Date();
-const monthIdx = now.getMonth();
+const YM = `${now.getFullYear()}-${pad(now.getMonth() + 1)}`;
+const monthIndex = ym => { const [y, m] = ym.split("-").map(Number); return y * 12 + m - 1; };
+const ymLabel = ym => `${MONTH_NAMES[+ym.slice(5) - 1]} ${ym.slice(0, 4)}`;
 const seasonFor = m => [11, 0, 1].includes(m) ? "winter" : m <= 4 ? "spring" : m <= 7 ? "summer" : "fall";
-const state = Object.assign({ season: seasonFor(monthIdx), occasion: "everyday", mood: "elegant", tone: "any", service: "gel", brand: "all" }, store.get("mm-picks", {}));
-for (const g of Object.keys(GROUPS)) if (!GROUPS[g].some(([v]) => v === state[g])) state[g] = GROUPS[g][0][0];
-let favs = store.get("mm-favs2", []).filter(id => byId[id]);
-let currentLook = { shape: "squoval", length: "Short" };
 
-// ---------- Matching ----------
-function lookFor(occasion, mood, service) {
-  let [shape, length] = OCCASION_LOOK[occasion];
-  const [mShape, bump] = MOOD_LOOK[mood];
-  const conservative = occasion === "work" || occasion === "interview";
-  if (!conservative && (bump || mood === "romantic" || mood === "playful")) shape = mShape;
-  let step = LENGTHS.indexOf(length);
-  if (!conservative && bump) step++;
-  if (service === "gelx" && !conservative) step++;       // extensions are for length
-  if (service === "polish" && step > 1) step = 1;        // regular polish chips on long free edges
-  length = LENGTHS[Math.min(2, step)];
+// Each month's edition has a name and a line of story.
+const MONTH_EDITIONS = [
+  ["The Clean Slate", "Crisp whites and inky navies for a year that starts tidy."],
+  ["The Valentine", "True reds and rosy pinks, from first dates to a quiet night in."],
+  ["The Thaw", "Fresh sheers and soft greens as the cold finally lets go."],
+  ["In Bloom", "Lilacs, petal pinks and the first true pastels of the year."],
+  ["Garden Party", "Showers, graduations and long lunches outdoors."],
+  ["Wedding Season", "Sheers and blushes for the ceremony, one good coral for the reception."],
+  ["Midsummer", "Poolside brights, and a red for the fireworks."],
+  ["Golden Hour", "Sun-warmed corals and gold before the season turns."],
+  ["Back to Form", "Polished nudes and soft browns for the return to routine."],
+  ["Velvet Hour", "Wines, plums and something dark for the end of the month."],
+  ["First Frost", "Burnished browns and deep berries for long dinners and cold nights."],
+  ["Black Tie", "Shimmer, true reds and midnight shades for the party season."],
+];
+
+// The colour families each month's story is about; the signature leans toward them.
+const MONTH_FAMILIES = [
+  ["nude", "blue", "dark"], ["red", "pink", "berry"], ["blue", "nude", "pink"], ["purple", "pink", "nude"],
+  ["pink", "orange", "purple", "blue"], ["nude", "pink", "orange"], ["orange", "pink", "red", "blue"], ["orange", "blue", "sparkle"],
+  ["nude", "dark"], ["berry", "purple", "dark"], ["dark", "berry", "orange", "red"], ["sparkle", "red", "dark", "blue"],
+];
+
+// ---------- Profile ----------
+const STYLES = {
+  quiet:    { label: "Quiet luxury", hint: "Sheers, nudes and soft neutrals that whisper.", moods: ["calm", "elegant"], shape: "squoval" },
+  classic:  { label: "Timeless classic", hint: "A perfect red, a polished nude, never a trend.", moods: ["elegant", "bold"], shape: "oval" },
+  romantic: { label: "Romantic", hint: "Blush, rose and berry, soft and feminine.", moods: ["romantic", "calm"], shape: "almond" },
+  bold:     { label: "Bold", hint: "Saturated colour that starts conversations.", moods: ["bold", "playful"], shape: "coffin" },
+  avant:    { label: "Avant-garde", hint: "Dark, metallic and unexpected.", moods: ["edgy", "bold"], shape: "stiletto" },
+};
+const HANDS = {
+  busy:      { label: "Busy hands", hint: "Typing, training, little ones. Short and strong.", length: "Short" },
+  balanced:  { label: "Balanced", hint: "A little length that still works.", length: "Medium" },
+  statement: { label: "Statement", hint: "Length is part of the look.", length: "Long" },
+};
+const TONES = {
+  cool:    { label: "Cool", hint: "Veins look blue. Silver flatters you." },
+  warm:    { label: "Warm", hint: "Veins look green. Gold flatters you." },
+  neutral: { label: "Neutral", hint: "A mix of both. Either metal works." },
+  any:     { label: "Not sure", hint: "We'll keep every option open." },
+};
+const SERVICES = {
+  polish: { label: "Regular polish", hint: "Easy to change. Lasts about a week." },
+  gel:    { label: "Gel manicure", hint: "Mirror shine for two to three weeks." },
+  gelx:   { label: "Gel-X extensions", hint: "Soft-gel length, shaped to order." },
+};
+const BRAND_CHOICES = ["opi", "dnd", "apres", "cnd", "essie", "zoya", "chinaGlaze", "orly", "sally"];
+const OCCASIONS = GROUPS.occasion;
+const DEFAULT_PROFILE = { name: "", tone: "any", hands: "balanced", style: "classic", service: "gel", brands: [], occasions: {}, picks: {}, lastUnveiled: "", created: YM, skipped: true };
+
+let profile = store.get("mm-profile", null);
+let journal = store.get("mm-journal", []).filter(j => byId[j.id]);          // { ym, id, rating, at }
+let saved = store.get("mm-saved", store.get("mm-favs2", [])).filter(id => byId[id]);
+const saveProfile = () => store.set("mm-profile", profile);
+const p0 = () => profile || DEFAULT_PROFILE;
+
+// ---------- Commissioning an edition ----------
+function lookFor(p, occasion) {
+  let shape = STYLES[p.style].shape;
+  let length = HANDS[p.hands].length;
+  if (occasion === "work" || occasion === "interview") {
+    length = "Short";
+    if (shape === "coffin" || shape === "stiletto") shape = occasion === "interview" ? "oval" : "almond";
+  }
+  if (occasion === "wedding" && shape === "stiletto") shape = "almond";
+  if (p.service === "polish" && length === "Long") length = "Medium";
   if ((shape === "coffin" || shape === "stiletto") && length === "Short") length = "Medium";
   return { shape, length };
 }
-function gelxTip(look) {
-  const [tip, filed] = GELX_FOR[look.shape];
-  return { text: `${tip} · ${look.length}`, filed };
-}
+const gelxTip = look => { const [tip, filed] = GELX_FOR[look.shape]; return { text: `${tip} · ${look.length}`, filed }; };
 
-function score(s) {
+function affinity() {
+  const fam = {}, bad = new Set(), recent = new Set(), cur = monthIndex(YM);
+  journal.forEach(j => {
+    const s = byId[j.id];
+    fam[s.family] = (fam[s.family] || 0) + (j.rating === "loved" ? 1 : j.rating === "no" ? -1 : 0);
+    if (j.rating === "no") bad.add(j.id);
+    const d = cur - monthIndex(j.ym);
+    if (d > 0 && d <= 2) recent.add(j.id);       // don't repeat the last two months
+  });
+  return { fam, bad, recent };
+}
+function scoreFor(s, p, occasion, month, aff) {
   let v = 0;
-  if (s.seasons.includes(state.season)) v += 3;
-  if (s.occasions.includes(state.occasion)) v += 3;
-  if (s.moods.includes(state.mood)) v += 2.5;
-  if (state.tone !== "any") {
-    if (s.tone === state.tone) v += 1.2;
-    else if (s.tone === "all") v += .8;
-    else if (state.tone === "neutral") v += .4;
-  }
-  if (state.service === "gelx" && s.brand === "apres") v += .8;
-  // For gel services, prefer brands that make a salon gel of the shade.
-  if (state.service !== "polish" && !hasGel(s)) v -= 1;
+  if (s.seasons.includes(seasonFor(month))) v += 3;
+  if (s.occasions.includes(occasion)) v += occasion === "everyday" ? 1 : 3;   // "everyday" means nothing special, so the month leads
+  const [primary, secondary] = STYLES[p.style].moods;
+  if (s.moods.includes(primary)) v += 2.5; else if (s.moods.includes(secondary)) v += 1.2;
+  if (MONTH_FAMILIES[month].includes(s.family)) v += 1.6;
+  if (p.tone !== "any") v += s.tone === p.tone ? 1.2 : s.tone === "all" ? .8 : p.tone === "neutral" ? .5 : 0;
+  if (p.service !== "polish" && !hasGel(s)) v -= 1;
+  if (p.service === "gelx" && s.brand === "apres") v += .8;
+  if (displayCode(s)) v += .6;                     // a code makes the salon visit easier
+  v += Math.max(-2, Math.min(2, aff.fam[s.family] || 0)) * .8;
   return v;
 }
-
-function eligible() {
-  return SHADES.filter(s => (state.brand === "all" || s.brand === state.brand) && !(state.service === "polish" && gelOnly(s)));
+function commission(p, ym, occasion) {
+  const aff = affinity();
+  let list = SHADES.filter(s => !(p.service === "polish" && gelOnly(s)) && !aff.bad.has(s.id) && !aff.recent.has(s.id));
+  if (p.brands.length) { const own = list.filter(s => p.brands.includes(s.brand)); if (own.length >= 12) list = own; }
+  const month = +ym.slice(5) - 1;
+  const ranked = list.map((s, i) => ({ s, v: scoreFor(s, p, occasion, month, aff) - i * 1e-4 })).sort((a, b) => b.v - a.v);
+  // Seeded so an edition stays the same all month, but differs by person, month and occasion.
+  const rnd = mulberry32(hashStr(`${p.name}|${p.created}|${p.style}|${p.tone}|${ym}|${occasion}`));
+  const pick = (arr, n) => arr.length ? arr[Math.floor(rnd() * Math.min(n, arr.length))].s : null;
+  const key = `${ym}|${occasion}`;
+  const signature = (p.picks && byId[p.picks[key]]) || pick(ranked, 5);
+  const rest = ranked.filter(r => r.s !== signature);
+  const quietish = x => { const c = hsl(x.hex); return x.family === "nude" || (c.l > .72 && c.s < .7) || x.moods.includes("calm"); };
+  const statementish = x => { const c = hsl(x.hex); return x.family !== "nude" && (x.family === "sparkle" || c.l < .32 || (c.s > .55 && c.l < .62) || x.moods.includes("bold") || x.moods.includes("edgy")); };
+  const quiet = pick(rest.filter(r => quietish(r.s) && r.s.family !== signature.family), 4) || pick(rest, 4);
+  const statement = pick(rest.filter(r => r.s !== quiet && statementish(r.s) && r.s.family !== signature.family), 4) || pick(rest.filter(r => r.s !== quiet), 4);
+  return { signature, quiet, statement, look: lookFor(p, occasion), occasion };
 }
-function matches(n = 6) {
-  const pool = eligible().map((s, i) => ({ s, v: score(s) - i * 0.001 }));
-  const picked = [], famCount = {}, brandCount = {};
-  while (picked.length < n && pool.length) {
-    // Penalize repeat families (and brands, when showing all) so results stay varied.
-    pool.forEach(p => p.adj = p.v - (famCount[p.s.family] || 0) * 1.6 - (state.brand === "all" ? (brandCount[p.s.brand] || 0) * .5 : 0));
-    pool.sort((a, b) => b.adj - a.adj);
-    const best = pool.shift().s;
-    picked.push(best);
-    famCount[best.family] = (famCount[best.family] || 0) + 1;
-    brandCount[best.brand] = (brandCount[best.brand] || 0) + 1;
+
+const FAMILY_LINE = {
+  nude: "a polished nude that reads clean and expensive", pink: "a pink with real poise", red: "a red with presence",
+  berry: "a deep wine that glows by candlelight", orange: "a warm, sun-touched shade", purple: "a purple with quiet drama",
+  blue: "a cool, composed colour", dark: "a deep neutral with an editorial edge", sparkle: "a finish that catches every light",
+};
+function familyLine(s) {
+  const { l } = hsl(s.hex);
+  if (s.family === "dark") return l < .16 ? "a near-black with an editorial edge" : l > .5 ? (hsl(s.hex).s < .1 ? "a soft dove grey that goes with everything" : "a soft taupe that goes with everything") : FAMILY_LINE.dark;
+  if (s.family === "nude" && l > .9) return "a clean, gallery white";
+  return FAMILY_LINE[s.family] || "a considered choice";
+}
+function noteFor(s, p, look, occasion) {
+  const parts = [`${s.name} is ${familyLine(s)}.`];
+  if (p.tone !== "any" && (s.tone === p.tone || s.tone === "all")) parts.push(p.tone === "cool" ? "Its cool cast flatters your skin." : p.tone === "warm" ? "Its warmth flatters your skin." : "It sits easily on neutral skin.");
+  const occ = { work: "Polished enough for the office.", interview: "Quietly confident for an interview.", date: "Made for a candlelit table.", wedding: "It photographs beautifully at a wedding.", party: "Ready for the party season.", vacation: "Built for sun and salt water." }[occasion];
+  if (occ) parts.push(occ);
+  parts.push(p.service === "gel" ? "In gel, it will see you through the month." : p.service === "gelx" ? `Ask for Gel-X ${gelxTip(look).text.toLowerCase()} tips.` : "Plan a fresh coat in about a week.");
+  return parts.join(" ");
+}
+function brandNote(s) {
+  const code = displayCode(s);
+  return s.brand === "opi" ? `Prefer gel? Ask for "${s.name}" in OPI gel.`
+    : s.brand === "dnd" ? `DND duos include matching gel and polish, so ${s.code} works for either.`
+    : s.brand === "apres" ? "Gel only. Pairs beautifully with Gel-X."
+    : s.brand === "cnd" ? `Made as Vinylux polish and Shellac gel${code ? " under the same number" : ""}.`
+    : s.brand === "essie" && code ? "essie's US and EU numbers differ. Tell your tech which you're reading."
+    : code ? "The number is on the bottle's label." : "This brand doesn't use shade numbers, so ask by name.";
+}
+
+// ---------- Visual building blocks ----------
+let uid = 0;
+function nailSvg(shapeKey, hex, cls = "") {
+  const id = `lq${++uid}`, d = SHAPES[shapeKey].path;
+  return `<svg class="${cls}" viewBox="0 0 60 100" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="${mix(hex, "#ffffff", .24)}"/><stop offset=".5" stop-color="${hex}"/><stop offset="1" stop-color="${mix(hex, "#000000", .38)}"/></linearGradient></defs>
+    <path d="${d}" fill="url(#${id})"/><path d="M17 30 Q17 22 22 20 L22 70 Q17 68 17 60 Z" fill="rgba(255,255,255,.4)"/>
+    <path d="${d}" fill="none" stroke="rgba(255,255,255,.16)" stroke-width=".6"/></svg>`;
+}
+function stageHtml(s, look, { drape = null, cls = "" } = {}) {
+  return `<div class="stage ${cls} ${isSparkly(s) ? "sparkle" : ""}" style="--c:${s.hex}" data-tilt>
+    <div class="halo"></div><div class="plinth"></div>
+    <div class="lacquer">${nailSvg(look.shape, s.hex)}</div>
+    <div class="sheen"></div>
+    ${drape ? `<div class="drape"><div class="drape-text"><span class="label">${esc(drape.label)}</span><b>${esc(drape.title)}</b></div></div>` : ""}
+  </div>`;
+}
+function bindTilt(root) {
+  if (!finePointer || reduceMotion) return;
+  $$("[data-tilt]", root).forEach(el => {
+    el.addEventListener("pointermove", e => {
+      const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      el.style.setProperty("--ry", `${(x * 16).toFixed(2)}deg`); el.style.setProperty("--rx", `${(-y * 12).toFixed(2)}deg`);
+    });
+    el.addEventListener("pointerleave", () => { el.style.setProperty("--ry", "0deg"); el.style.setProperty("--rx", "0deg"); });
+  });
+}
+const heartSvg = `<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>`;
+function codeHtml(s) {
+  const code = displayCode(s);
+  return code
+    ? `<span class="code">${esc(code)}</span>${s.check ? `<span class="check-tag">Double-check this code on the bottle</span>` : ""}`
+    : `<span class="byname">${esc(BRANDS[s.brand].label)} ${esc(s.name)}</span>`;
+}
+function factsHtml(s, look, service) {
+  const tip = gelxTip(look);
+  return `<div><dt>Finish</dt><dd>${esc(s.finish)}</dd></div>
+    <div><dt>Shape</dt><dd>${SHAPES[look.shape].label}</dd></div>
+    <div><dt>Length</dt><dd>${look.length}</dd></div>
+    ${service === "gelx" ? `<div><dt>Gel-X tip</dt><dd>${tip.text}${tip.filed ? `<small>${tip.filed}</small>` : ""}</dd></div>` : ""}`;
+}
+
+// ---------- The Edition ----------
+let edition = null;
+function renderEdition({ unveil = null } = {}) {
+  const p = p0();
+  const occasion = (p.occasions && p.occasions[YM]) || "everyday";
+  edition = commission(p, YM, occasion);
+  const { signature: s, look } = edition;
+  const m = now.getMonth(), [title, story] = MONTH_EDITIONS[m];
+  const no = Math.max(1, monthIndex(YM) - monthIndex(p.created) + 1);
+  const h = now.getHours(), greet = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
+
+  $("#edNo").textContent = `Edition No. ${pad(no)} · ${MONTH_NAMES[m]} ${now.getFullYear()}`;
+  $("#edGreet").textContent = p.name ? `${greet}, ${p.name}.` : `${greet}.`;
+  $("#edTitle").textContent = title;
+  $("#edStory").textContent = story;
+  $("#edPersonalize").hidden = !p.skipped;
+
+  const play = unveil ?? (!reduceMotion && p.lastUnveiled !== YM);
+  $("#edStage").innerHTML = stageHtml(s, look, { drape: { label: p.name ? `For ${p.name}` : "Your edition", title: `The ${MONTH_NAMES[m]} Edition` }, cls: play ? "" : "unveiled instant" });
+  bindTilt($("#edStage"));
+  if (play) {
+    setTimeout(() => $("#edStage .stage")?.classList.add("unveiled"), 900);
+    if (profile) { profile.lastUnveiled = YM; saveProfile(); }
   }
-  return picked;
-}
 
-// ---------- Rendering ----------
-function chipsHtml(group, values, current, name = group) {
-  return values.map(([v, l]) =>
-    `<label class="chip"><input type="radio" name="${name}" id="${name}-${v}" value="${v}" ${current === v ? "checked" : ""}><span>${l}</span></label>`).join("");
+  $("#edDetails").innerHTML = `
+    <p class="label">The Signature</p>
+    <h2 class="shade-name">${esc(s.name)}</h2>
+    <p class="brandline">${esc(brandLine(s))}</p>
+    <div class="code-block"><span class="label" style="color:var(--faint)">Salon code</span>${codeHtml(s)}</div>
+    <dl class="facts">${factsHtml(s, look, p.service)}</dl>
+    <p class="note">${esc(noteFor(s, p, look, occasion))}</p>
+    <div class="actions">
+      <button class="btn primary" type="button" data-present="${s.id}"><span>Present at the salon</span></button>
+      <button class="btn" type="button" data-wore="${s.id}"><span>${wornThisMonth(s.id) ? "Worn ✓" : "I wore this"}</span></button>
+      <button class="icon-btn" type="button" data-save="${s.id}" aria-pressed="${saved.includes(s.id)}" aria-label="Save ${esc(s.name)}">${heartSvg}</button>
+    </div>`;
+
+  $("#occasionChips").innerHTML = OCCASIONS.map(([v, l]) =>
+    `<label class="chip"><input type="radio" name="occasion" id="occ-${v}" value="${v}" ${v === occasion ? "checked" : ""}><span>${v === "everyday" ? "Nothing special" : l}</span></label>`).join("");
+
+  $("#alts").innerHTML = [["The Quiet Luxury", edition.quiet], ["The Statement", edition.statement]].filter(([, x]) => x).map(([label, x]) => `
+    <article class="alt">
+      ${stageHtml(x, look, { cls: "small unveiled instant" })}
+      <div class="alt-body">
+        <p class="label">${label}</p>
+        <h3>${esc(x.name)}</h3>
+        <p class="brandline">${displayCode(x) ? `<span class="code-sm">${esc(displayCode(x))}</span>` : `${esc(BRANDS[x.brand].label)} · ask by name`}</p>
+        <p class="muted small">${esc(`${familyLine(x)[0].toUpperCase()}${familyLine(x).slice(1)}, in ${x.finish.toLowerCase()}.`)}</p>
+        <div class="actions">
+          <button class="btn small" type="button" data-present="${x.id}"><span>Salon card</span></button>
+          <button class="btn small link" type="button" data-make="${x.id}"><span>Make it my signature</span></button>
+        </div>
+      </div>
+    </article>`).join("");
+  bindTilt($("#alts"));
+
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const days = Math.max(1, Math.ceil((next - now) / 864e5));
+  $("#edNext").textContent = `The ${MONTH_NAMES[next.getMonth()]} edition, ${MONTH_EDITIONS[next.getMonth()][0]}, unveils ${days === 1 ? "tomorrow" : `in ${days} days`}.`;
+  $("#monogram").textContent = (p.name || "M")[0].toUpperCase();
+}
+function recommission(change) {
+  const hero = $("#hero");
+  if (reduceMotion) { change(); renderEdition({ unveil: false }); return; }
+  hero.classList.add("swap");
+  setTimeout(() => { change(); renderEdition({ unveil: true }); hero.classList.remove("swap"); }, 450);
+}
+$("#occasionChips").addEventListener("change", e => {
+  ensureProfile();
+  recommission(() => { profile.occasions = { ...profile.occasions, [YM]: e.target.value }; saveProfile(); });
+});
+$("#replay").addEventListener("click", () => {
+  const st = $("#edStage .stage"); if (!st) return;
+  st.classList.remove("unveiled", "instant"); void st.offsetWidth;
+  setTimeout(() => st.classList.add("unveiled"), 700);
+});
+function ensureProfile() { if (!profile) { profile = { ...DEFAULT_PROFILE, created: YM }; saveProfile(); } }
+
+// ---------- Consultation ----------
+const ROMAN = ["I", "II", "III", "IV", "V", "VI"];
+const STEPS = [
+  { key: "name", type: "text", title: "What shall we call you?", sub: "Your edition is addressed to you each month." },
+  { key: "tone", type: "choice", title: "How does your skin read in daylight?", sub: "So every shade flatters your skin instead of fighting it.", options: TONES },
+  { key: "hands", type: "choice", title: "How do you live with your hands?", sub: "We'll keep the length practical for your days.", options: HANDS },
+  { key: "style", type: "choice", title: "Which sounds most like you?", sub: "Your style sets the mood of every edition.", options: STYLES },
+  { key: "service", type: "choice", title: "How do you like it done?", sub: "We'll choose shades your salon can do this way.", options: SERVICES },
+  { key: "brands", type: "multi", title: "Which brands does your salon carry?", sub: "Not sure? Leave it on Any brand and we'll choose from all 22." },
+];
+let draft = null, step = 0;
+function startConsult() {
+  draft = { ...DEFAULT_PROFILE, ...(profile || {}), brands: [...((profile && profile.brands) || [])] };
+  step = 0; drawStep(0);
+}
+function drawStep(dir = 1) {
+  const S = STEPS[step];
+  $("#cStep").textContent = `${ROMAN[step]} of ${ROMAN[STEPS.length - 1]}`;
+  $("#cProgress").style.setProperty("--p", (step + 1) / STEPS.length);
+  let body = `<h2>${S.title}</h2><p class="sub">${S.sub}</p>`;
+  if (S.type === "text") {
+    body += `<div class="field"><label class="visually-hidden" for="cName">First name</label><input id="cName" type="text" maxlength="30" autocomplete="given-name" placeholder="Your first name" value="${esc(draft.name)}"></div>`;
+  } else if (S.type === "choice") {
+    body += `<div class="opts">${Object.entries(S.options).map(([k, o]) =>
+      `<button class="opt ${draft[S.key] === k ? "on" : ""}" type="button" data-opt="${k}" aria-pressed="${draft[S.key] === k}"><b>${o.label}</b><span>${o.hint}</span></button>`).join("")}</div>`;
+  } else {
+    const any = !draft.brands.length;
+    body += `<div class="opts"><button class="opt ${any ? "on" : ""}" type="button" data-opt="any" aria-pressed="${any}"><b>Any brand</b><span>Choose from all 556 shades.</span></button>
+      ${BRAND_CHOICES.map(k => { const on = draft.brands.includes(k); return `<button class="opt ${on ? "on" : ""}" type="button" data-opt="${k}" aria-pressed="${on}"><b>${esc(BRANDS[k].label)}</b><span>${esc(BRANDS[k].known)}</span></button>`; }).join("")}</div>`;
+  }
+  $("#cBody").innerHTML = body;
+  if (dir) retrigger($("#cBody"), dir > 0 ? "next" : "prev");
+  $("#cBack").style.visibility = step ? "visible" : "hidden";
+  $("#cNext").firstElementChild.textContent = step === STEPS.length - 1 ? "Unveil my edition" : S.type === "text" && !draft.name ? "Skip" : "Continue";
+  if (S.type === "text") {
+    const inp = $("#cName");
+    inp.addEventListener("input", () => { draft.name = inp.value.trim(); $("#cNext").firstElementChild.textContent = draft.name ? "Continue" : "Skip"; });
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") nextStep(); });
+    if (finePointer) setTimeout(() => inp.focus({ preventScroll: true }), 300);
+  }
+}
+function nextStep() {
+  if (step < STEPS.length - 1) { step++; drawStep(1); return; }
+  const fresh = !profile;
+  profile = { ...draft, created: (profile && profile.created) || YM, skipped: false, lastUnveiled: "", picks: {} };
+  saveProfile();
+  toast(fresh ? "Your atelier is ready" : "Preferences saved");
+  location.hash = "#edition";
+}
+$("#cBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-opt]"); if (!b) return;
+  const S = STEPS[step], v = b.dataset.opt;
+  if (S.type === "choice") {
+    draft[S.key] = v;
+    $$(".opt", $("#cBody")).forEach(o => { o.classList.toggle("on", o === b); o.setAttribute("aria-pressed", o === b); });
+    setTimeout(nextStep, reduceMotion ? 0 : 420);          // one tap moves you on
+  } else {
+    draft.brands = v === "any" ? [] : draft.brands.includes(v) ? draft.brands.filter(x => x !== v) : [...draft.brands, v];
+    drawStep(0);
+  }
+});
+$("#cNext").addEventListener("click", nextStep);
+$("#cBack").addEventListener("click", () => { if (step) { step--; drawStep(-1); } });
+
+// ---------- Collection ----------
+const RATING = { loved: "Loved it", fine: "It was fine", no: "Not for me" };
+const wornThisMonth = id => journal.some(j => j.ym === YM && j.id === id);
+function renderCollection() {
+  const p = p0(), y = now.getFullYear();
+  $("#colTitle").textContent = `${p.name ? `${p.name}'s` : "Your"} ${y} in colour`;
+  $("#year").innerHTML = MONTH_NAMES.map((name, i) => {
+    const ym = `${y}-${pad(i + 1)}`, e = [...journal].reverse().find(j => j.ym === ym), s = e && byId[e.id];
+    const cls = `${i === now.getMonth() ? "now" : ""} ${i > now.getMonth() ? "future" : ""}`;
+    return s
+      ? `<button class="yr has ${cls}" type="button" data-present="${s.id}" style="--c:${s.hex}"><i></i><span><b>${name.slice(0, 3)}</b><small>${esc(s.name)}</small></span></button>`
+      : `<div class="yr ${cls}"><i></i><span><b>${name.slice(0, 3)}</b></span></div>`;
+  }).join("");
+
+  const loved = journal.filter(j => j.rating === "loved").map(j => byId[j.id]);
+  const famCount = {}; loved.forEach(s => famCount[s.family] = (famCount[s.family] || 0) + 1);
+  const topFam = Object.entries(famCount).sort((a, b) => b[1] - a[1])[0];
+  const famLabel = topFam && (FAMILIES.find(([k]) => k === topFam[0]) || [])[1];
+  $("#insight").innerHTML = !journal.length
+    ? `<p class="label">Your signature, in time</p><p>Mark your manicure as worn each month. After a few, we'll tell you what your hands love.</p>`
+    : `<p class="label">What we've learned</p><p>${loved.length
+        ? `You've loved ${loved.length} ${loved.length === 1 ? "manicure" : "manicures"} so far. Your signature leans toward ${famLabel ? famLabel.toLowerCase() : "considered classics"}, so future editions will too.`
+        : `You've worn ${journal.length} ${journal.length === 1 ? "edition" : "editions"}. Tell us which ones you love and future editions will follow your lead.`}</p>`;
+
+  $("#history").innerHTML = journal.length
+    ? [...journal].reverse().map(j => { const s = byId[j.id]; return `<button class="row" type="button" data-present="${s.id}"><i style="--c:${s.hex}"></i><span><b>${esc(s.name)}</b><span>${esc(displayCode(s) || BRANDS[s.brand].label)} · ${ymLabel(j.ym)}</span></span><em>${RATING[j.rating] || ""}</em></button>`; }).join("")
+    : `<p class="empty">Nothing worn yet. After your appointment, tap "I wore this" on your edition.</p>`;
+
+  $("#savedGrid").innerHTML = saved.length ? saved.map((id, i) => tileHtml(byId[id], i)).join("") : `<p class="empty" style="grid-column:1/-1">Tap the heart on any shade to keep it here.</p>`;
+
+  const brands = p.brands.length ? p.brands.map(k => BRANDS[k].label).join(", ") : "Any brand";
+  $("#prefs").innerHTML = `<dt>Name</dt><dd>${esc(p.name || "Not set")}</dd><dt>Undertone</dt><dd>${TONES[p.tone].label}</dd><dt>Hands</dt><dd>${HANDS[p.hands].label}</dd>
+    <dt>Style</dt><dd>${STYLES[p.style].label}</dd><dt>Service</dt><dd>${SERVICES[p.service].label}</dd><dt>Brands</dt><dd>${esc(brands)}</dd>`;
+}
+$("#clearAsk").addEventListener("click", () => { $("#clearConfirm").hidden = false; });
+$("#clearNo").addEventListener("click", () => { $("#clearConfirm").hidden = true; });
+$("#clearYes").addEventListener("click", () => {
+  ["mm-profile", "mm-journal", "mm-saved", "mm-favs2", "mm-picks"].forEach(store.del);
+  profile = null; journal = []; saved = [];
+  $("#clearConfirm").hidden = true; toast("Cleared from this device");
+  location.hash = "#edition"; route();
+});
+
+// ---------- Library ----------
+const LIB_PAGE = 48;
+const lib = { brand: "all", family: "all", query: "", limit: LIB_PAGE };
+function tileHtml(s, i = 0) {
+  return `<button class="tile" type="button" data-present="${s.id}" style="--c:${s.hex};--i:${Math.min(i, 24)}"><i></i><div><b>${esc(s.name)}</b><span>${esc(BRANDS[s.brand].label)}</span><span class="c">${esc(displayCode(s) || "Ask by name")}</span></div></button>`;
 }
 function brandOptions(current) {
   return `<option value="all">All brands</option>` + BRAND_GROUPS.map(([g, label]) =>
     `<optgroup label="${label}">${Object.entries(BRANDS).filter(([, b]) => b.group === g)
       .map(([k, b]) => `<option value="${k}" ${current === k ? "selected" : ""}>${esc(b.label)}</option>`).join("")}</optgroup>`).join("");
 }
-function syncPickers() {
-  document.querySelectorAll("#pickers input").forEach(i => { i.checked = state[i.name] === i.value; });
-  $("#brandSelect").value = state.brand;
-}
-function renderPickers() {
-  document.querySelectorAll("[data-group]").forEach(box => { box.innerHTML = chipsHtml(box.dataset.group, GROUPS[box.dataset.group], state[box.dataset.group]); });
-  $("#brandSelect").innerHTML = brandOptions(state.brand);
-  $("#pickers").addEventListener("change", e => {
-    const { name, value } = e.target;
-    state[name] = value;
-    // Aprés colors are gel only, so keep the two pickers consistent.
-    if (name === "brand" && value === "apres" && state.service === "polish") { state.service = "gel"; toast("Aprés is gel only, so we switched to gel"); }
-    if (name === "service" && value === "polish" && state.brand === "apres") { state.brand = "all"; toast("Aprés is gel only, so we're showing all brands"); }
-    syncPickers();
-    store.set("mm-picks", state);
-    updateResults();
-  });
-}
-
-function updateResults() {
-  if (reduceMotion) { renderResults(); return; }
-  $("#results").classList.add("out");
-  setTimeout(() => { $("#results").classList.remove("out"); renderResults(); }, 170);
-}
-
-function renderResults() {
-  currentLook = lookFor(state.occasion, state.mood, state.service);
-  const list = matches();
-  const tip = gelxTip(currentLook);
-  $("#resultsTitle").textContent = `${LABEL[state.season]} · ${LABEL[state.occasion]} · ${LABEL[state.mood]}`;
-  $("#resultsSub").innerHTML = state.service === "gelx"
-    ? `Ask for Gel-X <b>${tip.text}</b>${tip.filed ? `, ${tip.filed}` : ""}`
-    : `Pair with <b>${SHAPES[currentLook.shape].label}</b> shape, <b>${currentLook.length.toLowerCase()}</b> length`;
-  if (!list.length) {
-    $("#results").innerHTML = `<p class="empty no-results">No shades match that brand and service. Try All brands.</p>`;
-    return;
-  }
-  $("#results").innerHTML = list.map((s, i) => {
-    const hits = [
-      s.seasons.includes(state.season) && LABEL[state.season],
-      s.occasions.includes(state.occasion) && LABEL[state.occasion],
-      s.moods.includes(state.mood) && LABEL[state.mood],
-    ].filter(Boolean);
-    const extra = s.moods.filter(m => m !== state.mood).slice(0, 2).map(m => LABEL[m]);
-    const shimmer = /shimmer|pearl|glitter|holo|metallic|chrome|foil|flakie|iridescent|multichrome|pixie/i.test(s.finish) || s.family === "sparkle";
-    const code = displayCode(s);
-    const gelHint = state.service !== "polish" && !hasGel(s) ? `<p class="gel-hint">Regular polish. For gel, ask your tech to match this color.</p>` : "";
-    return `<article class="card ${shimmer ? "shimmer" : ""}" style="--i:${i}">
-      <div class="swatch" style="--c:${s.hex}">
-        <span class="badge rank">#${i + 1} match</span>
-        <span class="badge brand-tag">${BRANDS[s.brand].label}</span>
-        ${paintedNail(currentLook.shape, s.hex)}
-      </div>
-      <div class="card-body">
-        <div class="card-title">
-          <div><h4>${esc(s.name)}</h4><small>${brandLine(s)} · ${s.finish}</small></div>
-          <button class="heart" type="button" data-fav="${s.id}" aria-pressed="${favs.includes(s.id)}" aria-label="Save ${esc(s.name)} to shortlist">
-            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg>
-          </button>
-        </div>
-        <div class="code-row">
-          ${code
-            ? `<div><div class="label">Salon code${s.check ? " · double-check" : ""}</div><div class="code">${esc(code)}</div></div>`
-            : `<div><div class="label">Ask for it by name</div><div class="code byname">${esc(BRANDS[s.brand].label)} ${esc(s.name)}</div></div>`}
-          <button class="copy" type="button" data-copy="${esc(askText(s))}">Copy</button>
-        </div>
-        ${gelHint}
-        <dl class="meta">
-          <dt>Shape</dt><dd>${nailSvg(currentLook.shape, "currentColor")}${SHAPES[currentLook.shape].label}</dd>
-          <dt>Length</dt><dd>${currentLook.length}</dd>
-          ${state.service === "gelx" ? `<dt>Gel-X tip</dt><dd>${tip.text}${tip.filed ? ` <small>(${tip.filed})</small>` : ""}</dd>` : ""}
-        </dl>
-        <div class="why">${hits.map(h => `<span class="hit">${h}</span>`).join("")}${extra.map(h => `<span>${h}</span>`).join("")}</div>
-      </div>
-      <div class="card-actions"><button class="btn small" type="button" data-open="${s.id}">Open salon card</button></div>
-    </article>`;
-  }).join("");
-  paintTheme(list);
-}
-
-let fanBuilt = false;
-function paintTheme(list) {
-  // The hero fan, aura, brand mark and shape guide take on the current top matches.
-  const top = list[0];
-  const fanShades = [...list, ...matches(9).slice(list.length)].slice(0, 9);
-  while (fanShades.length < 9) fanShades.push(top);
-  const fan = $("#fan");
-  if (!fanBuilt) {
-    fan.innerHTML = fanShades.map((s, i) => `<div class="stick" style="--i:${i};--a:${-52 + i * 13}deg;--c:${s.hex}"><div class="tip"></div><div class="rod"></div></div>`).join("");
-    fanBuilt = true;
-  } else {
-    [...fan.children].forEach((el, i) => { el.style.setProperty("--c", fanShades[i].hex); if (!reduceMotion) retrigger(el.firstElementChild, "pop"); });
-    if (!reduceMotion) retrigger($("#fanLabel"), "bump");
-  }
-  $("#aura").style.setProperty("--a1", top.hex);
-  $("#aura").style.setProperty("--a2", (list[1] || top).hex);
-  $("#fanLabel").innerHTML = `<span class="mono">${esc(displayCode(top) || BRANDS[top.brand].label)}</span><b>${esc(top.name)}</b>Top match right now`;
-  $("#brandDot").style.background = top.hex;
-  document.querySelectorAll(".shape").forEach(el => {
-    el.classList.toggle("picked", el.dataset.shape === currentLook.shape);
-    el.querySelector("path").style.fill = top.hex;
-  });
-  $("#heroEyebrow").textContent = `${LABEL[state.season]} consultation · ${now.toLocaleString("en-US", { month: "long" })}`;
-}
-
-function renderShortlist() {
-  const box = $("#shortlist");
-  box.innerHTML = favs.length
-    ? favs.map((id, i) => { const s = byId[id]; return `<button class="mini" type="button" data-open="${id}" style="animation-delay:${i * 40}ms"><i style="--c:${s.hex}"></i>${esc(s.name)} <span class="mono">${esc(displayCode(s) || BRANDS[s.brand].label)}</span></button>`; }).join("")
-    : `<p class="empty">Tap the heart on any shade to save it here. Your shortlist stays on this device.</p>`;
-}
-
-function toggleFav(id, fromEl) {
-  const adding = !favs.includes(id);
-  favs = adding ? [...favs, id] : favs.filter(n => n !== id);
-  store.set("mm-favs2", favs);
-  document.querySelectorAll(`[data-fav="${CSS.escape(id)}"]`).forEach(b => { b.setAttribute("aria-pressed", adding); if (!reduceMotion) retrigger(b, "beat"); });
-  if (adding && fromEl) burst(fromEl, byId[id].hex);
-  renderShortlist();
-  toast(adding ? "Saved to shortlist" : "Removed from shortlist");
-  return adding;
-}
-
-function renderBrands() {
-  const numbered = ["essie", "zoya", "cnd", "sally", "chinaGlaze", "chanel", "dior", "hermes", "gucci"];
-  $("#brandGrid").innerHTML = CODE_CARDS.map(c => {
-    const keys = c.key === "essie" ? numbered : [c.key];
-    const shades = SHADES.filter(s => keys.includes(s.brand));
-    const strip = shades.filter((_, i) => i % Math.ceil(shades.length / 8) === 0).slice(0, 8);
-    const label = c.label || BRANDS[c.key].label;
-    return `<div class="brand-card">
-      <div class="strip">${strip.map(s => `<i style="--c:${s.hex}"></i>`).join("")}</div>
-      <h3>${label}</h3>
-      <div class="sample">${c.sample}</div>
-      <p>${c.blurb}</p>
-      <span class="count">${shades.length} shades in Mani Match</span>
-      <button class="btn small" type="button" data-brand="${c.key}">Show ${BRANDS[c.key].label} matches</button>
-    </div>`;
-  }).join("");
-  $("#brandTable").innerHTML = `<thead><tr><th>Brand</th><th>Type</th><th class="num">Shades</th><th>Price</th><th>Known for</th><th>How to ask</th></tr></thead><tbody>` +
-    Object.entries(BRANDS).map(([key, b]) => {
-      const shades = SHADES.filter(s => s.brand === key);
-      return `<tr><td><button class="brand-link" type="button" data-brand="${key}"><span class="dots">${shades.slice(0, 4).map(s => `<i style="--c:${s.hex}"></i>`).join("")}</span>${esc(b.label)}</button></td>
-        <td>${BRAND_GROUPS.find(([g]) => g === b.group)[1]}</td><td class="num">${shades.length}</td><td>${b.price}</td><td>${b.known}</td><td>${b.ask}${b.gel ? " · gel available" : ""}</td></tr>`;
-    }).join("") + `</tbody>`;
-  $("#tipGrid").innerHTML = GELX_TIPS.map(([key, label, note]) =>
-    `<div class="tip-card"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${SHAPES[key].path}"/></svg><b>${label}</b><span>${note}</span></div>`).join("");
-}
-
-function renderMonths() {
-  $("#monthGrid").innerHTML = MONTHS.map(([m, id, why], i) => {
-    const s = byId[id];
-    return `<button class="month ${i === monthIdx ? "now" : ""}" type="button" data-open="${id}">
-      <span class="chip-color" style="--c:${s.hex}"></span>
-      <span class="m-body"><span class="m-name">${m}${i === monthIdx ? " · now" : ""}</span><span class="m-shade">${esc(s.name)}</span><span class="m-why">${why} · <span class="mono">${esc(displayCode(s))}</span></span></span>
-    </button>`;
-  }).join("");
-}
-
-function renderShapes() {
-  $("#shapeGrid").innerHTML = Object.entries(SHAPES).map(([key, sh]) =>
-    `<div class="shape" data-shape="${key}"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}"/></svg><b>${sh.label}</b><p>${sh.note}</p></div>`).join("");
-}
-
-const LIB_PAGE = 48;
-const lib = { brand: "all", family: "all", query: "", limit: LIB_PAGE };
-function renderLibrary() {
+function setupLibrary() {
   $("#libBrand").innerHTML = brandOptions(lib.brand);
-  $("#filters").innerHTML = chipsHtml("family", FAMILIES, lib.family, "libFamily");
-  drawLibrary();
+  $("#libFamilies").innerHTML = FAMILIES.map(([v, l]) => `<label class="chip"><input type="radio" name="libFamily" id="fam-${v}" value="${v}" ${v === lib.family ? "checked" : ""}><span>${l}</span></label>`).join("");
   $("#libBrand").addEventListener("change", e => { lib.brand = e.target.value; lib.limit = LIB_PAGE; drawLibrary(); });
-  $("#filters").addEventListener("change", e => { lib.family = e.target.value; lib.limit = LIB_PAGE; drawLibrary(); });
+  $("#libFamilies").addEventListener("change", e => { lib.family = e.target.value; lib.limit = LIB_PAGE; drawLibrary(); });
   $("#libSearch").addEventListener("input", e => { lib.query = e.target.value.trim().toLowerCase(); lib.limit = LIB_PAGE; drawLibrary(); });
   $("#libMore").addEventListener("click", () => { const from = lib.limit; lib.limit += LIB_PAGE; drawLibrary(from); });
+  drawLibrary();
 }
 function drawLibrary(from = 0) {
   const q = lib.query;
@@ -1707,133 +1811,182 @@ function drawLibrary(from = 0) {
     && (!q || `${s.name} ${displayCode(s)} ${BRANDS[s.brand].label}`.toLowerCase().includes(q)));
   const shown = list.slice(0, lib.limit);
   $("#libCount").textContent = `${list.length} ${list.length === 1 ? "shade" : "shades"}${list.length > shown.length ? `, showing ${shown.length}` : ""}`;
-  $("#libraryGrid").innerHTML = shown.length ? shown.map((s, i) =>
-    `<button class="lib" type="button" data-open="${s.id}" style="--i:${Math.min(Math.max(i - from, 0), 24)}"><i style="--c:${s.hex}"></i><div><b>${esc(s.name)}</b><span class="lib-brand">${esc(BRANDS[s.brand].label)}</span>${displayCode(s) ? `<span class="mono">${esc(displayCode(s))}</span>` : `<span class="by-name">Ask by name</span>`}</div></button>`).join("")
-    : `<p class="empty">No shades match. Try another brand, color family or search.</p>`;
+  $("#libGrid").innerHTML = shown.length ? shown.map((s, i) => tileHtml(s, Math.max(i - from, 0))).join("")
+    : `<p class="empty" style="grid-column:1/-1">No shades match. Try another brand, colour family or search.</p>`;
   const left = list.length - shown.length;
   $("#libMore").hidden = left <= 0;
-  $("#libMore").textContent = `Show ${Math.min(left, LIB_PAGE)} more`;
+  $("#libMore").firstElementChild.textContent = `Show ${Math.min(left, LIB_PAGE)} more`;
 }
 
-// ---------- Salon card ----------
-let openShade = null;
-function openCard(id, evt) {
+// ---------- Guide ----------
+function setupGuide() {
+  const numbered = ["essie", "zoya", "cnd", "sally", "chinaGlaze", "chanel", "dior", "hermes", "gucci"];
+  $("#codeCards").innerHTML = CODE_CARDS.map(c => {
+    const keys = c.key === "essie" ? numbered : [c.key];
+    const n = SHADES.filter(s => keys.includes(s.brand)).length;
+    return `<div class="gcard"><p class="label">${n} shades</p><h3>${esc(c.label || BRANDS[c.key].label)}</h3><span class="code">${esc(c.sample)}</span><p>${esc(c.blurb)}</p></div>`;
+  }).join("");
+  $("#brandTable").innerHTML = `<thead><tr><th>Brand</th><th>Type</th><th class="num">Shades</th><th>Price</th><th>Known for</th><th>How to ask</th></tr></thead><tbody>` +
+    Object.entries(BRANDS).map(([key, b]) => `<tr><td>${esc(b.label)}</td><td>${BRAND_GROUPS.find(([g]) => g === b.group)[1]}</td><td class="num">${SHADES.filter(s => s.brand === key).length}</td><td>${b.price}</td><td>${b.known}</td><td>${b.ask}${b.gel ? " · gel available" : ""}</td></tr>`).join("") + `</tbody>`;
+  $("#shapeGrid").innerHTML = Object.values(SHAPES).map(sh => `<div class="shape"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${sh.path}"/></svg><b>${sh.label}</b><p>${sh.note}</p></div>`).join("");
+  $("#tipGrid").innerHTML = GELX_TIPS.map(([key, label, note]) => `<div class="shape"><svg viewBox="0 0 60 100" aria-hidden="true"><path d="${SHAPES[key].path}"/></svg><b>${label}</b><p>${note}</p></div>`).join("");
+  $("#almanac").innerHTML = MONTHS.map(([m, id], i) => { const s = byId[id]; return s ? tileHtml(s, i).replace(`<span>${esc(BRANDS[s.brand].label)}</span>`, `<span>${m}</span>`) : ""; }).join("");
+}
+
+// ---------- Presentation card ----------
+let carded = null;
+function present(id) {
   const s = byId[id]; if (!s) return;
-  openShade = s;
-  const dlg = $("#salonCard");
-  const code = displayCode(s);
-  dlg.style.setProperty("--c", s.hex);
-  dlg.style.setProperty("--t", textOn(s.hex));
-  $("#scBrand").textContent = code ? brandLine(s) : `${brandLine(s)} · ask for it by name`;
-  $("#scCode").textContent = code || s.name;
-  $("#scCode").classList.toggle("long", !!code && code.length > 8);
-  $("#scCode").classList.toggle("byname", !code);
-  $("#scName").textContent = code ? s.name : "";
-  $("#scName").hidden = !code;
-  $("#scCopy").textContent = code ? "Copy code" : "Copy name";
-  $("#scFinish").textContent = s.finish;
-  $("#scShape").textContent = SHAPES[currentLook.shape].label;
-  $("#scLength").textContent = currentLook.length;
-  const tip = gelxTip(currentLook);
-  $("#scGelx").hidden = state.service !== "gelx";
-  $("#scGelxText").textContent = `${tip.text}${tip.filed ? ` (${tip.filed})` : ""}`;
-  const fit = `Shape and length suit ${LABEL[state.occasion].toLowerCase()} with ${article(state.mood)} ${LABEL[state.mood].toLowerCase()} mood.`;
-  const brandNote = s.brand === "opi" ? `Want gel? Ask for "${s.name}" in OPI gel.`
-    : s.brand === "dnd" ? `DND duos include matching gel and regular polish, so ${s.code} works for either.`
-    : s.brand === "apres" ? `Gel only. Pairs well with Gel-X extensions.`
-    : s.brand === "cnd" ? `CND makes this shade as Vinylux polish and Shellac gel${code ? " under the same number" : ""}.`
-    : s.brand === "essie" && code ? `essie's US and EU numbers differ. Tell your tech which one you're reading.`
-    : state.service !== "polish" ? `This is a regular polish. For gel, ask your tech to match the color.`
-    : code ? `The number is on the bottle's label.` : `This brand doesn't use shade numbers, so ask for it by name.`;
-  const checkNote = s.check ? " This code came from a retailer list, so double-check it on the bottle." : "";
-  $("#scNote").textContent = `${brandNote}${checkNote} ${fit}`;
-  $("#scSave").textContent = favs.includes(s.id) ? "Saved ✓" : "Save to shortlist";
-  if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", "");
-  if (!reduceMotion) {
-    const r = dlg.getBoundingClientRect();
-    const x = evt && evt.clientX ? evt.clientX - r.left : r.width / 2;
-    const y = evt && evt.clientY ? evt.clientY - r.top : r.height / 2;
-    dlg.style.setProperty("--x", `${Math.round(x)}px`);
-    dlg.style.setProperty("--y", `${Math.round(y)}px`);
-    retrigger(dlg, "flood");
-  }
+  carded = s;
+  const p = p0(), occasion = (p.occasions && p.occasions[YM]) || "everyday", look = lookFor(p, occasion), code = displayCode(s);
+  const dlg = $("#card");
+  $("#pcBand").style.setProperty("--c", s.hex);
+  $("#pcNail").innerHTML = nailSvg(look.shape, s.hex);
+  $("#pcDate").textContent = `${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
+  $("#pcFor").textContent = p.name ? `Prepared for ${p.name}` : "Prepared by Mani Match";
+  $("#pcBrand").textContent = brandLine(s);
+  $("#pcCode").textContent = code || s.name;
+  $("#pcCode").classList.toggle("byname", !code);
+  $("#pcName").textContent = code ? s.name : "Ask for it by name";
+  $("#pcFacts").innerHTML = factsHtml(s, look, p.service);
+  $("#pcNote").textContent = `${brandNote(s)}${s.check ? " This code came from a retailer list, so double-check the bottle." : ""}`;
+  $("#pcSave").setAttribute("aria-pressed", saved.includes(s.id));
+  if (dlg.open) dlg.close();
+  dlg.showModal ? dlg.showModal() : dlg.setAttribute("open", "");
 }
-$("#scClose").addEventListener("click", () => $("#salonCard").close());
-$("#salonCard").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
-$("#scCopy").addEventListener("click", e => openShade && copyText(askText(openShade), e.currentTarget));
-$("#scSave").addEventListener("click", () => {
-  if (!openShade) return;
-  $("#scSave").textContent = toggleFav(openShade.id) ? "Saved ✓" : "Save to shortlist";
+$("#pcClose").addEventListener("click", () => $("#card").close());
+$("#card").addEventListener("click", e => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+$("#pcCopy").addEventListener("click", () => {
+  if (!carded) return;
+  const p = p0(), look = lookFor(p, (p.occasions && p.occasions[YM]) || "everyday");
+  const extra = p.service === "gelx" ? `, Gel-X ${gelxTip(look).text}` : p.service === "gel" ? ", gel" : "";
+  copyText(`${askText(carded)} · ${SHAPES[look.shape].label}, ${look.length.toLowerCase()} length${extra}`, "Copied for your salon");
+});
+$("#pcSave").addEventListener("click", e => carded && toggleSave(carded.id, e.currentTarget));
+
+// ---------- Saving and wearing ----------
+function toggleSave(id, btn) {
+  const adding = !saved.includes(id);
+  saved = adding ? [...saved, id] : saved.filter(x => x !== id);
+  store.set("mm-saved", saved);
+  $$(`[data-save="${CSS.escape(id)}"]`).concat(btn ? [btn] : []).forEach(b => { b.setAttribute("aria-pressed", adding); if (!reduceMotion) retrigger(b, "beat"); });
+  if (carded && carded.id === id) $("#pcSave").setAttribute("aria-pressed", adding);
+  toast(adding ? "Saved for later" : "Removed");
+}
+let woreId = null;
+function askWore(id) { woreId = id; $("#woreTitle").textContent = `How did ${byId[id].name} wear?`; $("#wore").showModal(); }
+$("#wore").addEventListener("click", e => {
+  const b = e.target.closest("[data-rate]");
+  if (e.target === e.currentTarget || e.target.closest("#woreCancel")) { $("#wore").close(); return; }
+  if (!b || !woreId) return;
+  ensureProfile();
+  journal = journal.filter(j => !(j.ym === YM && j.id === woreId));
+  journal.push({ ym: YM, id: woreId, rating: b.dataset.rate, at: Date.now() });
+  store.set("mm-journal", journal);
+  $("#wore").close();
+  toast(b.dataset.rate === "no" ? "Noted. We'll steer away from it" : "Added to your collection");
+  renderEdition({ unveil: false });
 });
 
+// ---------- Delegated actions ----------
 document.addEventListener("click", e => {
-  const t = e.target.closest("[data-open],[data-copy],[data-fav],[data-brand]");
+  const t = e.target.closest("[data-present],[data-save],[data-wore],[data-make]");
   if (!t) return;
-  if (t.dataset.open) openCard(t.dataset.open, e);
-  else if (t.dataset.copy) copyText(t.dataset.copy, t);
-  else if (t.dataset.fav) toggleFav(t.dataset.fav, t);
-  else if (t.dataset.brand) {
-    state.brand = t.dataset.brand;
-    if (state.brand === "apres" && state.service === "polish") state.service = "gel";
-    syncPickers(); store.set("mm-picks", state); renderResults();
-    $("#finder").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+  if (t.dataset.present) present(t.dataset.present);
+  else if (t.dataset.save) toggleSave(t.dataset.save);
+  else if (t.dataset.wore) askWore(t.dataset.wore);
+  else if (t.dataset.make) {
+    ensureProfile();
+    const occasion = (profile.occasions && profile.occasions[YM]) || "everyday";
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    recommission(() => { profile.picks = { ...profile.picks, [`${YM}|${occasion}`]: t.dataset.make }; saveProfile(); });
   }
 });
+$("#monogram").addEventListener("click", () => { location.hash = profile && !profile.skipped ? "#collection" : "#consult"; });
+$("#skipConsult").addEventListener("click", () => { ensureProfile(); location.hash = "#edition"; route(); });
 
-// ---------- Motion ----------
-function startRotator() {
-  const words = ["exact shade.", "salon code.", "perfect nude.", "party red.", "Gel-X shape."];
-  const box = $("#rotator");
-  box.innerHTML = words.map((w, i) => `<span class="rot-word${i === 0 ? " on" : ""}">${w}</span>`).join("");
-  if (reduceMotion) return;
-  let i = 0;
-  setInterval(() => {
-    const els = box.children;
-    els[i].className = "rot-word off";
-    const prev = i; i = (i + 1) % els.length;
-    els[i].className = "rot-word on";
-    setTimeout(() => { if (els[prev].classList.contains("off")) els[prev].className = "rot-word"; }, 600);
-  }, 2600);
+// ---------- Welcome ----------
+function renderWelcome() {
+  const id = MONTHS[now.getMonth()][1], s = byId[id];
+  $("#welcomeStage").innerHTML = stageHtml(s, { shape: "almond", length: "Medium" }, { cls: "unveiled instant" });
+  $("#welcomeCaption").textContent = `${MONTH_NAMES[now.getMonth()]}'s house pick · ${s.name}, ${displayCode(s) || BRANDS[s.brand].label}`;
+  bindTilt($("#welcomeStage"));
 }
-function countUp() {
-  document.querySelectorAll("[data-count]").forEach(el => {
-    const target = +el.dataset.count;
-    if (reduceMotion) { el.textContent = target; return; }
-    const t0 = performance.now(), dur = 1100;
-    const step = t => {
-      const p = Math.min(1, (t - t0) / dur);
-      el.textContent = Math.round(target * (1 - (1 - p) ** 3));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
+
+// ---------- Routing ----------
+const VIEWS = ["welcome", "consult", "edition", "collection", "library", "guide"];
+function route() {
+  let v = (location.hash || "#edition").slice(1);
+  if (!VIEWS.includes(v)) v = "edition";
+  if (v === "edition" && !profile) v = "welcome";
+  if (v === "welcome" && profile) v = "edition";
+  VIEWS.forEach(n => { $(`#v-${n}`).hidden = n !== v; });
+  $$("[data-nav]").forEach(a => {
+    const on = a.dataset.nav === v || (v === "welcome" && a.dataset.nav === "edition");
+    a.classList.toggle("active", on);
+    if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
+  if (v === "welcome") renderWelcome();
+  else if (v === "consult") startConsult();
+  else if (v === "edition") renderEdition();
+  else if (v === "collection") renderCollection();
+  const el = $(`#v-${v}`);
+  [...el.children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 8)));
+  if (!reduceMotion) retrigger(el, "enter");
+  window.scrollTo({ top: 0, behavior: "auto" });
+  $("#monogram").textContent = (p0().name || "M")[0].toUpperCase();
 }
-function setupReveal() {
-  const els = document.querySelectorAll(".reveal");
-  els.forEach(el => [...el.children].forEach((c, i) => c.style.setProperty("--i", Math.min(i, 12))));
-  if (reduceMotion || !("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver(entries => entries.forEach(en => {
-    if (!en.isIntersecting) return;
-    en.target.classList.remove("pending"); en.target.classList.add("in");
-    io.unobserve(en.target);
-  }), { rootMargin: "0px 0px -8% 0px" });
-  // Only sections below the first screen wait for scroll; everything else stays visible.
-  els.forEach(el => { if (el.getBoundingClientRect().top > innerHeight) { el.classList.add("pending"); io.observe(el); } });
+window.addEventListener("hashchange", route);
+
+// ---------- Starlight headliner ----------
+function sky() {
+  const c = $("#sky"), ctx = c.getContext("2d");
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  let w = 0, h = 0, stars = [], shoot = null, last = 0;
+  function size() {
+    w = c.width = Math.round(innerWidth * dpr); h = c.height = Math.round(innerHeight * dpr);
+    c.style.width = `${innerWidth}px`; c.style.height = `${innerHeight}px`;
+    const n = Math.min(240, Math.round(innerWidth * innerHeight / 7000));
+    stars = Array.from({ length: n }, () => ({ x: Math.random() * w, y: Math.random() * h, r: (Math.random() * 1 + .25) * dpr, p: Math.random() * 6.28, s: .3 + Math.random() * 1.1 }));
+    if (reduceMotion) draw(0);
+  }
+  function draw(t) {
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = "#F3EBDD";
+    for (const st of stars) {
+      ctx.globalAlpha = reduceMotion ? .5 : .18 + .6 * (.5 + .5 * Math.sin(st.p + t * .001 * st.s));
+      ctx.beginPath(); ctx.arc(st.x, st.y, st.r, 0, 6.283); ctx.fill();
+    }
+    if (shoot) {
+      const k = (t - shoot.t0) / 1100;
+      if (k > 1) shoot = null;
+      else {
+        const x = shoot.x + shoot.dx * k, y = shoot.y + shoot.dy * k, tx = x - shoot.dx * .22, ty = y - shoot.dy * .22;
+        const g = ctx.createLinearGradient(x, y, tx, ty);
+        g.addColorStop(0, "rgba(243,235,221,.9)"); g.addColorStop(1, "rgba(243,235,221,0)");
+        ctx.globalAlpha = Math.sin(k * Math.PI); ctx.strokeStyle = g; ctx.lineWidth = 1.2 * dpr;
+        ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(tx, ty); ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  function loop(t) {
+    if (!document.hidden && t - last > 33) {
+      draw(t); last = t;
+      if (!shoot && Math.random() < .002) shoot = { x: Math.random() * w * .6, y: Math.random() * h * .35, dx: w * .32, dy: h * .16, t0: t };
+    }
+    requestAnimationFrame(loop);
+  }
+  size();
+  window.addEventListener("resize", size);
+  if (!reduceMotion) requestAnimationFrame(loop);
 }
 
 // ---------- Boot ----------
-$("#statShades").dataset.count = SHADES.length;
-$("#statBrands").dataset.count = Object.keys(BRANDS).length;
-renderShapes();
-renderBrands();
-renderPickers();
-renderResults();
-renderShortlist();
-renderMonths();
-renderLibrary();
-startRotator();
-countUp();
-setupReveal();
+setupLibrary();
+setupGuide();
+sky();
+route();
 </script>
 </body>
 </html>
