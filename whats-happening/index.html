@@ -1,0 +1,648 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF6EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14161A" media="(prefers-color-scheme: dark)">
+<title>What's Happening</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* What's Happening: a going-out companion. Warm "golden hour" palette for the fun side,
+   a calm green for everything safety. Mobile-first, one column, bottom tab bar. */
+:root {
+  --bg: #FBF6EE; --surface: #FFFFFF; --surface-2: #F3ECE0;
+  --ink: #1E1A15; --muted: #6B6358; --line: #E6DCCB;
+  --accent: #E2502A; --accent-ink: #FFFFFF; --accent-soft: #FCE3D8;
+  --safe: #1B7A57; --safe-soft: #DDF1E7;
+  --warn: #9A6200; --warn-soft: #FBEBC8;
+  --alert: #B3261E; --alert-soft: #FADCD9;
+  --shadow: 0 1px 2px rgba(60,40,10,.06), 0 6px 20px rgba(60,40,10,.06);
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161A; --surface: #1D2026; --surface-2: #262A31;
+    --ink: #F3EEE6; --muted: #A8A195; --line: #32363E;
+    --accent: #FF7A52; --accent-ink: #1A0D07; --accent-soft: #3A2219;
+    --safe: #5FD3A4; --safe-soft: #17332A;
+    --warn: #F2BE5C; --warn-soft: #3A2E14;
+    --alert: #FF8A80; --alert-soft: #40201D;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; background: var(--bg); }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.45 var(--f-body); }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.1; letter-spacing: -.01em; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+
+.app { max-width: 560px; margin: 0 auto; min-height: 100dvh; padding: 0 16px calc(92px + env(safe-area-inset-bottom)); }
+
+/* header */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(14px + env(safe-area-inset-top)) 0 10px; }
+.brand { font: 800 22px/1 var(--f-display); letter-spacing: -.02em; }
+.brand i { font-style: normal; color: var(--accent); }
+.loc-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 55%; padding: 8px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 500; font-size: 14px; }
+.loc-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* shared */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+.btn { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; text-decoration: none; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.safe { background: var(--safe); border-color: var(--safe); color: var(--bg); }
+.btn.danger { background: var(--alert); border-color: var(--alert); color: var(--bg); }
+.btn.block { display: flex; width: 100%; }
+.btn.small { min-height: 38px; padding: 0 12px; font-size: 14px; border-radius: 11px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+.section-h { display: flex; align-items: baseline; justify-content: space-between; margin: 22px 0 10px; }
+.section-h h2 { font-size: 20px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 2px 16px 6px; margin: 0 -16px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; min-height: 38px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-weight: 500; font-size: 14px; white-space: nowrap; }
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--surface-2); color: var(--muted); }
+.tag.safe { background: var(--safe-soft); color: var(--safe); }
+.tag.warn { background: var(--warn-soft); color: var(--warn); }
+.tag.alert { background: var(--alert-soft); color: var(--alert); }
+.tag.sample { border: 1px dashed var(--line); background: transparent; }
+
+/* safety strip on Discover */
+.brief { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 14px; margin-top: 6px; border-radius: 18px; border: 1px solid transparent; }
+.brief.ok { background: var(--safe-soft); color: var(--safe); }
+.brief.warn { background: var(--warn-soft); color: var(--warn); }
+.brief.alert { background: var(--alert-soft); color: var(--alert); }
+.brief .ico { font-size: 26px; }
+.brief b { display: block; font: 700 16px/1.2 var(--f-display); }
+.brief small { display: block; color: var(--ink); opacity: .8; font-size: 13px; margin-top: 2px; }
+.brief .go { margin-left: auto; font-weight: 600; font-size: 13px; white-space: nowrap; }
+
+/* event + place cards */
+.list { display: grid; gap: 12px; }
+.item { display: grid; grid-template-columns: 56px 1fr; gap: 12px; width: 100%; text-align: left; padding: 14px; }
+.item .badge { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 26px; background: var(--accent-soft); }
+.item h3 { font-size: 17px; margin-bottom: 3px; }
+.item .meta { font-size: 14px; color: var(--muted); }
+.item .when { font-weight: 600; color: var(--accent); font-size: 14px; }
+.item .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.empty { text-align: center; padding: 36px 20px; color: var(--muted); }
+.empty .big { font-size: 40px; display: block; margin-bottom: 6px; }
+.notice { padding: 12px 14px; border-radius: 14px; background: var(--surface-2); color: var(--muted); font-size: 13px; margin-top: 12px; }
+
+/* safety tab */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { padding: 14px; }
+.stat .k { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.stat .v { font: 700 22px/1.15 var(--f-display); margin-top: 4px; }
+.stat .s { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.alert-card { padding: 14px; border-radius: 16px; background: var(--alert-soft); color: var(--alert); margin-bottom: 10px; }
+.alert-card b { display: block; font-family: var(--f-display); font-size: 16px; }
+.alert-card p { margin: 4px 0 0; font-size: 13px; color: var(--ink); }
+.pad { padding: 16px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.row > * { flex: 1 1 140px; }
+.field { display: grid; gap: 6px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+.field input, .field select { min-height: 46px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); font-weight: 400; font-size: 16px; width: 100%; }
+.tips { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.tips li { display: grid; grid-template-columns: 28px 1fr; gap: 8px; font-size: 14px; }
+.timer { font: 800 44px/1 var(--f-display); font-variant-numeric: tabular-nums; margin: 6px 0 12px; }
+
+/* check-in bar */
+.cibar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 10px; padding: 10px 14px; margin: 0 -16px 6px; background: var(--safe); color: var(--bg); font-weight: 600; font-size: 14px; width: calc(100% + 32px); border: 0; text-align: left; }
+.cibar .t { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+/* tab bar */
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom); }
+.tabs div { max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+.tabs button { border: 0; background: none; padding: 9px 0 10px; display: grid; justify-items: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.tabs button span { font-size: 22px; filter: grayscale(1); opacity: .7; }
+.tabs button[aria-current="page"] { color: var(--ink); }
+.tabs button[aria-current="page"] span { filter: none; opacity: 1; }
+
+/* sheets */
+dialog { border: 0; padding: 0; color: var(--ink); background: var(--bg); width: 100%; max-width: 560px; max-height: 92dvh; margin: auto auto 0; border-radius: 24px 24px 0 0; overflow: auto; }
+dialog::backdrop { background: rgba(10,8,5,.5); }
+.sheet { padding: 20px 18px calc(22px + env(safe-area-inset-bottom)); }
+.sheet-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.sheet h2 { font-size: 26px; }
+.x { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); font-size: 18px; }
+.kv { display: grid; grid-template-columns: 26px 1fr; gap: 8px 8px; margin: 14px 0; font-size: 15px; }
+.results { display: grid; gap: 8px; margin-top: 10px; }
+.results button { text-align: left; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); }
+dialog.full { max-height: 100dvh; height: 100dvh; border-radius: 0; }
+.center { min-height: 100%; display: grid; align-content: center; gap: 14px; text-align: center; }
+.interest-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: left; }
+.interest-grid button { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 0 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; }
+.interest-grid button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-size: 14px; font-weight: 500; z-index: 100; max-width: 90vw; }
+@media (prefers-reduced-motion: no-preference) {
+  .item { transition: transform .15s ease; } .item:active { transform: scale(.985); }
+  dialog[open] { animation: up .28s cubic-bezier(.16,1,.3,1); }
+  @keyframes up { from { transform: translateY(40px); opacity: 0; } }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">What's Happening<i>.</i></div>
+    <button class="loc-btn" id="locBtn" aria-label="Change location">📍 <span id="locName">Set location</span></button>
+  </header>
+  <button class="cibar" id="ciBar" hidden>🛟 <span id="ciBarLabel">Check-in running</span><span class="t" id="ciBarTime"></span></button>
+  <main id="view" aria-live="polite"></main>
+</div>
+
+<nav class="tabs" aria-label="Main"><div>
+  <button data-tab="discover"><span>✨</span>Discover</button>
+  <button data-tab="places"><span>🗺️</span>Places</button>
+  <button data-tab="safety"><span>🛟</span>Safety</button>
+  <button data-tab="saved"><span>💛</span>My plan</button>
+</div></nav>
+
+<dialog id="sheet"></dialog>
+<dialog id="overlay" class="full"></dialog>
+
+<script>
+'use strict';
+/* ---------- tiny helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem('wh.' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('wh.' + k, JSON.stringify(v)); } catch {} },
+};
+const IMPERIAL = /-(US|LR|MM)$/i.test(navigator.language || 'en-US');
+const fmtTime = d => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const startOfDay = (d = new Date()) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n, d.getHours(), d.getMinutes());
+function dayLabel(d) {
+  const diff = Math.round((startOfDay(d) - startOfDay()) / 864e5);
+  if (diff === 0) return 'Today'; if (diff === 1) return 'Tomorrow';
+  return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function distKm(a, b) {
+  const R = 6371, rad = x => x * Math.PI / 180, dLat = rad(b.lat - a.lat), dLon = rad(b.lon - a.lon);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+function fmtDist(km) {
+  if (IMPERIAL) { const mi = km * 0.621371; return mi < 0.1 ? 'Right here' : `${mi.toFixed(mi < 10 ? 1 : 0)} mi`; }
+  return km < 1 ? `${Math.round(km * 1000 / 50) * 50 || 50} m` : `${km.toFixed(km < 10 ? 1 : 0)} km`;
+}
+function offset(loc, km, bearingDeg) {
+  const b = bearingDeg * Math.PI / 180;
+  return { lat: loc.lat + (km * Math.cos(b)) / 111, lon: loc.lon + (km * Math.sin(b)) / (111 * Math.cos(loc.lat * Math.PI / 180)) };
+}
+const mapsUrl = p => `https://www.google.com/maps/dir/?api=1&destination=${p.lat.toFixed(6)},${p.lon.toFixed(6)}`;
+function toast(msg) {
+  document.querySelector('.toast')?.remove();
+  const t = Object.assign(document.createElement('div'), { className: 'toast', textContent: msg });
+  t.setAttribute('role', 'status');
+  (document.querySelector('dialog[open]') || document.body).append(t);
+  setTimeout(() => t.remove(), 2600);
+}
+
+/* ---------- state ---------- */
+const CATS = [
+  { id: 'markets', label: 'Markets', ico: '🥕' }, { id: 'music', label: 'Live music', ico: '🎵' },
+  { id: 'festivals', label: 'Festivals', ico: '🎪' }, { id: 'movies', label: 'Movies', ico: '🎬' },
+  { id: 'food', label: 'Food & drink', ico: '🌮' }, { id: 'arts', label: 'Arts', ico: '🎭' },
+  { id: 'outdoors', label: 'Outdoors', ico: '🌳' }, { id: 'family', label: 'Family', ico: '🎈' },
+];
+const CAT = Object.fromEntries(CATS.map(c => [c.id, c]));
+const S = {
+  tab: 'discover',
+  loc: store.get('loc', null),               // {lat, lon, name}
+  interests: store.get('interests', null),   // array of cat ids
+  saved: store.get('saved', {}),             // id -> snapshot
+  contact: store.get('contact', { name: '', phone: '' }),
+  emergency: store.get('emergency', IMPERIAL ? '911' : '112'),
+  checkin: store.get('checkin', null),       // {due, label}
+  when: 'all', cat: 'foryou', kind: 'all',
+  wx: null, wxErr: false, alerts: [], places: null, placesErr: false, events: [],
+};
+
+/* ---------- data: live sources (no API keys) ---------- */
+async function getJSON(url, opts) {
+  const r = await fetch(url, opts);
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+async function loadWeather() {
+  const { lat, lon } = S.loc;
+  const u = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+    `&current=temperature_2m,apparent_temperature,weather_code,wind_gusts_10m,is_day` +
+    `&hourly=precipitation_probability&daily=sunrise,sunset&forecast_days=7&timezone=auto` +
+    (IMPERIAL ? '&temperature_unit=fahrenheit&wind_speed_unit=mph' : '');
+  try { S.wx = await getJSON(u); S.wxErr = false; } catch { S.wx = null; S.wxErr = true; }
+}
+async function loadAlerts() {   // US National Weather Service; quietly empty elsewhere
+  try {
+    const j = await getJSON(`https://api.weather.gov/alerts/active?point=${S.loc.lat.toFixed(4)},${S.loc.lon.toFixed(4)}`, { headers: { Accept: 'application/geo+json' } });
+    S.alerts = (j.features || []).map(f => f.properties).filter(p => p && p.event);
+  } catch { S.alerts = []; }
+}
+const KINDS = {
+  marketplace: { cat: 'markets', label: 'Market', ico: '🥕' }, cinema: { cat: 'movies', label: 'Cinema', ico: '🎬' },
+  theatre: { cat: 'arts', label: 'Theatre', ico: '🎭' }, arts_centre: { cat: 'arts', label: 'Arts centre', ico: '🎨' },
+  museum: { cat: 'arts', label: 'Museum', ico: '🏛️' }, gallery: { cat: 'arts', label: 'Gallery', ico: '🖼️' },
+  music_venue: { cat: 'music', label: 'Music venue', ico: '🎵' }, events_venue: { cat: 'festivals', label: 'Event venue', ico: '🎪' },
+};
+async function loadPlaces() {   // OpenStreetMap via Overpass
+  const { lat, lon } = S.loc, a = `(around:6000,${lat},${lon})`;
+  const q = `[out:json][timeout:20];(nwr["name"]["amenity"~"^(marketplace|cinema|theatre|arts_centre|music_venue|events_venue)$"]${a};nwr["name"]["tourism"~"^(museum|gallery)$"]${a};);out center tags 120;`;
+  try {
+    const j = await getJSON('https://overpass-api.de/api/interpreter', { method: 'POST', body: 'data=' + encodeURIComponent(q), headers: { 'Content-Type': 'application/x-www-form-urlencoded' } });
+    S.places = (j.elements || []).map(e => {
+      const t = e.tags || {}, k = KINDS[t.amenity] || KINDS[t.tourism], p = { lat: e.lat ?? e.center?.lat, lon: e.lon ?? e.center?.lon };
+      if (!k || p.lat == null) return null;
+      return { id: `p${e.type[0]}${e.id}`, type: 'place', title: t.name, kind: k.label, cat: k.cat, ico: k.ico, ...p,
+        hours: t.opening_hours || '', website: t.website || t['contact:website'] || '', phone: t.phone || t['contact:phone'] || '',
+        address: [t['addr:housenumber'], t['addr:street']].filter(Boolean).join(' '), wheelchair: t.wheelchair || '', km: distKm(S.loc, p) };
+    }).filter(Boolean).sort((x, y) => x.km - y.km);
+    S.placesErr = false;
+  } catch { S.places = null; S.placesErr = true; }
+}
+
+/* ---------- data: sample events (placeholder until a live events feed is connected) ---------- */
+const SAMPLE = [
+  // w: {dow, h, dur} = next such weekday; {off, h, dur} = days from today
+  { id: 's1', cat: 'markets', title: 'Saturday Farmers Market', venue: 'Courthouse Square', w: { dow: 6, h: 8, dur: 5 }, km: 0.9, br: 40, price: 'Free entry', desc: 'Forty-odd growers and bakers, live acoustic set at 10. Most stalls take cards; bring a bag.', tags: ['Daytime', 'Family-friendly'] },
+  { id: 's2', cat: 'markets', title: 'Sunday Makers & Growers Market', venue: 'Riverside Lot B', w: { dow: 0, h: 9, dur: 4 }, km: 2.4, br: 200, price: 'Free entry', desc: 'Produce, flowers and local craft stalls along the river walk.', tags: ['Daytime', 'Stroller-friendly'] },
+  { id: 's3', cat: 'music', title: 'Rooftop Jazz Trio', venue: 'The Lantern Room', w: { off: 0, h: 19.5, dur: 2.5 }, km: 1.2, br: 300, price: '$12', desc: 'Two sets with a break. Seating is first come; doors half an hour before.', tags: ['Staffed door', 'Rideshare zone out front'] },
+  { id: 's4', cat: 'music', title: 'Indie Night: three bands', venue: 'Parlor Hall', w: { off: 1, h: 20, dur: 3.5 }, km: 3.1, br: 120, price: '$18', desc: 'Standing room, all ages until 10. Earplugs at the bar.', tags: ['Bag check', 'Late finish'] },
+  { id: 's5', cat: 'festivals', title: 'Harvest Lights Festival', venue: 'Founders Park', w: { dow: 6, h: 16, dur: 6 }, km: 1.8, br: 250, price: 'Free', desc: 'Lantern walk at dusk, food trucks, a kids’ craft tent and two stages.', tags: ['First-aid tent', 'Family-friendly', 'Big crowd'] },
+  { id: 's6', cat: 'festivals', title: 'Street Food & Culture Fair', venue: 'Main Street (closed to cars)', w: { dow: 0, h: 12, dur: 6 }, km: 0.6, br: 90, price: 'Free entry', desc: 'Twelve blocks of food stalls, dance stages and a makers’ row.', tags: ['Car-free street', 'Info booths'] },
+  { id: 's7', cat: 'movies', title: 'Movie in the Park: a family classic', venue: 'Founders Park lawn', w: { dow: 5, h: 19, dur: 2.5 }, km: 1.8, br: 250, price: 'Free', desc: 'Bring a blanket. Film starts at dusk; popcorn stand opens an hour before.', tags: ['Family-friendly', 'Lit paths'] },
+  { id: 's8', cat: 'movies', title: 'Late Show Double Feature', venue: 'The Avalon Cinema', w: { off: 0, h: 21, dur: 4 }, km: 2.2, br: 10, price: '$11', desc: 'Two cult favourites back to back with an intermission.', tags: ['Late finish', 'Staffed lobby'] },
+  { id: 's9', cat: 'food', title: 'Taco Tuesday Truck Rally', venue: 'Depot Yard', w: { dow: 2, h: 17, dur: 4 }, km: 1.4, br: 160, price: 'Pay per plate', desc: 'Eight trucks, picnic tables, a DJ from 6.', tags: ['Well-lit lot', 'Family-friendly'] },
+  { id: 's10', cat: 'food', title: 'Night Market', venue: 'Canal Walk', w: { dow: 5, h: 18, dur: 5 }, km: 2.9, br: 330, price: 'Free entry', desc: 'Street food, dessert stalls and vintage sellers under string lights.', tags: ['Security on site', 'Big crowd'] },
+  { id: 's11', cat: 'arts', title: 'First Look Gallery Walk', venue: 'Arts District', w: { off: 2, h: 17.5, dur: 3 }, km: 1.1, br: 70, price: 'Free', desc: 'Nine galleries open late with artists on hand. Maps at any door.', tags: ['Walkable route'] },
+  { id: 's12', cat: 'arts', title: 'Open Mic & Poetry', venue: 'Second Story Books', w: { off: 1, h: 19, dur: 2 }, km: 0.7, br: 280, price: 'Free', desc: 'Sign-up sheet at 6:30. Five minutes a slot.', tags: ['Small venue'] },
+  { id: 's13', cat: 'outdoors', title: 'Sunrise Group Hike', venue: 'Ridge Trailhead', w: { dow: 6, h: 6.5, dur: 2.5 }, km: 5.4, br: 350, price: 'Free', desc: 'Four easy miles with a guide. Bring water and a layer.', tags: ['Guided group', 'Daytime'] },
+  { id: 's14', cat: 'outdoors', title: 'Community Bike Ride', venue: 'City Hall steps', w: { dow: 0, h: 10, dur: 2 }, km: 1.0, br: 110, price: 'Free', desc: 'Slow roll on protected lanes, all ages. Helmets required.', tags: ['Marshalled ride', 'Daytime'] },
+  { id: 's15', cat: 'family', title: 'Story Time & Crafts', venue: 'Central Library', w: { off: 1, h: 10.5, dur: 1.5 }, km: 0.8, br: 20, price: 'Free', desc: 'For ages 3–7 with a grown-up.', tags: ['Indoors', 'Daytime'] },
+  { id: 's16', cat: 'family', title: 'Pumpkin Patch & Hayrides', venue: 'Miller Family Farm', w: { dow: 6, h: 10, dur: 7 }, km: 8.5, br: 230, price: '$8', desc: 'Hayrides every half hour, corn maze, cider stand.', tags: ['Family-friendly', 'Daytime'] },
+];
+function buildEvents() {
+  const now = new Date(), today = startOfDay();
+  S.events = SAMPLE.map(s => {
+    let day;
+    if ('off' in s.w) day = addDays(today, s.w.off);
+    else {
+      day = addDays(today, (s.w.dow - today.getDay() + 7) % 7);
+      if (new Date(+day + (s.w.h + s.w.dur) * 36e5) <= now) day = addDays(day, 7);
+    }
+    const start = new Date(+day + s.w.h * 36e5), end = new Date(+start + s.w.dur * 36e5);
+    return { ...s, type: 'event', sample: true, start: +start, end: +end, ...offset(S.loc, s.km, s.br) };
+  }).filter(e => e.end > now).sort((a, b) => a.start - b.start);
+}
+
+/* ---------- safety logic ---------- */
+function locNow() {   // wall-clock "now" at the chosen location
+  const off = S.wx?.utc_offset_seconds;
+  return off == null ? new Date() : new Date(Date.now() + off * 1000 + new Date().getTimezoneOffset() * 60000);
+}
+function sunsetFor(dateMs) {
+  const d = S.wx?.daily; if (!d) return null;
+  const i = d.time.indexOf(dayKey(new Date(dateMs)));
+  return i < 0 ? null : new Date(d.sunset[i]);
+}
+const WX = c => c === 0 ? ['Clear', '☀️'] : c <= 2 ? ['Partly cloudy', '⛅'] : c === 3 ? ['Overcast', '☁️'] : c <= 48 ? ['Fog', '🌫️'] :
+  c <= 57 ? ['Drizzle', '🌦️'] : c <= 67 ? ['Rain', '🌧️'] : c <= 77 ? ['Snow', '🌨️'] : c <= 82 ? ['Showers', '🌧️'] : c <= 86 ? ['Snow showers', '🌨️'] : ['Thunderstorms', '⛈️'];
+function brief() {
+  const out = { level: 'ok', title: 'Good night to be out', lines: [], sun: null, rain: null };
+  if (!S.wx) { out.title = S.wxErr ? 'Conditions unavailable' : 'Checking conditions…'; out.level = S.wxErr ? 'warn' : 'ok'; if (S.wxErr) out.lines.push('Couldn’t reach the weather service. Check the sky before you go.'); return out; }
+  const c = S.wx.current, now = locNow(), hot = IMPERIAL ? 95 : 35, cold = IMPERIAL ? 32 : 0, gust = IMPERIAL ? 35 : 55;
+  const ss = sunsetFor(+now), sr = S.wx.daily ? new Date(S.wx.daily.sunrise[0]) : null;
+  if (c.is_day && ss) {
+    const m = Math.round((ss - now) / 6e4);
+    out.sun = { k: 'Sunset', v: fmtTime(ss), s: m > 0 ? `in ${m >= 60 ? Math.floor(m / 60) + 'h ' : ''}${m % 60}m` : 'now' };
+    if (m > 0 && m <= 90) out.lines.push(`Dark in ${m} min: sort your way home now`);
+  } else {
+    out.sun = { k: 'Daylight', v: 'Dark now', s: sr ? `sunrise ${fmtTime(now < sr ? sr : new Date(S.wx.daily.sunrise[1] || sr))}` : '' };
+    out.lines.push('It’s dark: stick to lit, busy streets');
+  }
+  const hi = S.wx.hourly ? S.wx.hourly.time.map((t, i) => [new Date(t), S.wx.hourly.precipitation_probability[i]]).filter(([t]) => t >= now - 36e5 && t <= +now + 6 * 36e5) : [];
+  out.rain = hi.length ? Math.max(...hi.map(x => x[1] ?? 0)) : null;
+  let warn = false;
+  if (out.rain >= 60) { warn = true; out.lines.unshift(`${out.rain}% chance of rain in the next 6 hours`); }
+  if (c.weather_code >= 95) { warn = true; out.lines.unshift('Thunderstorms nearby: outdoor plans are risky'); }
+  if (c.apparent_temperature >= hot) { warn = true; out.lines.unshift('Dangerous heat: water, shade, take breaks'); }
+  if (c.apparent_temperature <= cold) { warn = true; out.lines.unshift('Freezing: dress in layers, watch for ice'); }
+  if (c.wind_gusts_10m >= gust) { warn = true; out.lines.unshift('Strong wind gusts'); }
+  if (warn) { out.level = 'warn'; out.title = 'Heads up before you go'; }
+  else if (!c.is_day) out.title = 'Clear skies, dark streets';
+  else out.title = 'Looks good out there';
+  if (S.alerts.length) { out.level = 'alert'; out.title = S.alerts.length === 1 ? S.alerts[0].event : `${S.alerts.length} active weather alerts`; }
+  return out;
+}
+function eventSafety(e) {
+  const tags = [], ss = sunsetFor(e.end);
+  if (ss && e.end > +ss) tags.push({ t: '🌙 Ends after dark', c: 'warn' });
+  else if (ss) tags.push({ t: '☀️ Done before dark', c: 'safe' });
+  (e.tags || []).forEach(t => tags.push({ t, c: /late|crowd/i.test(t) ? 'warn' : 'safe' }));
+  return tags;
+}
+
+/* ---------- views ---------- */
+function eventCard(e) {
+  const live = e.start <= Date.now();
+  return `<button class="card item" data-open="${esc(e.id)}">
+    <div class="badge" aria-hidden="true">${CAT[e.cat].ico}</div>
+    <div><div class="when">${live ? 'Happening now · until ' + fmtTime(new Date(e.end)) : dayLabel(new Date(e.start)) + ' · ' + fmtTime(new Date(e.start))}</div>
+      <h3>${esc(e.title)}</h3>
+      <div class="meta">${esc(e.venue)} · ${fmtDist(distKm(S.loc, e))} · ${esc(e.price)}</div>
+      <div class="tags">${eventSafety(e).slice(0, 2).map(t => `<span class="tag ${t.c}">${esc(t.t)}</span>`).join('')}${e.sample ? '<span class="tag sample">Sample</span>' : ''}${S.saved[e.id] ? '<span class="tag">💛 Saved</span>' : ''}</div>
+    </div></button>`;
+}
+function placeCard(p) {
+  return `<button class="card item" data-open="${esc(p.id)}">
+    <div class="badge" aria-hidden="true">${p.ico}</div>
+    <div><div class="when">${esc(p.kind)} · ${fmtDist(distKm(S.loc, p))}</div>
+      <h3>${esc(p.title)}</h3>
+      <div class="meta">${p.hours ? '🕒 ' + esc(p.hours) : 'Hours not listed'}</div>
+      ${S.saved[p.id] ? '<div class="tags"><span class="tag">💛 Saved</span></div>' : ''}
+    </div></button>`;
+}
+function briefStrip() {
+  const b = brief(), ico = { ok: '🟢', warn: '🟡', alert: '🔴' }[b.level];
+  return `<button class="brief ${b.level}" data-tab="safety"><span class="ico" aria-hidden="true">${ico}</span>
+    <span><b>${esc(b.title)}</b><small>${esc(b.lines[0] || (b.sun ? `${b.sun.k} ${b.sun.v} ${b.sun.s}` : 'Tap for the full safety brief'))}</small></span>
+    <span class="go">Safety ›</span></button>`;
+}
+function viewDiscover() {
+  const today = startOfDay(), dow = today.getDay();
+  const inWhen = e => {
+    const d = Math.round((startOfDay(new Date(e.start)) - today) / 864e5);
+    if (S.when === 'today') return d === 0 || e.start <= Date.now();
+    if (S.when === 'tomorrow') return d === 1;
+    if (S.when === 'weekend') { const wd = new Date(e.start).getDay(); return d < 7 && (wd === 6 || wd === 0 || (wd === 5 && new Date(e.start).getHours() >= 17)) && !(dow === 0 && d > 0); }
+    return true;
+  };
+  const mine = S.interests || [];
+  const list = S.events.filter(inWhen).filter(e => S.cat === 'foryou' ? (!mine.length || mine.includes(e.cat)) : S.cat === 'all' ? true : e.cat === S.cat);
+  const whenChips = [['all', 'This week'], ['today', 'Today'], ['tomorrow', 'Tomorrow'], ['weekend', 'Weekend']];
+  const catChips = [['foryou', '⭐ For you'], ['all', 'Everything'], ...CATS.map(c => [c.id, `${c.ico} ${c.label}`])];
+  return `${briefStrip()}
+    <div class="section-h"><h2>Near ${esc(S.loc.name)}</h2><button class="btn small" data-act="interests">Interests</button></div>
+    <div class="chips" role="group" aria-label="When">${whenChips.map(([k, l]) => `<button class="chip" data-when="${k}" aria-pressed="${S.when === k}">${l}</button>`).join('')}</div>
+    <div class="chips" role="group" aria-label="Category">${catChips.map(([k, l]) => `<button class="chip" data-cat="${k}" aria-pressed="${S.cat === k}">${l}</button>`).join('')}</div>
+    <div class="list" style="margin-top:10px">${list.map(eventCard).join('') || `<div class="empty"><span class="big">🔭</span>Nothing matches those filters.<br><button class="btn small" style="margin-top:12px" data-act="clear">Show everything</button></div>`}</div>
+    <p class="notice">Events marked <b>Sample</b> are placeholders that show how listings will look. Places, weather, daylight and alerts are live for your location.</p>`;
+}
+function viewPlaces() {
+  let body;
+  if (S.placesErr) body = `<div class="empty"><span class="big">📡</span>Couldn’t load nearby places.<br><button class="btn small" style="margin-top:12px" data-act="retry">Try again</button></div>`;
+  else if (!S.places) body = `<div class="empty"><span class="big">🧭</span>Looking around ${esc(S.loc.name)}…</div>`;
+  else {
+    const list = S.places.filter(p => S.kind === 'all' || p.cat === S.kind);
+    body = list.map(placeCard).join('') || `<div class="empty"><span class="big">🗺️</span>No mapped ${S.kind === 'all' ? 'spots' : esc(CAT[S.kind].label.toLowerCase())} within ${fmtDist(6)}.</div>`;
+  }
+  const kinds = [['all', 'All'], ['markets', '🥕 Markets'], ['movies', '🎬 Cinemas'], ['music', '🎵 Music'], ['arts', '🎭 Arts'], ['festivals', '🎪 Venues']];
+  return `<div class="section-h" style="margin-top:8px"><h2>Places nearby</h2><span class="muted small">within ${fmtDist(6)}</span></div>
+    <div class="chips" role="group" aria-label="Kind">${kinds.map(([k, l]) => `<button class="chip" data-kind="${k}" aria-pressed="${S.kind === k}">${l}</button>`).join('')}</div>
+    <div class="list" style="margin-top:10px">${body}</div>
+    <p class="notice">Places and opening hours come from OpenStreetMap contributors. Hours can be out of date, so check before a long trip.</p>`;
+}
+function viewSafety() {
+  const b = brief(), c = S.wx?.current, ci = S.checkin, hasC = S.contact.phone;
+  const alerts = S.alerts.map(a => `<div class="alert-card" role="alert"><b>⚠️ ${esc(a.event)}</b><p>${esc(a.headline || '')}</p>${a.instruction ? `<p>${esc(String(a.instruction).slice(0, 280))}</p>` : ''}</div>`).join('');
+  const stats = c ? `<div class="stat-grid">
+      <div class="card stat"><div class="k">Right now</div><div class="v">${WX(c.weather_code)[1]} ${Math.round(c.temperature_2m)}°</div><div class="s">${WX(c.weather_code)[0]}, feels ${Math.round(c.apparent_temperature)}°</div></div>
+      <div class="card stat"><div class="k">${b.sun.k}</div><div class="v">${esc(b.sun.v)}</div><div class="s">${esc(b.sun.s)}</div></div>
+      <div class="card stat"><div class="k">Rain, next 6h</div><div class="v">${b.rain ?? '–'}%</div><div class="s">${b.rain >= 60 ? 'Pack a jacket' : b.rain >= 30 ? 'Possible showers' : 'Staying dry'}</div></div>
+      <div class="card stat"><div class="k">Alerts</div><div class="v">${S.alerts.length || 'None'}</div><div class="s">${S.alerts.length ? 'See above' : 'No active weather alerts'}</div></div>
+    </div>` : `<div class="notice">${S.wxErr ? 'Weather and daylight couldn’t be loaded. <button class="btn small" data-act="retry">Retry</button>' : 'Loading conditions…'}</div>`;
+  const checkin = ci ? `<div class="k small muted">CHECK-IN DUE ${esc(fmtTime(new Date(ci.due)))}${ci.label ? ' · ' + esc(ci.label) : ''}</div>
+      <div class="timer" id="ciBig">–</div>
+      <div class="row"><button class="btn safe" data-act="ci-safe">I’m safe</button><button class="btn" data-act="ci-add">+30 min</button></div>`
+    : `<p class="muted small" style="margin:0 0 12px">Set a time you expect to be done. When it runs out we ask if you’re OK, with one tap to text ${hasC ? esc(S.contact.name || 'your contact') : 'a trusted contact'}.</p>
+      <div class="row">${[[30, '30 min'], [60, '1 hour'], [120, '2 hours'], [180, '3 hours']].map(([m, l]) => `<button class="btn small" data-ci="${m}">${l}</button>`).join('')}</div>`;
+  return `<div class="section-h" style="margin-top:8px"><h2>Safety brief</h2><span class="tag ${b.level === 'ok' ? 'safe' : b.level}">${{ ok: 'All clear', warn: 'Heads up', alert: 'Alert' }[b.level]}</span></div>
+    ${alerts}${stats}
+    ${b.lines.length ? `<ul class="tips card pad" style="margin-top:10px">${b.lines.map(l => `<li><span>👉</span><span>${esc(l)}</span></li>`).join('')}</ul>` : ''}
+    <div class="section-h"><h2>Check-in timer</h2></div>
+    <div class="card pad">${checkin}<p class="muted small" style="margin:12px 0 0">Keep this app open in a tab: the timer can’t alert anyone by itself.</p></div>
+    <div class="section-h"><h2>Trusted contact</h2></div>
+    <div class="card pad">
+      <label class="field">Name<input id="cName" autocomplete="off" value="${esc(S.contact.name)}" placeholder="e.g. Sam"></label>
+      <label class="field">Mobile number<input id="cPhone" type="tel" inputmode="tel" autocomplete="off" value="${esc(S.contact.phone)}" placeholder="+1 555 010 0199"></label>
+      <label class="field">Emergency number<select id="emg">${['911', '112', '999', '000', '111'].map(n => `<option ${n === S.emergency ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+      <div class="row"><button class="btn" data-act="save-contact">Save</button><a class="btn danger" href="tel:${esc(S.emergency)}">📞 Call ${esc(S.emergency)}</a></div>
+      <p class="muted small" style="margin:12px 0 0">Stored only on this device.</p>
+    </div>
+    <div class="section-h"><h2>Going-out basics</h2></div>
+    <ul class="tips card pad">
+      <li><span>📲</span><span><b>Share your plan.</b> Open any event and tap “Share plan” so someone knows where you are and when you’ll be back.</span></li>
+      <li><span>🔋</span><span><b>Charge up.</b> Leave with a full phone, and note the address of where you’re staying.</span></li>
+      <li><span>🚕</span><span><b>Book the ride home first.</b> Check the last train or set a pickup spot before the night gets going.</span></li>
+      <li><span>🥤</span><span><b>Keep your drink with you.</b> If it’s been out of sight, get a new one.</span></li>
+      <li><span>👯</span><span><b>Arrive together, leave together.</b> Agree a meeting spot in case you get split up.</span></li>
+      <li><span>🧭</span><span><b>Trust your read.</b> If a place feels off, leaving is always a fine call.</span></li>
+    </ul>`;
+}
+function viewSaved() {
+  const items = Object.values(S.saved), now = Date.now();
+  const ev = items.filter(i => i.type === 'event' && i.end > now).sort((a, b) => a.start - b.start), pl = items.filter(i => i.type === 'place');
+  if (!ev.length && !pl.length) return `<div class="empty" style="margin-top:40px"><span class="big">💛</span><b>Nothing saved yet</b><br>Tap “Save” on an event or place and it lands here.<br><button class="btn primary" style="margin-top:14px" data-tab="discover">Find something to do</button></div>`;
+  return `${ev.length ? `<div class="section-h" style="margin-top:8px"><h2>Coming up</h2></div><div class="list">${ev.map(eventCard).join('')}</div>` : ''}
+    ${pl.length ? `<div class="section-h"><h2>Places</h2></div><div class="list">${pl.map(placeCard).join('')}</div>` : ''}`;
+}
+function render() {
+  $('#locName').textContent = S.loc ? S.loc.name : 'Set location';
+  document.querySelectorAll('.tabs button').forEach(b => b.toggleAttribute('aria-current', false) || (b.dataset.tab === S.tab && b.setAttribute('aria-current', 'page')));
+  if (!S.loc) { $('#view').innerHTML = ''; return; }
+  $('#view').innerHTML = { discover: viewDiscover, places: viewPlaces, safety: viewSafety, saved: viewSaved }[S.tab]();
+  tick();
+}
+
+/* ---------- detail sheet ---------- */
+function findItem(id) { return S.events.find(e => e.id === id) || (S.places || []).find(p => p.id === id) || S.saved[id]; }
+function planText(e) {
+  const by = new Date(e.end + 45 * 6e4);
+  return `I’m heading to ${e.title} at ${e.venue}, ${dayLabel(new Date(e.start))} ${fmtTime(new Date(e.start))}–${fmtTime(new Date(e.end))}. I’ll check in by ${fmtTime(by)}. Location: ${mapsUrl(e)}`;
+}
+function openItem(id) {
+  const it = findItem(id); if (!it) return;
+  const saved = !!S.saved[it.id], d = $('#sheet');
+  const head = `<div class="sheet-top"><div><div class="when" style="color:var(--accent);font-weight:600;font-size:14px">${it.type === 'event' ? esc(CAT[it.cat].ico + ' ' + CAT[it.cat].label) : esc(it.ico + ' ' + it.kind)}</div><h2>${esc(it.title)}</h2></div><button class="x" data-act="close" aria-label="Close">✕</button></div>`;
+  let body;
+  if (it.type === 'event') {
+    body = `<div class="tags" style="display:flex;flex-wrap:wrap;gap:6px">${eventSafety(it).map(t => `<span class="tag ${t.c}">${esc(t.t)}</span>`).join('')}${it.sample ? '<span class="tag sample">Sample listing</span>' : ''}</div>
+      <div class="kv"><span>🗓️</span><span><b>${dayLabel(new Date(it.start))}</b>, ${fmtTime(new Date(it.start))} – ${fmtTime(new Date(it.end))}</span>
+        <span>📍</span><span>${esc(it.venue)} · ${fmtDist(distKm(S.loc, it))} away</span><span>🎟️</span><span>${esc(it.price)}</span></div>
+      <p>${esc(it.desc)}</p>
+      <div class="row"><button class="btn primary" data-save="${esc(it.id)}">${saved ? '💛 Saved' : 'Save to my plan'}</button><a class="btn" target="_blank" rel="noopener" href="${mapsUrl(it)}">Directions</a></div>
+      <div class="card pad" style="margin-top:14px;background:var(--safe-soft);border-color:transparent">
+        <b style="font-family:var(--f-display)">Go safely</b>
+        <p class="small" style="margin:4px 0 12px">Let someone know, and set a check-in for 45 minutes after it ends (${fmtTime(new Date(it.end + 45 * 6e4))}).</p>
+        <div class="row"><button class="btn safe" data-share="${esc(it.id)}">📲 Share plan</button><button class="btn" data-ci-event="${esc(it.id)}">⏱️ Check-in</button></div>
+      </div>`;
+  } else {
+    const q = encodeURIComponent(`${it.title} ${S.loc.name} showtimes`);
+    body = `<div class="kv"><span>🕒</span><span>${it.hours ? esc(it.hours) : '<span class="muted">Hours not listed</span>'}</span>
+        <span>📍</span><span>${esc(it.address || 'See map')} · ${fmtDist(distKm(S.loc, it))} away</span>
+        ${it.phone ? `<span>📞</span><span><a href="tel:${esc(it.phone)}">${esc(it.phone)}</a></span>` : ''}
+        ${it.wheelchair === 'yes' ? '<span>♿</span><span>Wheelchair accessible</span>' : ''}</div>
+      <div class="row"><button class="btn primary" data-save="${esc(it.id)}">${saved ? '💛 Saved' : 'Save to my plan'}</button><a class="btn" target="_blank" rel="noopener" href="${mapsUrl(it)}">Directions</a></div>
+      <div class="row" style="margin-top:10px">${it.cat === 'movies' ? `<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/search?q=${q}">🎬 Today’s showtimes</a>` : ''}
+        ${/^https?:\/\//i.test(it.website) ? `<a class="btn" target="_blank" rel="noopener" href="${esc(it.website)}">Website</a>` : ''}</div>
+      <p class="muted small">From OpenStreetMap. Confirm hours with the venue.</p>`;
+  }
+  d.innerHTML = `<div class="sheet">${head}${body}</div>`;
+  if (!d.open) d.showModal();
+}
+
+/* ---------- location + onboarding ---------- */
+function setLoc(loc) {
+  S.loc = loc; store.set('loc', loc);
+  S.wx = null; S.places = null; S.alerts = []; S.wxErr = S.placesErr = false;
+  buildEvents(); render(); refresh();
+}
+async function refresh() {
+  if (!S.loc) return;
+  loadPlaces().then(render);
+  await Promise.all([loadWeather(), loadAlerts()]); render();
+}
+function useGPS(statusEl) {
+  if (!navigator.geolocation) { statusEl.textContent = 'This browser can’t share location. Search for a city instead.'; return; }
+  statusEl.textContent = 'Finding you…';
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude, lon = pos.coords.longitude; let name = 'you';
+    try { const j = await getJSON(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`); name = j.city || j.locality || name; } catch {}
+    closeSheets(); setLoc({ lat, lon, name }); afterLoc();
+  }, () => { statusEl.textContent = 'Location is blocked or unavailable. Search for a city instead.'; }, { timeout: 10000, maximumAge: 300000 });
+}
+async function searchCity(q, box) {
+  if (q.trim().length < 2) return;
+  box.innerHTML = '<span class="muted small">Searching…</span>';
+  try {
+    const j = await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q.trim())}&count=6&language=en`);
+    box.innerHTML = (j.results || []).map(r => `<button data-pick='${esc(JSON.stringify({ lat: r.latitude, lon: r.longitude, name: r.name }))}'><b>${esc(r.name)}</b> <span class="muted">${esc([r.admin1, r.country].filter(Boolean).join(', '))}</span></button>`).join('') || '<span class="muted small">No matches. Try a nearby city.</span>';
+  } catch { box.innerHTML = '<span class="muted small">Search is unavailable right now.</span>'; }
+}
+const locForm = `<button class="btn primary block" data-act="gps">📍 Use my location</button>
+  <p class="muted small" id="gpsStatus" role="status" style="min-height:18px;margin:8px 0"></p>
+  <form id="cityForm" class="row" style="flex-wrap:nowrap"><input id="cityQ" aria-label="City" placeholder="Or search a city" style="flex:1;min-width:0;min-height:46px;padding:0 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px"><button class="btn" style="flex:none">Search</button></form>
+  <div class="results" id="cityResults"></div>`;
+function openLocation() {
+  const d = $('#sheet');
+  d.innerHTML = `<div class="sheet"><div class="sheet-top"><h2>Where are you?</h2><button class="x" data-act="close" aria-label="Close">✕</button></div>${locForm}</div>`;
+  if (!d.open) d.showModal();
+}
+function openWelcome() {
+  const d = $('#overlay');
+  d.innerHTML = `<div class="sheet center"><div style="font-size:54px">✨</div><h1 style="font-size:38px">What’s Happening<span style="color:var(--accent)">.</span></h1>
+    <p class="muted" style="margin:0 auto;max-width:320px">Markets, music, movies and festivals around you, with a safety brief for every night out.</p>
+    <div style="text-align:left;margin-top:8px">${locForm}</div></div>`;
+  d.showModal();
+}
+function openInterests(first) {
+  const d = first ? $('#overlay') : $('#sheet'), sel = new Set(S.interests || []);
+  d.innerHTML = `<div class="sheet ${first ? 'center' : ''}"><div class="sheet-top"><h2>What are you into?</h2>${first ? '' : '<button class="x" data-act="close" aria-label="Close">✕</button>'}</div>
+    <p class="muted" style="margin:0 0 6px;text-align:left">Pick a few and “For you” will lead with them.</p>
+    <div class="interest-grid">${CATS.map(c => `<button data-int="${c.id}" aria-pressed="${sel.has(c.id)}"><span aria-hidden="true">${c.ico}</span>${c.label}</button>`).join('')}</div>
+    <button class="btn primary block" style="margin-top:14px" data-act="int-done">Done</button></div>`;
+  if (!d.open) d.showModal();
+}
+function afterLoc() { if (S.interests == null) openInterests(true); }
+function closeSheets() { for (const d of [$('#sheet'), $('#overlay')]) if (d.open) d.close(); }
+
+/* ---------- check-in ---------- */
+function startCheckin(due, label) {
+  S.checkin = { due, label: label || '' }; store.set('checkin', S.checkin);
+  if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().catch(() => {});
+  toast(`Check-in set for ${fmtTime(new Date(due))}`); render();
+}
+function endCheckin(msg) { S.checkin = null; store.set('checkin', null); const o = $('#overlay'); if (o.open && o.dataset.kind === 'ci') o.close(); render(); if (msg) toast(msg); }
+function smsHref(body) { return `sms:${S.contact.phone.replace(/[^\d+]/g, '')}?&body=${encodeURIComponent(body)}`; }
+function showDue() {
+  const o = $('#overlay'); if (o.open && o.dataset.kind === 'ci') return;
+  closeSheets(); o.dataset.kind = 'ci';
+  const msg = `Checking in from ${S.checkin.label || 'my night out'}. I’m running late and wanted you to know.` + (S.loc ? ` Last area: ${S.loc.name}.` : '');
+  o.innerHTML = `<div class="sheet center"><div style="font-size:54px">🛟</div><h1 style="font-size:34px">Are you OK?</h1>
+    <p class="muted" style="margin:0">Your check-in${S.checkin.label ? ' for ' + esc(S.checkin.label) : ''} is due.</p>
+    <button class="btn safe block" data-act="ci-safe">I’m safe</button>
+    <button class="btn block" data-act="ci-add">I need 30 more minutes</button>
+    ${S.contact.phone ? `<a class="btn block" href="${esc(smsHref(msg))}">💬 Text ${esc(S.contact.name || 'my contact')}</a>` : '<p class="muted small" style="margin:0">Add a trusted contact in Safety to text them from here.</p>'}
+    <a class="btn danger block" href="tel:${esc(S.emergency)}">📞 Call ${esc(S.emergency)}</a></div>`;
+  o.showModal();
+  try { if ('Notification' in window && Notification.permission === 'granted' && document.hidden) new Notification('Are you OK?', { body: 'Your check-in is due. Tap to respond.' }); } catch {}
+}
+function tick() {
+  const ci = S.checkin, bar = $('#ciBar');
+  bar.hidden = !ci; if (!ci) return;
+  const left = ci.due - Date.now(), s = Math.max(0, Math.floor(left / 1000));
+  const txt = `${Math.floor(s / 3600)}:${String(Math.floor(s / 60) % 60).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  $('#ciBarLabel').textContent = left > 0 ? 'Check-in running' : 'Check-in due';
+  $('#ciBarTime').textContent = txt;
+  const big = $('#ciBig'); if (big) big.textContent = txt;
+  if (left <= 0) showDue();
+}
+setInterval(tick, 1000);
+
+/* ---------- events ---------- */
+document.addEventListener('click', async ev => {
+  const t = ev.target.closest('button, a'); if (!t) return;
+  const ds = t.dataset;
+  if (ds.tab) { S.tab = ds.tab; render(); scrollTo(0, 0); return; }
+  if (ds.when) { S.when = ds.when; return render(); }
+  if (ds.cat) { S.cat = ds.cat; return render(); }
+  if (ds.kind) { S.kind = ds.kind; return render(); }
+  if (ds.open) return openItem(ds.open);
+  if (ds.pick) { closeSheets(); setLoc(JSON.parse(ds.pick)); return afterLoc(); }
+  if (ds.int) return t.setAttribute('aria-pressed', t.getAttribute('aria-pressed') !== 'true');
+  if (ds.ci) return startCheckin(Date.now() + ds.ci * 6e4);
+  if (ds.save) {
+    const it = findItem(ds.save); if (!it) return;
+    if (S.saved[it.id]) delete S.saved[it.id]; else S.saved[it.id] = it;
+    store.set('saved', S.saved); render(); return openItem(it.id);
+  }
+  if (ds.share) {
+    const e = findItem(ds.share), text = planText(e);
+    try { if (navigator.share) await navigator.share({ title: 'My plan', text }); else { await navigator.clipboard.writeText(text); toast('Plan copied. Paste it to someone you trust.'); } }
+    catch (err) { if (err?.name !== 'AbortError') toast('Couldn’t share. Try again.'); }
+    return;
+  }
+  if (ds.ciEvent) { const e = findItem(ds.ciEvent); $('#sheet').close(); S.tab = 'safety'; return startCheckin(Math.max(e.end + 45 * 6e4, Date.now() + 30 * 6e4), e.title); }
+  switch (ds.act) {
+    case 'close': return t.closest('dialog').close();
+    case 'gps': return useGPS($('#gpsStatus', t.closest('dialog')));
+    case 'interests': return openInterests(false);
+    case 'int-done': {
+      S.interests = [...t.closest('dialog').querySelectorAll('[data-int][aria-pressed="true"]')].map(b => b.dataset.int);
+      store.set('interests', S.interests); S.cat = 'foryou'; closeSheets(); return render();
+    }
+    case 'clear': S.when = 'all'; S.cat = 'all'; return render();
+    case 'retry': render(); return refresh();
+    case 'ci-safe': return endCheckin('Glad you’re safe. Check-in cleared.');
+    case 'ci-add': { const o = $('#overlay'); if (o.open && o.dataset.kind === 'ci') o.close(); return startCheckin(Math.max(Date.now(), S.checkin.due) + 30 * 6e4, S.checkin.label); }
+    case 'save-contact':
+      S.contact = { name: $('#cName').value.trim(), phone: $('#cPhone').value.trim() }; S.emergency = $('#emg').value;
+      store.set('contact', S.contact); store.set('emergency', S.emergency); render(); return toast('Saved on this device');
+  }
+});
+document.addEventListener('submit', ev => { if (ev.target.id === 'cityForm') { ev.preventDefault(); searchCity($('#cityQ', ev.target).value, $('#cityResults', ev.target.parentElement)); } });
+$('#locBtn').addEventListener('click', openLocation);
+$('#ciBar').addEventListener('click', () => { S.tab = 'safety'; render(); });
+$('#sheet').addEventListener('click', ev => { if (ev.target.id === 'sheet') ev.target.close(); });
+$('#overlay').addEventListener('cancel', ev => ev.preventDefault());   // welcome + check-in need an explicit answer
+$('#overlay').addEventListener('close', ev => { delete ev.target.dataset.kind; });
+document.addEventListener('visibilitychange', () => { if (!document.hidden && S.loc) { buildEvents(); refresh(); } });
+
+/* ---------- boot ---------- */
+if (S.loc) { buildEvents(); render(); refresh(); afterLoc(); } else { render(); openWelcome(); }
+</script>
+</body>
+</html>
