@@ -5,3 +5,8 @@ A luxury, single-page nail atelier. A six-question consultation (name, undertone
 Everything is saved on the client's own device (localStorage); there is no backend.
 
 Open `index.html` in a browser. No build step or dependencies.
+
+## Other apps in this repo
+
+- [`whats-happening/`](whats-happening/): see what's going on around you (events, food, markets, movies) with open-now status, a map, and safety tools.
+- [`what-to-eat/`](what-to-eat/)
