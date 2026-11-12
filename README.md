@@ -8,5 +8,5 @@ Open `index.html` in a browser. No build step or dependencies.
 
 ## Other apps in this repo
 
-- [`whats-happening/`](whats-happening/): find local events and places nearby, with a safety brief and check-in timer.
+- [`whats-happening/`](whats-happening/): see what's going on around you (events, food, markets, movies) with open-now status, a map, and safety tools.
 - [`what-to-eat/`](what-to-eat/)
