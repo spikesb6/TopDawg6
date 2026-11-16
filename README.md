@@ -5,3 +5,8 @@ A luxury, single-page nail atelier. A six-question consultation (name, undertone
 Everything is saved on the client's own device (localStorage); there is no backend.
 
 Open `index.html` in a browser. No build step or dependencies.
+
+## Also in this repo
+
+- [`momentum/`](momentum/README.md): Momentum, a project management dashboard for PMs. It tracks jobs and KPIs and flags delays and bottlenecks early.
+- [`what-to-eat/`](what-to-eat/README.md): What to eat?, an Expo app that picks dinner.
