@@ -5,3 +5,8 @@ A luxury, single-page nail atelier. A six-question consultation (name, undertone
 Everything is saved on the client's own device (localStorage); there is no backend.
 
 Open `index.html` in a browser. No build step or dependencies.
+
+## Also in this repo
+
+- [`build-it/`](build-it/): **Build It**, a step-by-step guide for first-time home builders, from buying the lot to move-in.
+- [`what-to-eat/`](what-to-eat/): **What to eat?**, an Expo app that picks dinner.

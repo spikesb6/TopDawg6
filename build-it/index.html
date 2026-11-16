@@ -1,0 +1,924 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Build It</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a site-sign header with a dimension-line progress bar, a tab strip, then one working view at a time.
+   The roadmap is a plan-sheet index (phase rail) beside the open sheet (steps). Inspection hold points wear flagging-tape pink. */
+:root {
+  --bg: #ECEEEA;          /* cured concrete */
+  --surface: #FAFBF8;
+  --surface-2: #E1E5DF;
+  --ink: #1B2226;         /* graphite */
+  --muted: #59646A;
+  --line: #CBD1CA;
+  --accent: #1E5B57;      /* weathered copper patina */
+  --accent-soft: #D2E3DF;
+  --on-accent: #FFFFFF;
+  --flag: #C8195F;        /* surveyor's flagging tape */
+  --flag-soft: #F8D9E5;
+  --ok: #2B7445;
+  --ok-soft: #D8EDDF;
+  --warn: #9A5B00;
+  --warn-soft: #F6E6C8;
+  --bad: #AF2B21;
+  --bad-soft: #F6DAD6;
+  --shadow: 0 1px 2px rgba(27,34,38,.06), 0 6px 20px rgba(27,34,38,.07);
+  --f-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111517; --surface: #192024; --surface-2: #222A2F; --ink: #E7ECE9; --muted: #9AA5A8; --line: #2F393E;
+    --accent: #6CC0B4; --accent-soft: #1C3633; --on-accent: #0D1A19; --flag: #FF6EA5; --flag-soft: #3E1A2A;
+    --ok: #6CC48D; --ok-soft: #173123; --warn: #E7AE4E; --warn-soft: #3A2B12; --bad: #F2837A; --bad-soft: #3D1C19;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111517; --surface: #192024; --surface-2: #222A2F; --ink: #E7ECE9; --muted: #9AA5A8; --line: #2F393E;
+  --accent: #6CC0B4; --accent-soft: #1C3633; --on-accent: #0D1A19; --flag: #FF6EA5; --flag-soft: #3E1A2A;
+  --ok: #6CC48D; --ok-soft: #173123; --warn: #E7AE4E; --warn-soft: #3A2B12; --bad: #F2837A; --bad-soft: #3D1C19;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15.5px/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  overflow-x: clip;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1180px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; line-height: 1.05; text-wrap: balance; }
+h2 { font-size: clamp(1.5rem, 3.4vw, 2.1rem); font-weight: 800; font-stretch: 112%; letter-spacing: -.01em; }
+h3 { font-size: 1.08rem; font-weight: 700; font-stretch: 105%; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+.label { font: 600 .7rem/1.2 var(--f-body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* Header */
+.top { padding-block: 22px 8px; display: grid; gap: 14px; }
+.brand { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 24px; }
+.wordmark { font-size: clamp(2.6rem, 8vw, 4.4rem); font-weight: 900; font-stretch: 125%; letter-spacing: -.03em; line-height: .9; }
+.wordmark span { color: var(--accent); }
+.tag { color: var(--muted); max-width: 46ch; }
+.dim { position: relative; padding-top: 18px; }
+.dim-line { position: relative; height: 12px; }
+.dim-line::before { content: ""; position: absolute; left: 0; right: 0; top: 5.5px; height: 1px; background: var(--muted); }
+.dim-line::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; border-inline: 1px solid var(--muted); }
+.dim-fill { position: absolute; left: 0; top: 3px; height: 6px; background: var(--accent); border-radius: 0 3px 3px 0; transition: width .5s ease; }
+.dim-label { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; font: 500 .74rem/1 var(--f-mono); color: var(--muted); }
+.dim-label b { color: var(--ink); font-weight: 500; }
+
+/* Tabs */
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); margin-inline: -4px; padding: 8px 4px; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--line); }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { flex: none; border: 0; background: transparent; padding: 9px 13px; border-radius: 8px; font-weight: 600; font-size: .92rem; color: var(--muted); cursor: pointer; white-space: nowrap; min-height: 40px; }
+.tab:hover { color: var(--ink); background: var(--surface-2); }
+.tab[aria-selected="true"] { color: var(--on-accent); background: var(--accent); }
+
+main { padding-block: 22px 40px; }
+.view-head { display: grid; gap: 6px; margin-bottom: 18px; }
+.view-head p { color: var(--muted); max-width: 70ch; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 16px; align-items: start; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 9px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; min-height: 40px; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.btn.danger { color: var(--bad); }
+.btn.small { padding: 5px 10px; min-height: 32px; font-size: .85rem; }
+.linkish { border: 0; background: none; padding: 0; text-align: left; color: var(--accent); font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.field { display: grid; gap: 5px; }
+.field > span { font-size: .82rem; font-weight: 600; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 11px; min-height: 40px; }
+.field textarea { min-height: 70px; resize: vertical; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 12px; }
+.check { display: flex; gap: 9px; align-items: flex-start; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--accent); flex: none; }
+
+.pill { display: inline-flex; align-items: center; gap: 5px; font: 600 .7rem/1 var(--f-body); letter-spacing: .06em; text-transform: uppercase; padding: 5px 8px; border-radius: 99px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.flag { background: var(--flag-soft); color: var(--flag); }
+.pill.info { background: var(--accent-soft); color: var(--accent); }
+.pill.plain { background: var(--surface-2); color: var(--muted); }
+
+/* Stats */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 12px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 4px; }
+.stat .v { font: 800 1.7rem/1 var(--f-display); font-stretch: 110%; font-variant-numeric: tabular-nums; }
+.stat .s { font-size: .82rem; color: var(--muted); }
+.stat.alert { border-color: var(--flag); }
+.stat.alert .v { color: var(--flag); }
+
+/* Roadmap */
+.road { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 22px; align-items: start; }
+.rail { display: grid; gap: 2px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 70px); max-height: calc(100vh - 90px); overflow-y: auto; }
+.rail button { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; text-align: left; border: 0; background: transparent; padding: 9px 10px; border-radius: 8px; cursor: pointer; }
+.rail button:hover { background: var(--surface-2); }
+.rail button[aria-current="true"] { background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); }
+.rail .num { font: 500 .8rem/1 var(--f-mono); color: var(--muted); }
+.rail .nm { font-weight: 600; font-size: .92rem; line-height: 1.25; }
+.rail .pct { font: 500 .75rem/1 var(--f-mono); color: var(--muted); }
+.rail .done .pct { color: var(--ok); }
+.rail .bar { grid-column: 2 / 4; height: 3px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.rail .bar i { display: block; height: 100%; background: var(--accent); }
+.rail-select { display: none; }
+
+.sheet-head { display: grid; gap: 10px; padding-bottom: 16px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+.sheet-head .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.who { display: flex; flex-wrap: wrap; gap: 6px; }
+.who span { font-size: .8rem; padding: 4px 9px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); }
+
+.steps { display: grid; gap: 8px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.step.gate { border-left: 4px solid var(--flag); }
+.step.is-done { background: transparent; }
+.step.is-done .st-title { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--line); }
+.st-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 14px; }
+.st-row input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
+.st-title { font-weight: 600; cursor: pointer; background: none; border: 0; padding: 0; text-align: left; line-height: 1.35; }
+.st-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.st-toggle { border: 0; background: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; width: 32px; height: 32px; border-radius: 6px; }
+.st-toggle:hover { background: var(--surface-2); }
+.st-body { padding: 0 14px 14px 48px; display: grid; gap: 12px; }
+.st-body .pro { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; }
+.st-body .pro b { display: block; font: 600 .7rem/1.4 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+.st-body .hold { background: var(--flag-soft); color: var(--ink); border-radius: 8px; padding: 10px 12px; }
+.st-body .hold b { color: var(--flag); }
+
+.warnbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--flag-soft); border-radius: var(--r); padding: 12px 14px; margin-bottom: 14px; }
+.warnbar p { flex: 1 1 260px; }
+
+/* Lot check */
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex: none; }
+.seg button { border: 0; background: var(--surface); padding: 6px 9px; font-size: .78rem; font-weight: 600; cursor: pointer; color: var(--muted); min-height: 34px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"][data-v="ok"] { background: var(--ok-soft); color: var(--ok); }
+.seg button[aria-pressed="true"][data-v="concern"] { background: var(--warn-soft); color: var(--warn); }
+.seg button[aria-pressed="true"][data-v="nogo"] { background: var(--bad-soft); color: var(--bad); }
+.seg button[aria-pressed="true"][data-v="unknown"] { background: var(--surface-2); color: var(--ink); }
+.lotrow { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; padding: 11px 0; border-top: 1px solid var(--line); }
+.lotrow:first-of-type { border-top: 0; }
+.lotrow > div { flex: 1 1 240px; min-width: 0; }
+.lotrow small { display: block; color: var(--muted); font-size: .82rem; }
+.verdict { display: grid; gap: 6px; border-radius: var(--r); padding: 16px 18px; }
+.verdict.ok { background: var(--ok-soft); } .verdict.warn { background: var(--warn-soft); } .verdict.bad { background: var(--bad-soft); } .verdict.plain { background: var(--surface-2); }
+.verdict h3 { font-size: 1.25rem; }
+
+/* Tables */
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 .7rem/1.3 var(--f-body); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+tfoot td { font-weight: 600; background: var(--surface-2); }
+
+/* Budget bar */
+.stackbar { display: flex; height: 30px; border-radius: 6px; overflow: hidden; gap: 2px; }
+.stackbar i { display: block; min-width: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .84rem; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.c1 { background: var(--accent); } .c2 { background: var(--flag); } .c3 { background: var(--warn); } .c4 { background: var(--ok); } .c5 { background: var(--muted); } .c6 { background: var(--bad); } .c7 { background: var(--line); }
+
+.rules { display: grid; gap: 10px; counter-reset: rule; }
+.rules li { list-style: none; display: grid; grid-template-columns: 30px 1fr; gap: 10px; }
+.rules li::before { counter-increment: rule; content: counter(rule); font: 800 1.2rem/1.2 var(--f-display); color: var(--accent); }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.rules, ol.rules { margin: 0; padding: 0; }
+
+.principle { display: grid; gap: 6px; }
+.principle .linkish { justify-self: start; font-size: .85rem; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--bg); padding: 11px 16px; border-radius: 10px; box-shadow: var(--shadow); max-width: min(560px, calc(100vw - 32px)); z-index: 20; font-size: .92rem; display: flex; gap: 12px; align-items: center; }
+.toast button { background: none; border: 0; color: var(--bg); font-weight: 700; text-decoration: underline; cursor: pointer; flex: none; }
+
+.photos { display: flex; flex-wrap: wrap; gap: 8px; }
+.photo { width: 104px; height: 104px; border-radius: 8px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--line); display: grid; place-items: center; }
+.photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo.pending { font-size: .78rem; color: var(--muted); text-align: center; padding: 6px; }
+
+footer { border-top: 1px solid var(--line); padding-block: 18px 30px; color: var(--muted); font-size: .84rem; display: grid; gap: 8px; }
+
+@media (max-width: 820px) {
+  .road { grid-template-columns: minmax(0, 1fr); }
+  .rail { display: none; }
+  .rail-select { display: block; }
+  .st-body { padding-left: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1 class="wordmark">Build<span>It</span></h1>
+      <p class="tag">From empty lot to keys in hand. Every step in order, every inspection on the calendar, every payment backed by paper.</p>
+    </div>
+    <div class="dim" aria-label="Overall progress">
+      <div class="dim-label"><span>Lot</span><span id="dimText"><b>0%</b> built</span><span>Keys</span></div>
+      <div class="dim-line"><div class="dim-fill" id="dimFill" style="width:0%"></div></div>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <main id="view"></main>
+  <footer>
+    <p>Build It is a guide, not legal, financial or engineering advice. Building codes, permits and lien laws are set locally and change. Your building department, licensed design professionals and attorney have the final word for your project.</p>
+    <p>Your progress is saved in this browser. Sign in, or use “Back up my build” on the My build tab, to carry it to another device or the phone app.</p>
+  </footer>
+</div>
+<div id="toast" class="toast" hidden role="status" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="sync.js"></script>
+<script src="content.js"></script>
+<script>
+(() => {
+  const KEY = "buildit.v1";
+  const TABS = [
+    ["home", "My build"], ["roadmap", "Roadmap"], ["land", "Land check"], ["permits", "Permits"],
+    ["budget", "Budget"], ["pay", "Paying people"], ["team", "Your team"], ["last", "Built to last"]
+  ];
+  const ALL_STEPS = PHASES.flatMap((p, pi) => p.steps.map(s => ({ ...s, phase: p.id, pi })));
+
+  const EXAMPLE_PAYMENTS = [
+    { id: "x1", date: "2026-03-04", payee: "Ridgeline Excavating", phase: "site", amount: 18400, waiver: "unconditional", inspected: true, example: true },
+    { id: "x2", date: "2026-03-28", payee: "Ridgeline Excavating", phase: "foundation", amount: 9600, waiver: "conditional", inspected: true, example: true },
+    { id: "x3", date: "2026-04-15", payee: "Stonebridge Concrete", phase: "foundation", amount: 31250, waiver: "none", inspected: false, example: true }
+  ];
+
+  const fresh = () => ({
+    profile: { name: "", location: "", sqft: 2200, stories: "1", foundation: "slab", route: "gc", utilities: "public", hoa: false, flood: false, acre: false, trees: false, demo: false, gas: true },
+    done: {}, notes: {}, lot: {}, permits: {}, vet: {},
+    budget: { land: 85000, sqft: 2200, cpsf: 210, site: 30000, softPct: 10, contPct: 12, downPct: 20, rate: 7.5, months: 10, extras: 25000 },
+    payments: EXAMPLE_PAYMENTS.slice(), photos: [], retainPct: 10
+  });
+
+  let S = load();
+  let tab = (location.hash || "").replace("#", "");
+  if (!TABS.some(t => t[0] === tab)) tab = "home";
+  let openPhase = currentPhase().id;
+  let openStep = null;
+  let confirmReset = false;
+
+  // Fills in anything an older or partial save is missing.
+  function normalize(d) { const f = fresh(); return { ...f, ...d, profile: { ...f.profile, ...d.profile }, budget: { ...f.budget, ...d.budget } }; }
+  function load() {
+    try {
+      const raw = localStorage.getItem(KEY);
+      if (raw) return normalize(JSON.parse(raw));
+    } catch (e) {}
+    return fresh();
+  }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(S)); localStorage.setItem(SYNC_KEY, JSON.stringify(meta)); } catch (e) {} }
+  /** Saves a change made here. When signed in, it reaches the account a couple of seconds later. */
+  function save() { meta.dirty = true; revision++; persist(); schedulePush(); }
+
+  /* ---------- Account and cloud sync (only when config.js has Supabase keys) ---------- */
+  const SYNC_KEY = "buildit.sync";
+  const CFG = window.BUILDIT_CONFIG || {};
+  const accountsOn = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+  let meta = (() => { try { return JSON.parse(localStorage.getItem(SYNC_KEY)) || { dirty: false, version: null }; } catch (e) { return { dirty: false, version: null }; } })();
+  let sb = null, user = null, revision = 0, pushTimer, running = false, again = false;
+  let syncState = "idle", syncError = "", lastSynced = null, codeSentTo = "", confirmDelete = false, pendingRender = false;
+  const photoUrls = {};
+
+  function schedulePush() { if (!user) return; clearTimeout(pushTimer); pushTimer = setTimeout(syncNow, 2000); }
+
+  // Re-render without yanking focus from a field someone is typing in.
+  function softRender() {
+    const a = document.activeElement;
+    if (a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT")) { pendingRender = true; return; }
+    render();
+  }
+  document.addEventListener("focusout", () => { if (pendingRender) { pendingRender = false; setTimeout(render, 0); } });
+
+  async function syncOnce() {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      const rev = revision, local = JSON.parse(JSON.stringify(S));
+      const { data: row, error } = await sb.from("builds").select("data, version").eq("user_id", user.id).maybeSingle();
+      if (error) throw error;
+      const plan = BUILDIT_SYNC.planSync(local, meta.dirty, meta.version, row, normalize);
+      if (plan.action === "none") return;
+      if (plan.action === "pull") { S = plan.data; meta = { dirty: false, version: plan.version }; persist(); softRender(); return; }
+      let version = null;
+      if (plan.action === "create") {
+        const { error: e } = await sb.from("builds").insert({ user_id: user.id, data: plan.data, version: 1 });
+        if (e && e.code !== "23505") throw e;
+        if (!e) version = 1;
+      } else {
+        const { data: rows, error: e } = await sb.from("builds").update({ data: plan.data, version: plan.expectVersion + 1 })
+          .eq("user_id", user.id).eq("version", plan.expectVersion).select("version");
+        if (e) throw e;
+        if (rows.length) version = plan.expectVersion + 1;
+      }
+      if (version == null) continue; // Another device saved first. Look again.
+      const merged = JSON.stringify(plan.data) !== JSON.stringify(local);
+      if (revision === rev) { S = plan.data; meta = { dirty: false, version }; }
+      else { S = normalize(BUILDIT_SYNC.mergeBuilds(S, plan.data)); meta = { dirty: true, version }; }
+      persist();
+      if (merged) softRender();
+      return;
+    }
+  }
+
+  async function syncNow() {
+    if (!user) return;
+    if (running) { again = true; return; }
+    running = true; syncState = "syncing"; updateAccountStatus();
+    try {
+      do { again = false; await syncOnce(); } while (again);
+      syncState = "synced"; syncError = ""; lastSynced = new Date();
+    } catch (e) {
+      syncState = "error"; syncError = (e && e.message) || "Could not reach your account.";
+    } finally { running = false; updateAccountStatus(); }
+  }
+
+  function updateAccountStatus() { const el = $("#syncStatus"); if (el) el.outerHTML = syncStatusHTML(); }
+  function syncStatusHTML() {
+    const [tone, label] = { idle: ["plain", "Signed in"], syncing: ["info", "Saving"], synced: ["ok", "Up to date"], error: ["bad", "Not saved"] }[syncState];
+    const when = lastSynced ? ` Last saved at ${lastSynced.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}.` : "";
+    return `<div id="syncStatus" class="stack" style="gap:6px"><span class="pill ${tone}" style="align-self:flex-start">${label}</span>
+      <p class="muted">${syncState === "error" ? `Couldn’t reach your account: ${esc(syncError)} Your changes are safe in this browser.` : `Your build and phone photos sync with your account.${when}`}</p></div>`;
+  }
+
+  function startAccounts() {
+    if (!accountsOn) return;
+    const tag = document.createElement("script");
+    tag.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+    tag.onload = () => {
+      sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, { auth: { persistSession: true, autoRefreshToken: true } });
+      sb.auth.onAuthStateChange((_event, session) => {
+        const was = user && user.id;
+        user = session ? session.user : null;
+        if (user && user.id !== was) { setTimeout(syncNow, 0); }
+        if (tab === "home" || tab === "roadmap") softRender();
+      });
+      document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") syncNow(); });
+    };
+    tag.onerror = () => { syncState = "error"; syncError = "Couldn’t load sign-in. Check your connection."; };
+    document.head.appendChild(tag);
+  }
+
+  function accountHTML() {
+    if (!accountsOn) return "";
+    if (!sb) return `<section class="card stack"><h3>Account</h3><p class="muted">Loading sign-in…</p></section>`;
+    if (!user) return `<section class="card stack"><h3>Sign in to sync with your phone</h3>
+      <p class="muted">Use the same email as the Build It phone app. We email you a 6-digit code. No password to remember.</p>
+      <div class="fields">
+        <label class="field"><span>Email</span><input id="acct-email" type="email" autocomplete="email" value="${esc(codeSentTo)}" placeholder="you@example.com"></label>
+        ${codeSentTo ? `<label class="field"><span>6-digit code from the email</span><input id="acct-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>` : ""}
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${codeSentTo ? `<button class="btn primary" id="verifyCode">Sign in</button><button class="btn" id="sendCode">Send a new code</button>` : `<button class="btn primary" id="sendCode">Email me a code</button>`}</div>
+    </section>`;
+    return `<section class="card stack"><h3>Account</h3><p><b>${esc(user.email)}</b></p>${syncStatusHTML()}
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn" id="syncNow">Save now</button><button class="btn" id="signOut">Sign out</button>
+      ${confirmDelete ? `<span style="display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Delete your account, its saved build and photos?</b><button class="btn danger" id="doDelete">Yes, delete it</button><button class="btn" id="cancelDelete">Keep it</button></span>` : `<button class="btn danger" id="askDelete">Delete account</button>`}</div>
+    </section>`;
+  }
+
+  // Photos are taken in the phone app. Signed in, the web app shows the ones that are backed up.
+  function photosHTML(stepId) {
+    const list = (S.photos || []).filter(p => p.step === stepId);
+    if (!list.length) return "";
+    if (!user) return `<p class="muted">${list.length} photo${list.length > 1 ? "s" : ""} in the phone app.${accountsOn ? " Sign in on the My build tab to see them here." : ""}</p>`;
+    return `<div class="photos">${list.map(p => p.uploaded
+      ? `<a class="photo" data-photo-link="${esc(p.id)}" target="_blank" rel="noopener"><img data-photo="${esc(p.id)}" alt="Photo from ${new Date(p.takenAt).toLocaleDateString()}"></a>`
+      : `<span class="photo pending">Still on the phone</span>`).join("")}</div>`;
+  }
+  async function fillPhotos() {
+    if (!user) return;
+    for (const img of document.querySelectorAll("img[data-photo]")) {
+      const id = img.dataset.photo;
+      if (!photoUrls[id]) {
+        const { data, error } = await sb.storage.from("photos").createSignedUrl(`${user.id}/${id}.jpg`, 3600);
+        if (error) continue;
+        photoUrls[id] = data.signedUrl;
+      }
+      img.src = photoUrls[id];
+      const link = img.closest("a"); if (link) link.href = photoUrls[id];
+    }
+  }
+
+  const $ = s => document.querySelector(s);
+  const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const money = n => "$" + Math.round(n || 0).toLocaleString("en-US");
+  const num = v => { const n = parseFloat(String(v).replace(/[^0-9.\-]/g, "")); return isFinite(n) ? n : 0; };
+
+  function phaseStats(p) {
+    const total = p.steps.length, done = p.steps.filter(s => S.done[s.id]).length;
+    const gates = p.steps.filter(s => s.gate), gatesOpen = gates.filter(s => !S.done[s.id]).length;
+    return { total, done, pct: Math.round(done / total * 100), gates: gates.length, gatesOpen };
+  }
+  function currentPhase() { return PHASES.find(p => p.steps.some(s => !S.done[s.id])) || PHASES[PHASES.length - 1]; }
+  // Steps left open behind the furthest step you have checked off.
+  function skipped() {
+    let last = -1;
+    ALL_STEPS.forEach((s, i) => { if (S.done[s.id]) last = i; });
+    return ALL_STEPS.slice(0, last + 1).filter(s => !S.done[s.id]);
+  }
+  function overall() { const d = ALL_STEPS.filter(s => S.done[s.id]).length; return Math.round(d / ALL_STEPS.length * 100); }
+
+  function budgetCalc(b) {
+    const house = b.sqft * b.cpsf;
+    const soft = house * b.softPct / 100;
+    const sub = b.land + b.site + house + soft + b.extras;
+    const cont = (b.site + house + soft) * b.contPct / 100;
+    const total = sub + cont;
+    const loan = total * (1 - b.downPct / 100);
+    // Draws ramp up, so on average about half the loan is outstanding during the build.
+    const interest = loan * (b.rate / 100) * (b.months / 12) * 0.5;
+    return { house, soft, cont, total: total + interest, interest, loan, cash: total * b.downPct / 100 + interest, perSqft: (total + interest) / Math.max(b.sqft, 1) };
+  }
+
+  let toastTimer;
+  function toast(msg, actionLabel, action) {
+    const t = $("#toast");
+    t.innerHTML = `<span>${msg}</span>` + (actionLabel ? `<button type="button" id="toastAct">${actionLabel}</button>` : "");
+    t.hidden = false;
+    if (actionLabel) $("#toastAct").onclick = () => { t.hidden = true; action(); };
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 6000);
+  }
+
+  function renderTabs() {
+    $("#tabs").innerHTML = TABS.map(([id, label]) =>
+      `<button class="tab" role="tab" type="button" data-tab="${id}" aria-selected="${id === tab}">${label}</button>`).join("");
+  }
+  function renderDim() {
+    const p = overall();
+    $("#dimFill").style.width = p + "%";
+    $("#dimText").innerHTML = `<b>${p}%</b> built · ${ALL_STEPS.filter(s => S.done[s.id]).length} of ${ALL_STEPS.length} steps`;
+  }
+
+  /* ---------- Views ---------- */
+  const V = {};
+
+  V.home = () => {
+    const P = S.profile, cur = currentPhase(), cs = phaseStats(cur), sk = skipped();
+    const gatesOpen = PHASES.reduce((a, p) => a + phaseStats(p).gatesOpen, 0);
+    const bc = budgetCalc(S.budget);
+    const paid = S.payments.reduce((a, x) => a + num(x.amount), 0);
+    const nextSteps = cur.steps.filter(s => !S.done[s.id]).slice(0, 3);
+    return `
+    <div class="view-head"><span class="label">My build</span><h2>${P.name ? esc(P.name) : "Your home, start to finish"}</h2>
+      <p>Tell Build It about your project. It shapes your permit list and budget. Then work the roadmap one step at a time.</p></div>
+    <div class="stats">
+      <div class="stat"><span class="label">You are in</span><span class="v">${PHASES.indexOf(cur) + 1}<span class="muted" style="font-size:.9rem"> / ${PHASES.length}</span></span><span class="s">${cur.name} · ${cs.done} of ${cs.total} steps</span></div>
+      <div class="stat ${sk.length ? "alert" : ""}"><span class="label">Skipped steps</span><span class="v">${sk.length}</span><span class="s">${sk.length ? "Open steps behind your progress" : "Nothing left behind"}</span></div>
+      <div class="stat"><span class="label">Hold points left</span><span class="v">${gatesOpen}</span><span class="s">Inspections that must pass before covering work</span></div>
+      <div class="stat"><span class="label">All-in budget</span><span class="v">${money(bc.total)}</span><span class="s">${money(paid)} paid so far${S.payments.some(x => x.example) ? " (examples)" : ""}</span></div>
+    </div>
+    ${sk.length ? `<div class="warnbar" style="margin-top:14px"><p><b>No step gets skipped.</b> ${sk.length} earlier step${sk.length > 1 ? "s are" : " is"} still open, starting with “${esc(sk[0].t)}”.</p><button class="btn small" data-goto-step="${sk[0].id}">Go to it</button></div>` : ""}
+    <div class="grid2" style="margin-top:16px">
+      <section class="card stack">
+        <h3>Up next: ${esc(cur.name)}</h3>
+        ${nextSteps.length ? `<ul class="plain">${nextSteps.map(s => `<li><button class="linkish" data-goto-step="${s.id}">${esc(s.t)}</button>${s.gate ? ` <span class="pill flag">Hold point</span>` : ""}</li>`).join("")}</ul>` : `<p>Every step is done. Enjoy the house.</p>`}
+        <div><button class="btn primary" data-tab="roadmap">Open the roadmap</button></div>
+      </section>
+      <section class="card stack">
+        <h3>About your project</h3>
+        <div class="fields">
+          <label class="field"><span>Project name</span><input id="pf-name" data-p="name" value="${esc(P.name)}" placeholder="The Oak Hill house"></label>
+          <label class="field"><span>City, county and state</span><input id="pf-location" data-p="location" value="${esc(P.location)}" placeholder="Wake County, NC"></label>
+          <label class="field"><span>Heated square feet</span><input id="pf-sqft" data-p="sqft" inputmode="numeric" value="${esc(P.sqft)}"></label>
+          <label class="field"><span>Stories</span><select id="pf-stories" data-p="stories">${["1", "1.5", "2", "3"].map(v => `<option ${P.stories === v ? "selected" : ""}>${v}</option>`).join("")}</select></label>
+          <label class="field"><span>Foundation</span><select id="pf-foundation" data-p="foundation">${[["slab", "Slab on grade"], ["crawl", "Crawlspace"], ["basement", "Basement"]].map(([v, l]) => `<option value="${v}" ${P.foundation === v ? "selected" : ""}>${l}</option>`).join("")}</select></label>
+          <label class="field"><span>Who runs the build</span><select id="pf-route" data-p="route"><option value="gc" ${P.route === "gc" ? "selected" : ""}>A general contractor</option><option value="owner" ${P.route === "owner" ? "selected" : ""}>Me (owner-builder)</option></select></label>
+          <label class="field"><span>Water and sewer</span><select id="pf-utilities" data-p="utilities"><option value="public" ${P.utilities === "public" ? "selected" : ""}>Public water and sewer</option><option value="private" ${P.utilities === "private" ? "selected" : ""}>Well and septic</option></select></label>
+        </div>
+        <div class="grid3">
+          ${[["hoa", "Lot has an HOA"], ["flood", "In or near a flood zone"], ["acre", "Disturbing 1+ acre"], ["trees", "Removing large trees"], ["demo", "Tearing down a structure"], ["gas", "Using natural gas or propane"]].map(([k, l]) =>
+            `<label class="check"><input type="checkbox" id="pf-${k}" data-pb="${k}" ${P[k] ? "checked" : ""}><span>${l}</span></label>`).join("")}
+        </div>
+        ${P.route === "owner" ? `<p class="pill warn" style="white-space:normal;text-transform:none;letter-spacing:0;font-size:.85rem;line-height:1.4">Owner-builder: check your state’s owner-builder rules, your lender’s policy and your insurance before you commit.</p>` : ""}
+      </section>
+    </div>
+    ${accountsOn ? `<div style="margin-top:16px">${accountHTML()}</div>` : ""}
+    <section class="card stack" style="margin-top:16px">
+      <h3>Back up my build</h3>
+      <p class="muted">${user ? "Your build syncs with your account. A backup code is a copy you keep yourself." : "Progress lives in this browser."} Copy a backup code and paste it on another device or the phone app to carry on there.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="btn" id="copyBackup">Copy backup code</button>
+        <button class="btn" id="showRestore">Restore from a code</button>
+        ${confirmReset ? `<span style="display:inline-flex;gap:8px;align-items:center"><b>Erase everything?</b><button class="btn danger" id="doReset">Yes, start over</button><button class="btn" id="cancelReset">Keep it</button></span>` : `<button class="btn danger" id="askReset">Start over</button>`}
+      </div>
+      <div id="restoreBox" hidden class="stack">
+        <label class="field"><span>Backup code</span><textarea id="restoreText" placeholder="Paste your backup code here"></textarea></label>
+        <div><button class="btn primary" id="doRestore">Restore</button></div>
+      </div>
+      <textarea id="backupOut" hidden readonly class="mono" style="width:100%;min-height:80px;font-size:.75rem;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px"></textarea>
+    </section>`;
+  };
+
+  V.roadmap = () => {
+    const p = PHASES.find(x => x.id === openPhase) || PHASES[0];
+    const st = phaseStats(p), idx = PHASES.indexOf(p);
+    const sk = skipped();
+    return `
+    <div class="road">
+      <nav class="rail" aria-label="Phases">
+        ${PHASES.map((x, i) => { const s = phaseStats(x); return `
+          <button type="button" data-phase="${x.id}" aria-current="${x.id === p.id}" class="${s.pct === 100 ? "done" : ""}">
+            <span class="num">${String(i + 1).padStart(2, "0")}</span><span class="nm">${x.name}</span><span class="pct">${s.pct === 100 ? "✓" : s.pct + "%"}</span>
+            <span class="bar"><i style="width:${s.pct}%"></i></span>
+          </button>`; }).join("")}
+      </nav>
+      <section style="min-width:0">
+        <label class="field rail-select" style="margin-bottom:14px"><span>Phase</span>
+          <select id="phaseSelect">${PHASES.map((x, i) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${i + 1}. ${x.name} (${phaseStats(x).pct}%)</option>`).join("")}</select></label>
+        ${sk.length ? `<div class="warnbar"><p><b>${sk.length} step${sk.length > 1 ? "s" : ""} behind you ${sk.length > 1 ? "are" : "is"} still open.</b> Builders who last don’t leave gaps. Next one: “${esc(sk[0].t)}”.</p><button class="btn small" data-goto-step="${sk[0].id}">Go to it</button></div>` : ""}
+        <div class="sheet-head">
+          <span class="label">Phase ${idx + 1} of ${PHASES.length}</span>
+          <h2>${p.name}</h2>
+          <p class="muted" style="max-width:68ch">${p.blurb}</p>
+          <div class="meta">
+            <span class="pill info">${st.done} / ${st.total} done</span>
+            <span class="pill plain">Typical time: ${p.days}</span>
+            ${st.gates ? `<span class="pill ${st.gatesOpen ? "flag" : "ok"}">${st.gatesOpen ? st.gatesOpen + " hold point" + (st.gatesOpen > 1 ? "s" : "") + " open" : "All hold points passed"}</span>` : ""}
+          </div>
+          <div class="who" aria-label="Who you need">${p.who.map(w => `<span>${w}</span>`).join("")}</div>
+        </div>
+        <div class="steps">
+          ${p.steps.map(s => stepHTML(s)).join("")}
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap">
+          ${idx > 0 ? `<button class="btn" data-phase="${PHASES[idx - 1].id}">← ${PHASES[idx - 1].name}</button>` : "<span></span>"}
+          ${idx < PHASES.length - 1 ? `<button class="btn ${st.pct === 100 ? "primary" : ""}" data-phase="${PHASES[idx + 1].id}">${PHASES[idx + 1].name} →</button>` : ""}
+        </div>
+      </section>
+    </div>`;
+  };
+
+  function stepHTML(s) {
+    const done = !!S.done[s.id], open = openStep === s.id;
+    return `
+    <article class="step ${s.gate ? "gate" : ""} ${done ? "is-done" : ""}" id="step-${s.id}">
+      <div class="st-row">
+        <input type="checkbox" id="chk-${s.id}" data-step="${s.id}" ${done ? "checked" : ""} aria-label="Mark done: ${esc(s.t)}">
+        <div style="min-width:0">
+          <button class="st-title" type="button" data-open="${s.id}" aria-expanded="${open}">${esc(s.t)}</button>
+          ${(s.gate || s.crit || S.notes[s.id]) ? `<div class="st-tags">${s.gate ? `<span class="pill flag">Hold point · inspection</span>` : ""}${s.crit ? `<span class="pill warn">Never skip</span>` : ""}${S.notes[s.id] ? `<span class="pill plain">Has notes</span>` : ""}</div>` : ""}
+        </div>
+        <button class="st-toggle" type="button" data-open="${s.id}" aria-label="${open ? "Hide" : "Show"} details">${open ? "−" : "+"}</button>
+      </div>
+      ${open ? `<div class="st-body">
+        <p>${s.d}</p>
+        <div class="pro"><b>How the best builders do it</b>${s.pro}</div>
+        ${photosHTML(s.id)}
+        ${s.gate ? `<div class="hold"><b>Hold point.</b> Do not cover, pour, close up or pay for this stage until it passes. Write the inspector’s name, date and result in your notes.</div>` : ""}
+        <label class="field"><span>Notes, dates, names, inspection results</span><textarea id="note-${s.id}" data-note="${s.id}" placeholder="Passed 4/12, inspector J. Ruiz. Photos in binder.">${esc(S.notes[s.id] || "")}</textarea></label>
+      </div>` : ""}
+    </article>`;
+  }
+
+  V.land = () => {
+    const all = LOT_GROUPS.flatMap(g => g.items);
+    const c = { ok: 0, concern: 0, nogo: 0, unknown: 0 };
+    all.forEach(i => c[S.lot[i.id] || "unknown"]++);
+    let v;
+    if (c.nogo) v = ["bad", "Walk away or renegotiate", `${c.nogo} deal-breaker${c.nogo > 1 ? "s" : ""}. Use your due diligence contingency before it expires.`];
+    else if (c.concern) v = ["warn", "Get answers before you close", `${c.concern} concern${c.concern > 1 ? "s" : ""} to price or resolve. Get written quotes and put them in your budget.`];
+    else if (c.unknown) v = ["plain", "Still in due diligence", `${c.unknown} of ${all.length} checks still unknown. Do not close until every one is answered.`];
+    else v = ["ok", "This lot checks out", "Every check passed. Close with title insurance and keep every report in your binder."];
+    return `
+    <div class="view-head"><span class="label">Land check</span><h2>Should you buy this lot?</h2>
+      <p>Work through every check during your due diligence period, before you close. Mark each one as you get an answer in writing.</p></div>
+    <div class="verdict ${v[0]}" style="margin-bottom:16px"><h3>${v[1]}</h3><p>${v[2]}</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill ok">${c.ok} OK</span><span class="pill warn">${c.concern} concern</span><span class="pill bad">${c.nogo} deal-breaker</span><span class="pill plain">${c.unknown} unknown</span></div></div>
+    <div class="grid2">
+      ${LOT_GROUPS.map(g => `<section class="card"><h3 style="margin-bottom:6px">${g.name}</h3>
+        ${g.items.map(i => { const val = S.lot[i.id] || "unknown"; return `
+          <div class="lotrow"><div><span>${i.t}</span><small>${i.how}</small></div>
+            <div class="seg" role="group" aria-label="${esc(i.t)}">
+              ${[["unknown", "?"], ["ok", "OK"], ["concern", "Concern"], ["nogo", "No-go"]].map(([k, l]) => `<button type="button" data-lot="${i.id}" data-v="${k}" aria-pressed="${val === k}">${l}</button>`).join("")}
+            </div></div>`; }).join("")}
+      </section>`).join("")}
+    </div>`;
+  };
+
+  V.permits = () => {
+    const P = S.profile;
+    const list = PERMITS.filter(x => !x.when || Object.entries(x.when).every(([k, v]) => P[k] === v));
+    const statuses = [["todo", "Not started"], ["applied", "Applied"], ["approved", "Approved"], ["na", "Not needed here"]];
+    const cnt = k => list.filter(x => (S.permits[x.id] || "todo") === k).length;
+    return `
+    <div class="view-head"><span class="label">Permits</span><h2>Your permit list</h2>
+      <p>Built from your project details on the My build tab${P.location ? ` for ${esc(P.location)}` : ""}. Call your building department to confirm what your town requires. Some combine these; some add others.</p></div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat"><span class="label">Permits on your list</span><span class="v">${list.length}</span></div>
+      <div class="stat"><span class="label">Approved</span><span class="v" style="color:var(--ok)">${cnt("approved")}</span></div>
+      <div class="stat"><span class="label">Applied, waiting</span><span class="v">${cnt("applied")}</span></div>
+      <div class="stat ${cnt("todo") ? "alert" : ""}"><span class="label">Not started</span><span class="v">${cnt("todo")}</span></div>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Permit or approval</th><th>Who issues it</th><th>Needed</th><th>Status</th></tr></thead>
+      <tbody>${list.map(x => `<tr><td><b>${x.t}</b></td><td>${x.by}</td><td>${x.stage}</td>
+        <td><select id="permit-${x.id}" data-permit="${x.id}" aria-label="Status for ${esc(x.t)}" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px">${statuses.map(([k, l]) => `<option value="${k}" ${(S.permits[x.id] || "todo") === k ? "selected" : ""}>${l}</option>`).join("")}</select></td></tr>`).join("")}</tbody>
+    </table></div>
+    <p class="muted" style="margin-top:12px">Questions to ask the permit counter: Which inspections do you require, in what order, and how do I schedule them? How long is plan review? What are the impact and tap fees? Does my permit expire if work stops?</p>`;
+  };
+
+  V.budget = () => {
+    const b = S.budget, r = budgetCalc(b);
+    const inp = (k, label, suffix) => `<label class="field"><span>${label}</span><input id="b-${k}" data-b="${k}" inputmode="decimal" value="${b[k]}"${suffix ? ` aria-describedby="b-${k}-u"` : ""}></label>`;
+    const parts = [["Land", b.land, "c5"], ["Site work and utilities", b.site, "c3"], ["House construction", r.house, "c1"], ["Design, engineering, permits, fees", r.soft, "c4"], ["Contingency", r.cont, "c2"], ["Loan interest during build", r.interest, "c6"], ["Landscaping, furniture, moving", b.extras, "c7"]];
+    const hard = r.house + b.site;
+    return `
+    <div class="view-head"><span class="label">Budget</span><h2>What it really costs</h2>
+      <p>Change any number. House cost per square foot varies widely by region and finish level, so ask two or three local builders for a current range and use the middle.</p></div>
+    <div class="grid2">
+      <section class="card stack">
+        <div class="fields">
+          ${inp("land", "Land price ($)")}${inp("sqft", "Heated square feet")}${inp("cpsf", "Build cost per sq ft ($)")}${inp("site", "Site work and utilities ($)")}
+          ${inp("softPct", "Soft costs (% of house)")}${inp("contPct", "Contingency (%)")}${inp("extras", "Landscape, furniture, moving ($)")}
+          ${inp("downPct", "Down payment (%)")}${inp("rate", "Loan interest rate (%)")}${inp("months", "Months to build")}
+        </div>
+        <p class="muted" style="font-size:.85rem">Soft costs cover plans, engineering, surveys, permits and fees: often 8–15%. Contingency should be at least 10%. Site work on raw land with a well and septic is often $30,000–$80,000 or more.</p>
+      </section>
+      <section class="card stack">
+        <div><span class="label">All-in total</span><div class="mono" style="font-size:2.2rem;font-weight:500">${money(r.total)}</div><span class="muted">${money(r.perSqft)} per heated sq ft, everything included</span></div>
+        <div class="stackbar" role="img" aria-label="Budget breakdown">${parts.map(([l, v, c]) => `<i class="${c}" style="flex:${Math.max(v, 0)}" title="${l}: ${money(v)}"></i>`).join("")}</div>
+        <div class="tablewrap"><table><tbody>
+          ${parts.map(([l, v, c]) => `<tr><td><span class="legend"><span><i class="${c}"></i>${l}</span></span></td><td class="num">${money(v)}</td><td class="num muted">${(v / r.total * 100).toFixed(0)}%</td></tr>`).join("")}
+        </tbody><tfoot><tr><td>Total</td><td class="num">${money(r.total)}</td><td></td></tr></tfoot></table></div>
+        <div class="grid3">
+          <div><span class="label">Construction loan</span><div class="mono">${money(r.loan)}</div></div>
+          <div><span class="label">Cash you need</span><div class="mono">${money(r.cash)}</div><span class="muted" style="font-size:.8rem">Down payment plus interest during the build</span></div>
+        </div>
+      </section>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <section class="stack">
+        <h3>Where the house money goes</h3>
+        <p class="muted">Typical split of construction cost for a new single-family home, rounded from industry cost surveys. Use it to sanity-check bids.</p>
+        <div class="tablewrap"><table><thead><tr><th>Category</th><th class="num">Share</th><th class="num">Your build</th></tr></thead><tbody>
+          ${COST_SPLIT.map(([l, p]) => `<tr><td>${l}</td><td class="num">${p}%</td><td class="num">${money(hard * p / 100)}</td></tr>`).join("")}
+        </tbody></table></div>
+      </section>
+      <section class="stack">
+        <h3>Draw schedule</h3>
+        <p class="muted">A typical way lenders release the construction money. Each draw is paid only after the milestone is finished and inspected. ${S.retainPct}% retainage is held from each one.</p>
+        <div class="tablewrap"><table><thead><tr><th>Milestone</th><th class="num">%</th><th class="num">Draw</th></tr></thead><tbody>
+          ${DRAWS.map(([l, p, proof]) => `<tr><td><b>${l}</b><br><span class="muted" style="font-size:.82rem">Proof: ${proof}</span></td><td class="num">${p}%</td><td class="num">${money(hard * p / 100)}</td></tr>`).join("")}
+        </tbody><tfoot><tr><td>Total construction</td><td class="num">100%</td><td class="num">${money(hard)}</td></tr></tfoot></table></div>
+      </section>
+    </div>`;
+  };
+
+  V.pay = () => {
+    const pays = S.payments;
+    const total = pays.reduce((a, x) => a + num(x.amount), 0);
+    const missing = pays.filter(x => x.waiver !== "unconditional");
+    const noInsp = pays.filter(x => !x.inspected);
+    const hasEx = pays.some(x => x.example);
+    const r = budgetCalc(S.budget);
+    const retain = total * S.retainPct / 100;
+    return `
+    <div class="view-head"><span class="label">Paying people</span><h2>Pay for work done, with paper for every dollar</h2>
+      <p>Most money lost in home building is lost by paying ahead of the work or paying without lien waivers. Log every payment here.</p></div>
+    <div class="stats" style="margin-bottom:16px">
+      <div class="stat"><span class="label">Paid so far</span><span class="v">${money(total)}</span><span class="s">${(total / r.total * 100).toFixed(1)}% of all-in budget</span></div>
+      <div class="stat ${missing.length ? "alert" : ""}"><span class="label">Waivers outstanding</span><span class="v">${missing.length}</span><span class="s">Payments without an unconditional lien waiver</span></div>
+      <div class="stat ${noInsp.length ? "alert" : ""}"><span class="label">Paid before inspection</span><span class="v">${noInsp.length}</span><span class="s">Work paid but not verified</span></div>
+      <div class="stat"><span class="label">Retainage to hold</span><span class="v">${money(retain)}</span><span class="s">At ${S.retainPct}% of payments</span></div>
+    </div>
+    ${hasEx ? `<div class="warnbar" style="background:var(--surface-2)"><p>The entries marked <b>Example</b> show how the log works. They are not your payments.</p><button class="btn small" id="clearEx">Clear examples</button></div>` : ""}
+    <section class="card stack" style="margin-bottom:16px">
+      <h3>Log a payment</h3>
+      <form id="payForm" class="fields">
+        <label class="field"><span>Date</span><input id="pay-date" name="date" type="date" required></label>
+        <label class="field"><span>Paid to (company)</span><input id="pay-payee" name="payee" required placeholder="Company on the contract"></label>
+        <label class="field"><span>Phase</span><select id="pay-phase" name="phase">${PHASES.map(p => `<option value="${p.id}">${p.name}</option>`).join("")}</select></label>
+        <label class="field"><span>Amount ($)</span><input id="pay-amount" name="amount" inputmode="decimal" required></label>
+        <label class="field"><span>Lien waiver received</span><select id="pay-waiver" name="waiver"><option value="none">None yet</option><option value="conditional">Conditional</option><option value="unconditional">Unconditional</option></select></label>
+        <label class="check" style="align-self:end;padding-bottom:10px"><input id="pay-inspected" type="checkbox" name="inspected"><span>Work inspected and verified</span></label>
+        <div style="align-self:end"><button class="btn primary" type="submit">Add payment</button></div>
+      </form>
+    </section>
+    <div class="tablewrap" style="margin-bottom:22px"><table>
+      <thead><tr><th>Date</th><th>Paid to</th><th>Phase</th><th class="num">Amount</th><th>Lien waiver</th><th>Inspected</th><th></th></tr></thead>
+      <tbody>${pays.length ? pays.slice().sort((a, b) => (a.date || "").localeCompare(b.date || "")).map(x => `<tr>
+        <td class="mono">${esc(x.date)}</td>
+        <td>${esc(x.payee)} ${x.example ? `<span class="pill plain">Example</span>` : ""}</td>
+        <td>${esc((PHASES.find(p => p.id === x.phase) || {}).name || "")}</td>
+        <td class="num">${money(num(x.amount))}</td>
+        <td><select id="w-${x.id}" data-waiver="${x.id}" aria-label="Lien waiver for ${esc(x.payee)}" style="background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px">
+          ${[["none", "None yet"], ["conditional", "Conditional"], ["unconditional", "Unconditional"]].map(([k, l]) => `<option value="${k}" ${x.waiver === k ? "selected" : ""}>${l}</option>`).join("")}</select>
+          ${x.waiver === "unconditional" ? "" : ` <span class="pill ${x.waiver === "none" ? "bad" : "warn"}">${x.waiver === "none" ? "Get it" : "Get final"}</span>`}</td>
+        <td><label class="check"><input type="checkbox" id="i-${x.id}" data-insp="${x.id}" ${x.inspected ? "checked" : ""}><span>${x.inspected ? "Yes" : `<span class="pill bad">No</span>`}</span></label></td>
+        <td><button class="btn small danger" data-delpay="${x.id}" aria-label="Delete payment to ${esc(x.payee)}">Delete</button></td></tr>`).join("")
+        : `<tr><td colspan="7" class="muted">No payments yet. Log your first one above when it happens.</td></tr>`}</tbody>
+    </table></div>
+    <div class="grid2">
+      <section class="card stack"><h3>The golden rules of paying contractors</h3>
+        <ol class="rules">${PAY_RULES.map(([t, d]) => `<li><div><b>${t}.</b> <span class="muted">${d}</span></div></li>`).join("")}</ol></section>
+      <section class="card stack"><h3>Lien waivers, in plain words</h3>
+        <p>If a contractor, sub or supplier is not paid, most states let them put a <b>mechanic’s lien</b> on your property, even if you already paid the GC. A lien waiver is their signed statement that they give up that right for a payment.</p>
+        <ul class="plain">
+          <li><b>Conditional waiver:</b> “I waive my lien rights once this payment clears.” Get it before you pay.</li>
+          <li><b>Unconditional waiver:</b> “I have been paid.” Get it after the money clears.</li>
+          <li><b>From everyone:</b> the GC, each subcontractor and each major supplier (lumber, concrete, windows).</li>
+          <li><b>Final waivers:</b> unconditional finals from all of them before the last payment and retainage.</li>
+        </ul>
+        <p class="muted" style="font-size:.86rem">Some states use required statutory forms. Ask your title company or attorney which forms apply where you build.</p>
+      </section>
+    </div>`;
+  };
+
+  V.team = () => {
+    const owner = S.profile.route === "owner";
+    return `
+    <div class="view-head"><span class="label">Your team</span><h2>Hire people who build to last</h2>
+      <p>You are hiring the people whose work you will live inside for decades. Vet every one of them the same way.</p></div>
+    <div class="grid2">
+      <section class="card stack"><h3>General contractor or owner-builder?</h3>
+        <div class="tablewrap"><table><thead><tr><th></th><th>Hire a GC</th><th>Owner-builder</th></tr></thead><tbody>
+          <tr><td><b>Cost</b></td><td>GC fee, often 10–20%</td><td>Saves the fee, mistakes cost more</td></tr>
+          <tr><td><b>Your time</b></td><td>Weekly meetings and decisions</td><td>Close to a full-time job</td></tr>
+          <tr><td><b>Financing</b></td><td>Most lenders say yes</td><td>Many lenders say no</td></tr>
+          <tr><td><b>Liability</b></td><td>GC carries insurance and code responsibility</td><td>You do, including injured workers</td></tr>
+          <tr><td><b>Scheduling subs</b></td><td>GC’s relationships</td><td>You compete for their time</td></tr>
+          <tr><td><b>Best for</b></td><td>First-time builders</td><td>People with real trade or project experience</td></tr>
+        </tbody></table></div>
+        <p class="muted">${owner ? "You picked owner-builder. Hire a construction consultant or experienced builder to review your schedule and walk the site at every hold point." : "A middle path: hire a GC and also your own independent inspector who works only for you."}</p>
+      </section>
+      <section class="card stack"><h3>Vetting checklist</h3><p class="muted">Use it for your GC and every major sub.</p>
+        ${VETTING.map((v, i) => `<label class="check"><input type="checkbox" id="vet-${i}" data-vet="${i}" ${S.vet[i] ? "checked" : ""}><span>${v}</span></label>`).join("")}
+      </section>
+    </div>
+    <div class="grid2" style="margin-top:16px">
+      <section class="card stack"><h3>What your contract must say</h3>
+        <div class="tablewrap" style="border:0"><table><tbody>${CONTRACT.map(([k, v]) => `<tr><td style="white-space:nowrap"><b>${k}</b></td><td>${v}</td></tr>`).join("")}</tbody></table></div>
+      </section>
+      <section class="stack">
+        <div class="card stack"><h3>Red flags: walk away</h3><ul class="plain">${RED_FLAGS.map(r => `<li>${r}</li>`).join("")}</ul></div>
+        <div class="card stack"><h3>Questions to ask every builder</h3><ul class="plain">
+          <li>How many homes do you build at once, and who is on my site every day?</li>
+          <li>Which trades are your own crews, and which are subs?</li>
+          <li>How do you handle change orders and price increases?</li>
+          <li>Will you do a blower door test, and what result do you guarantee?</li>
+          <li>Can my inspector visit before the pour, before drywall and at the end?</li>
+          <li>What does your warranty cover, and how fast do you respond?</li>
+        </ul></div>
+      </section>
+    </div>`;
+  };
+
+  V.last = () => `
+    <div class="view-head"><span class="label">Built to last</span><h2>How the best builders make houses last</h2>
+      <p>These principles come from building science research and from building traditions whose houses have stood for centuries. Code tells you the minimum. These tell you how to build for your grandchildren.</p></div>
+    <div class="grid3">
+      ${PRINCIPLES.map(x => { const ph = PHASES.find(p => p.id === x.phase); return `<section class="card principle"><h3>${x.t}</h3><p class="muted">${x.d}</p><button class="linkish" data-phase="${x.phase}" data-tab="roadmap">See it in ${ph.name}</button></section>`; }).join("")}
+    </div>`;
+
+  function render() {
+    renderTabs(); renderDim();
+    $("#view").innerHTML = V[tab]();
+    fillPhotos();
+  }
+
+  function go(t) { tab = t; try { history.replaceState(null, "", "#" + t); } catch (e) {} render(); window.scrollTo({ top: 0 }); }
+  function gotoStep(id) {
+    const s = ALL_STEPS.find(x => x.id === id); if (!s) return;
+    openPhase = s.phase; openStep = id; go("roadmap");
+    requestAnimationFrame(() => { const el = document.getElementById("step-" + id); if (el) el.scrollIntoView({ block: "center" }); });
+  }
+
+  /* ---------- Events ---------- */
+  document.addEventListener("click", e => {
+    const t = e.target.closest("button, [data-tab]"); if (!t) return;
+    if (t.dataset.phase) { openPhase = t.dataset.phase; openStep = null; if (tab !== "roadmap") go("roadmap"); else { render(); window.scrollTo({ top: 0 }); } return; }
+    if (t.dataset.tab) return go(t.dataset.tab);
+    if (t.dataset.gotoStep) return gotoStep(t.dataset.gotoStep);
+    if (t.dataset.open) { openStep = openStep === t.dataset.open ? null : t.dataset.open; render(); return; }
+    if (t.dataset.lot) { S.lot[t.dataset.lot] = t.dataset.v; save(); render(); return; }
+    if (t.dataset.delpay) { S.payments = S.payments.filter(x => x.id !== t.dataset.delpay); save(); render(); return; }
+    switch (t.id) {
+      case "clearEx": S.payments = S.payments.filter(x => !x.example); save(); render(); toast("Examples cleared"); break;
+      case "askReset": confirmReset = true; render(); break;
+      case "cancelReset": confirmReset = false; render(); break;
+      case "doReset":
+        if (user && S.photos.length) sb.storage.from("photos").remove(S.photos.map(p => `${user.id}/${p.id}.jpg`));
+        S = fresh(); S.payments = []; confirmReset = false; openPhase = PHASES[0].id; save(); render(); toast("Started a fresh build"); break;
+      case "showRestore": $("#restoreBox").hidden = !$("#restoreBox").hidden; break;
+      case "copyBackup": {
+        const code = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+        const out = $("#backupOut");
+        const fallback = () => { out.hidden = false; out.value = code; out.select(); toast("Select the code and copy it"); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(() => toast("Backup code copied"), fallback); else fallback();
+        break;
+      }
+      case "sendCode": {
+        const email = ($("#acct-email").value || "").trim();
+        if (!/^\S+@\S+\.\S+$/.test(email)) { toast("Enter your full email address, like you@example.com."); break; }
+        sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } }).then(({ error }) => {
+          if (error) { toast(error.message); return; }
+          codeSentTo = email; render(); toast("Code sent. Check your email.");
+        });
+        break;
+      }
+      case "verifyCode": {
+        const token = ($("#acct-code").value || "").trim();
+        if (!/^\d{6}$/.test(token)) { toast("Enter the 6 digits from the email."); break; }
+        sb.auth.verifyOtp({ email: codeSentTo, token, type: "email" }).then(({ error }) => {
+          if (error) { toast(error.message); return; }
+          codeSentTo = ""; toast("Signed in. Your build is syncing.");
+        });
+        break;
+      }
+      case "syncNow": syncNow(); break;
+      case "signOut": sb.auth.signOut().then(() => { meta = { dirty: false, version: null }; persist(); render(); toast("Signed out. Your build stays in this browser."); }); break;
+      case "askDelete": confirmDelete = true; render(); break;
+      case "cancelDelete": confirmDelete = false; render(); break;
+      case "doDelete":
+        sb.functions.invoke("delete-account", { method: "POST" }).then(async ({ error }) => {
+          if (error) { toast("Couldn’t delete the account. Check your connection and try again."); return; }
+          await sb.auth.signOut(); meta = { dirty: false, version: null }; confirmDelete = false; persist(); render(); toast("Account deleted.");
+        });
+        break;
+      case "doRestore": {
+        try {
+          const d = JSON.parse(decodeURIComponent(escape(atob($("#restoreText").value.trim()))));
+          if (!d || !d.profile || !d.done) throw 0;
+          S = normalize(d);
+          save(); openPhase = currentPhase().id; render(); toast("Build restored");
+        } catch (err) { toast("That code didn’t work. Copy the whole code again and paste it here."); }
+        break;
+      }
+    }
+  });
+
+  document.addEventListener("change", e => {
+    const t = e.target, d = t.dataset;
+    if (d.step) {
+      const id = d.step; S.done[id] = t.checked; if (!t.checked) delete S.done[id]; save();
+      if (t.checked) {
+        const i = ALL_STEPS.findIndex(s => s.id === id), s = ALL_STEPS[i];
+        const before = ALL_STEPS.slice(0, i).filter(x => !S.done[x.id]);
+        if (s.gate && !S.notes[id] && !(S.photos || []).some(p => p.step === id)) toast("Hold point checked. Record the inspector, date and result in its notes, and photograph it in the phone app.", "Add notes", () => gotoStep(id));
+        else if (before.length) toast(`${before.length} earlier step${before.length > 1 ? "s are" : " is"} still open. No step gets skipped.`, "Show me", () => gotoStep(before[0].id));
+        const ph = PHASES[s.pi];
+        if (phaseStats(ph).pct === 100 && !before.length) toast(`${ph.name} is complete.`, s.pi < PHASES.length - 1 ? "Next phase" : null, () => { openPhase = PHASES[s.pi + 1].id; openStep = null; render(); window.scrollTo({ top: 0 }); });
+      }
+      render(); return;
+    }
+    if (d.p) { S.profile[d.p] = d.p === "sqft" ? num(t.value) : t.value; if (d.p === "sqft") S.budget.sqft = num(t.value); save(); render(); return; }
+    if (d.pb) { S.profile[d.pb] = t.checked; save(); render(); return; }
+    if (d.permit) { S.permits[d.permit] = t.value; save(); render(); return; }
+    if (d.b) { S.budget[d.b] = num(t.value); if (d.b === "sqft") S.profile.sqft = num(t.value); save(); render(); return; }
+    if (d.vet) { S.vet[d.vet] = t.checked; save(); return; }
+    if (d.waiver) { const x = S.payments.find(p => p.id === d.waiver); if (x) { x.waiver = t.value; save(); render(); } return; }
+    if (d.insp) { const x = S.payments.find(p => p.id === d.insp); if (x) { x.inspected = t.checked; save(); render(); } return; }
+  });
+
+  document.addEventListener("input", e => {
+    const d = e.target.dataset;
+    if (d.note) { const v = e.target.value; if (v) S.notes[d.note] = v; else delete S.notes[d.note]; save(); }
+  });
+
+  document.addEventListener("submit", e => {
+    if (e.target.id !== "payForm") return;
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const amount = num(f.get("amount"));
+    if (!amount) { toast("Enter the amount you paid."); return; }
+    S.payments.push({ id: "p" + Date.now(), date: f.get("date"), payee: String(f.get("payee")).trim(), phase: f.get("phase"), amount, waiver: f.get("waiver"), inspected: !!f.get("inspected") });
+    save(); render();
+    toast(f.get("waiver") === "unconditional" ? "Payment logged" : "Payment logged. Get the lien waiver for it.");
+  });
+
+  document.addEventListener("change", e => { if (e.target.id === "phaseSelect") { openPhase = e.target.value; openStep = null; render(); } });
+
+  render();
+  startAccounts();
+})();
+</script>
+</body>
+</html>
